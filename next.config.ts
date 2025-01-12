@@ -1,7 +1,13 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: [
+      'cmdxd98sb0x3yprd.mangadex.network',
+      'uploads.mangadex.org',
+      'api.mangadex.org', // Add this line
+    ],
+  },
 };
 
 export default nextConfig;
