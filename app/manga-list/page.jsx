@@ -8,16 +8,21 @@ export default function MangaList() {
   const [mangas, setMangas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [error, setError] = useState(null); // Track error state
   const router = useRouter();
 
   useEffect(() => {
     const fetchMangas = async () => {
       try {
         setLoading(true);
+        setError(null); // Reset error before making request
         const response = await fetch(`/api/manga?page=${page}`);
+        if (!response.ok) throw new Error('Failed to fetch mangas');
         const data = await response.json();
-        setMangas((prev) => [...prev, ...(data.data || [])]);
+        console.log(data)
+        setMangas([ ...(data.data || [])]);
       } catch (error) {
+        setError(error.message || 'An unknown error occurred');
         console.error('Error fetching mangas:', error);
       } finally {
         setLoading(false);
@@ -33,6 +38,7 @@ export default function MangaList() {
   return (
     <div className="p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Discover Mangas</h1>
+      {error && <div className="text-center text-red-500 mb-4">{error}</div>} {/* Display error */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {mangas.map((manga) => {
           const {
@@ -49,14 +55,12 @@ export default function MangaList() {
             },
             relationships,
           } = manga;
-
-          // Find the cover art and use the new API endpoint
+          console.log(manga)
           const coverArt = relationships.find((rel) => rel.type === 'cover_art');
           const coverImageUrl = coverArt
-            ? `https://api.mangadex.org/cover/${coverArt.id}` // Use the new endpoint to fetch the image
-            : '/placeholder.png'; // Fallback if no cover art is found
+            ? `https://og.mangadex.org/og-image/manga/${id}`
+            : '';
 
-          // Extract author and artist names
           const author = relationships.find((rel) => rel.type === 'author');
           const artist = relationships.find((rel) => rel.type === 'artist');
           const authorName = author?.attributes?.name || 'Unknown Author';
@@ -70,11 +74,15 @@ export default function MangaList() {
             >
               <div className="relative h-48 w-full mb-4">
                 <Image
-                  src={coverImageUrl}
+                  src={coverImageUrl || '/placeholder.jpg'}
                   alt={title?.en || 'Unknown Title'}
-                  layout="fill"
+                  width={500}
+                  height={750}
+                  layout="responsive"
                   objectFit="cover"
                   className="rounded-lg"
+                  placeholder="blur"
+                  blurDataURL="/placeholder.jpg" // Base64 or a static image path
                 />
               </div>
               <h2 className="text-lg font-semibold truncate">{title?.en || 'Untitled'}</h2>

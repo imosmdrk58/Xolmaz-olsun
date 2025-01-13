@@ -4,20 +4,46 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const baseUrl = 'https://api.mangadex.org';
+  const limit = 50; // Limit for each API call
+  const maxBatches = 3; // Additional batches for add-ons
+  let allManga: any[] = [];
+  let offset = 0;
 
   try {
-    const mangaResponse = await axios.get(`${baseUrl}/manga`, {
-      params: {
-        limit: 10, // Fetch up to 10 manga for demonstration
-        includes: ['author', 'artist'],
-        order: { relevance: 'desc' },
-      },
-    });
+    // Fetch manga ordered by follower count
+    for (let i = 0; i < maxBatches; i++) {
+      const response = await axios.get(`${baseUrl}/manga`, {
+        params: {
+          limit,
+          offset,
+          includes: ['id', 'title', 'cover_art'],
+          order: { followedCount: 'desc' }, // Order by follower count
+        },
+      });
 
-    return NextResponse.json(mangaResponse.data); // Return the manga list
+      if (response.status === 200) {
+        const data = response.data.data.filter(
+          (manga: any) => manga.attributes.latestUploadedChapter !== null
+        );
+        allManga = allManga.concat(data);
+      } else {
+        console.error(`Failed to fetch manga for batch offset: ${offset}`);
+      }
+      offset += limit;
+    }
+
+    // Remove duplicates (if any)
+    const uniqueManga = Array.from(
+      new Map(allManga.map((manga: any) => [manga.id, manga])).values()
+    );
+
+    return NextResponse.json({ data: uniqueManga });
   } catch (error: any) {
-    const errorMessage = error?.message || 'An unknown error occurred';
+    const errorMessage = error?.response?.data?.errors || error?.message || 'An unknown error occurred';
     console.error('Error fetching manga list:', errorMessage);
-    return NextResponse.json({ error: 'Failed to fetch manga list', details: errorMessage });
+    return NextResponse.json(
+      { error: 'Failed to fetch manga list', details: errorMessage },
+      { status: 500 }
+    );
   }
 }

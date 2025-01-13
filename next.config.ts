@@ -5,7 +5,8 @@ const nextConfig: NextConfig = {
     domains: [
       'cmdxd98sb0x3yprd.mangadex.network',
       'uploads.mangadex.org',
-      'api.mangadex.org', // Add this line
+      'api.mangadex.org',
+      'og.mangadex.org'
     ],
   },
 };
