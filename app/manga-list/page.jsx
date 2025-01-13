@@ -2,127 +2,153 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import MangaCard from "../Components/MangaCard";
+import AsideComponent from "../Components/AsideComponent";
 
 export default function MangaList() {
   const [mangas, setMangas] = useState([]);
+  const [latestMangas, setLatestMangas] = useState([]);
+  const [processedMangas, setProcessedMangas] = useState([]);
+  const [processedLatestMangas, setProcessedLatestMangas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [error, setError] = useState(null); // Track error state
+  const [error, setError] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchMangas = async () => {
-      try {
-        setLoading(true);
-        setError(null); // Reset error before making request
-        const response = await fetch(`/api/manga?page=${page}`);
-        if (!response.ok) throw new Error('Failed to fetch mangas');
-        const data = await response.json();
-        console.log(data)
-        setMangas([ ...(data.data || [])]);
-      } catch (error) {
-        setError(error.message || 'An unknown error occurred');
-        console.error('Error fetching mangas:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMangas();
-  }, [page]);
-
-  const loadMoreMangas = () => {
-    setPage((prevPage) => prevPage + 1);
+  const clearAndSaveToLocalStorage = (key, data) => {
+    localStorage.removeItem(key);
+    localStorage.setItem(key, JSON.stringify(data));
   };
 
+  const fetchMangas = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch main mangas
+      const response = await fetch(`/api/manga?page=${page}`);
+      if (!response.ok) throw new Error('Failed to fetch mangas');
+      const data = await response.json();
+      const newMangas = data.data || [];
+      setMangas((prevMangas) => [...prevMangas, ...newMangas]);
+
+      // Fetch latest mangas
+      const additionalResponse = await fetch(`/api/manga/latest?page=${page}`);
+      if (!additionalResponse.ok) throw new Error('Failed to fetch latest manga details');
+      const additionalData = await additionalResponse.json();
+      const newLatestMangas = additionalData.data || [];
+      setLatestMangas((prevMangas) => [...prevMangas, ...newLatestMangas]);
+
+      // Save fetched data to local storage
+      clearAndSaveToLocalStorage('mangas', [...mangas, ...newMangas]);
+      clearAndSaveToLocalStorage('latestMangas', [...latestMangas, ...newLatestMangas]);
+    } catch (error) {
+      setError(error.message || 'An unknown error occurred');
+      console.error('Error fetching mangas:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const processMangaData = async (mangaList) => {
+    return await Promise.all(
+      mangaList.map(async (manga) => {
+        const {
+          id,
+          attributes: { title, description, altTitles, contentRating, status, year, updatedAt, tags },
+          relationships,
+        } = manga;
+
+        const coverArt = relationships.find((rel) => rel.type === 'cover_art');
+        const coverImageUrl = coverArt ? `https://og.mangadex.org/og-image/manga/${id}` : '';
+
+        const author = relationships.find((rel) => rel.type === 'author');
+        const artist = relationships.find((rel) => rel.type === 'artist');
+        const authorName = author?.attributes?.name || 'Unknown Author';
+        const artistName = artist?.attributes?.name || 'Unknown Artist';
+
+        let rating = 0;
+        try {
+          const ratingResponse = await fetch(`https://api.mangadex.org/statistics/manga/${id}`);
+          if (ratingResponse.ok) {
+            const ratingData = await ratingResponse.json();
+            rating = ratingData.statistics[id] || 0;
+          }
+        } catch (err) {
+          console.error(`Error fetching rating for manga ID ${id}:`, err);
+        }
+
+        return {
+          id,
+          title: title?.en || Object?.values(altTitles[0])[0] || 'Untitled',
+          description: description?.en || 'No description available for this manga.',
+          altTitle: Object.values(altTitles[0] ?? { none: "N/A" })[0] || 'N/A',
+          contentRating: contentRating || 'N/A',
+          status: status || 'Unknown',
+          year: year || 'N/A',
+          updatedAt: updatedAt ? new Date(updatedAt) : 'N/A',
+          tags: tags.map((tag) => tag.attributes?.name?.en || 'Unknown Tag'),
+          coverImageUrl,
+          authorName,
+          artistName,
+          rating,
+        };
+      })
+    );
+  };
+
+  useEffect(() => {
+    const storedMangas = JSON.parse(localStorage.getItem('mangas') || '[]');
+    const storedLatestMangas = JSON.parse(localStorage.getItem('latestMangas') || '[]');
+
+    if (Array.isArray(storedMangas) && Array.isArray(storedLatestMangas)) {
+      setMangas(storedMangas);
+      setLatestMangas(storedLatestMangas);
+    } else {
+      fetchMangas();
+    }
+  }, [page]);
+
+  useEffect(() => {
+    (async () => {
+      const processed = await processMangaData(mangas);
+      setProcessedMangas(processed);
+
+      const processedLatest = await processMangaData(latestMangas);
+      setProcessedLatestMangas(processedLatest);
+    })();
+  }, [mangas, latestMangas]);
+
+  const loadMoreMangas = () => setPage((prevPage) => prevPage + 1);
+
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Discover Mangas</h1>
-      {error && <div className="text-center text-red-500 mb-4">{error}</div>} {/* Display error */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {mangas.map((manga) => {
-          const {
-            id,
-            attributes: {
-              title,
-              description,
-              altTitles,
-              contentRating,
-              status,
-              year,
-              updatedAt,
-              tags,
-            },
-            relationships,
-          } = manga;
-          console.log(manga)
-          const coverArt = relationships.find((rel) => rel.type === 'cover_art');
-          const coverImageUrl = coverArt
-            ? `https://og.mangadex.org/og-image/manga/${id}`
-            : '';
-
-          const author = relationships.find((rel) => rel.type === 'author');
-          const artist = relationships.find((rel) => rel.type === 'artist');
-          const authorName = author?.attributes?.name || 'Unknown Author';
-          const artistName = artist?.attributes?.name || 'Unknown Artist';
-
-          return (
-            <div
-              key={id}
-              className="p-4 bg-white shadow rounded-lg hover:shadow-lg transition cursor-pointer"
-              onClick={() => router.push(`/manga/${id}/chapters`)}
+    <div className="min-h-screen w-full bg-gray-900 text-white p-6">
+      <h1 className="text-4xl font-bold text-center mb-8 text-indigo-400">Discover Mangas</h1>
+      {error && <div className="text-center text-red-500 mb-4">{error}</div>}
+      <div className="flex flex-row justify-between items-start gap-3">
+        <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-3 gap-6">
+          {processedLatestMangas.map((manga) => (
+            <a
+              key={manga.id}
+              href={`http://localhost:3000/manga/${manga.id}/chapters`}
+              className="group p-4 bg-gray-800 shadow-lg rounded-lg hover:shadow-xl transition cursor-pointer hover:bg-gray-700"
             >
-              <div className="relative h-48 w-full mb-4">
-                <Image
-                  src={coverImageUrl || '/placeholder.jpg'}
-                  alt={title?.en || 'Unknown Title'}
-                  width={500}
-                  height={750}
-                  layout="responsive"
-                  objectFit="cover"
-                  className="rounded-lg"
-                  placeholder="blur"
-                  blurDataURL="/placeholder.jpg" // Base64 or a static image path
-                />
-              </div>
-              <h2 className="text-lg font-semibold truncate">{title?.en || 'Untitled'}</h2>
-              <p className="text-sm text-gray-600 truncate">
-                Alternative Title: {altTitles?.[0]?.ja || 'N/A'}
-              </p>
-              <p className="text-sm text-gray-600 truncate">Author: {authorName}</p>
-              <p className="text-sm text-gray-600 truncate">Artist: {artistName}</p>
-              <p className="text-sm text-gray-600 truncate">Content Rating: {contentRating}</p>
-              <p className="text-sm text-gray-600 truncate">Status: {status || 'Unknown'}</p>
-              <p className="text-sm text-gray-600 truncate">Year: {year || 'N/A'}</p>
-              <p className="text-sm text-gray-600 truncate">
-                Updated: {new Date(updatedAt).toLocaleDateString()}
-              </p>
-              <p className="text-sm text-gray-600 line-clamp-3">
-                {description?.en ||
-                  'No description available for this manga. Click to learn more.'}
-              </p>
-              <div className="flex flex-wrap mt-2">
-                {tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 text-xs bg-gray-200 rounded-full mr-2 mb-2"
-                  >
-                    {tag.attributes?.name?.en || 'Unknown Tag'}
-                  </span>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+              <MangaCard id={manga.id} manga={manga} />
+            </a>
+          ))}
+        </div>
+        <div className='w-4/12'>
+        <AsideComponent memoizedMangas={processedMangas} />
+        </div>
 
+      </div>
       {loading ? (
-        <div className="text-center mt-6">Loading more mangas...</div>
+        <div className="text-center mt-6 text-indigo-400">Loading more mangas...</div>
       ) : (
         <div className="text-center mt-6">
           <button
             onClick={loadMoreMangas}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
           >
             Load More
           </button>

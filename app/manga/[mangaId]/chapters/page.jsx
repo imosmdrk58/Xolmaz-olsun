@@ -37,38 +37,37 @@ export default function MangaChapters() {
 
     fetchChapters();
   }, [mangaId]);
-console.log(chapters)
+
   const memoizedChapters = useMemo(() => chapters, [chapters]);
 
-  if (loading) return <div className="text-center text-lg">Loading chapters...</div>;
+  if (loading) return <div className="text-center text-lg text-white">Loading chapters...</div>;
   if (error) return <div className="text-center text-lg text-red-500">{error}</div>;
-  if (!memoizedChapters.length) return <div className="text-center text-lg">No chapters found for this manga.</div>;
+  if (!memoizedChapters.length) return <div className="text-center text-lg text-white">No chapters found for this manga.</div>;
 
   return (
-    <div className="max-w-4xl mx-auto px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Chapters</h1>
-      <ul className="space-y-4">
+    <div className="w-full min-h-screen bg-gray-900 text-white py-10 px-6 sm:px-12">
+      <h1 className="text-4xl font-extrabold mb-8 text-center text-indigo-400">Chapters</h1>
+      <ul className="grid grid-cols-2  gap-8">
         {memoizedChapters.map((chapter) => (
           <li
             key={chapter.id}
             onClick={() => router.push(`/chapter/${chapter.id}/read`)}
-            className="p-4 border rounded-lg cursor-pointer hover:bg-gray-100 transition duration-200 flex items-center space-x-4"
+            className="p-6 border-2 border-gray-700 rounded-xl cursor-pointer hover:bg-gray-700 hover:shadow-2xl transition-all duration-300 ease-in-out flex items-center space-x-6 transform hover:scale-105"
           >
-            <div className="flex-shrink-0 w-24 h-32 relative">
+            <div className="flex-shrink-0 w-32 h-24 relative rounded-lg overflow-hidden shadow-md">
               <Image
                 src={chapter.url}
                 alt={`Cover for Chapter ${chapter.chapter}`}
-                layout="fill"
-                objectFit="cover"
+                fill
                 className="rounded-md"
                 loading="lazy"
               />
             </div>
             <div className="flex-grow">
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-xl font-semibold text-white mb-3">
                 Chapter {chapter.chapter} - {chapter.title || 'Untitled'}
               </div>
-              <div className="text-sm text-gray-500">Total Pages: {chapter.pageCount || 'Unknown'}</div>
+              <div className="text-sm text-gray-400">Total Pages: {chapter.pageCount || 'Unknown'}</div>
             </div>
           </li>
         ))}
