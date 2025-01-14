@@ -15,8 +15,8 @@ export default function MangaList() {
   const [error, setError] = useState(null);
   const router = useRouter();
 
+ 
   const clearAndSaveToLocalStorage = (key, data) => {
-    localStorage.removeItem(key);
     localStorage.setItem(key, JSON.stringify(data));
   };
 
@@ -25,23 +25,22 @@ export default function MangaList() {
       setLoading(true);
       setError(null);
 
-      // Fetch main mangas
       const response = await fetch(`/api/manga?page=${page}`);
       if (!response.ok) throw new Error('Failed to fetch mangas');
       const data = await response.json();
       const newMangas = data.data || [];
       setMangas((prevMangas) => [...prevMangas, ...newMangas]);
 
-      // Fetch latest mangas
       const additionalResponse = await fetch(`/api/manga/latest?page=${page}`);
       if (!additionalResponse.ok) throw new Error('Failed to fetch latest manga details');
       const additionalData = await additionalResponse.json();
       const newLatestMangas = additionalData.data || [];
       setLatestMangas((prevMangas) => [...prevMangas, ...newLatestMangas]);
 
-      // Save fetched data to local storage
       clearAndSaveToLocalStorage('mangas', [...mangas, ...newMangas]);
       clearAndSaveToLocalStorage('latestMangas', [...latestMangas, ...newLatestMangas]);
+
+      localStorage.setItem('lastRefreshed', Date.now().toString());
     } catch (error) {
       setError(error.message || 'An unknown error occurred');
       console.error('Error fetching mangas:', error);
@@ -98,15 +97,24 @@ export default function MangaList() {
   };
 
   useEffect(() => {
-    const storedMangas = JSON.parse(localStorage.getItem('mangas') || '[]');
-    const storedLatestMangas = JSON.parse(localStorage.getItem('latestMangas') || '[]');
+    const checkLastRefresh = async () => {
+      const lastRefreshed = parseInt(localStorage.getItem('lastRefreshed') || '0', 10);
+      const currentTime = Date.now();
 
-    if (Array.isArray(storedMangas) && Array.isArray(storedLatestMangas)) {
-      setMangas(storedMangas);
-      setLatestMangas(storedLatestMangas);
-    } else {
-      fetchMangas();
-    }
+      if (!lastRefreshed || currentTime - lastRefreshed > 15 * 60 * 1000) {
+        await fetchMangas();
+      } else {
+        const storedMangas = JSON.parse(localStorage.getItem('mangas') || '[]');
+        const storedLatestMangas = JSON.parse(localStorage.getItem('latestMangas') || '[]');
+
+        if (Array.isArray(storedMangas) && Array.isArray(storedLatestMangas)) {
+          setMangas(storedMangas);
+          setLatestMangas(storedLatestMangas);
+        }
+      }
+    };
+
+    checkLastRefresh();
   }, [page]);
 
   useEffect(() => {
@@ -128,19 +136,24 @@ export default function MangaList() {
       <div className="flex flex-row justify-between items-start gap-3">
         <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-3 gap-6">
           {processedLatestMangas.map((manga) => (
-            <a
-              key={manga.id}
-              href={`http://localhost:3000/manga/${manga.id}/chapters`}
-              className="group p-4 bg-gray-800 shadow-lg rounded-lg hover:shadow-xl transition cursor-pointer hover:bg-gray-700"
-            >
-              <MangaCard id={manga.id} manga={manga} />
-            </a>
+            <div
+            key={manga.id}
+            onClick={() =>
+              router.push(
+                `/manga/${manga.id}/chapters?manga=${encodeURIComponent(
+                  JSON.stringify(manga)
+                )}`
+              )
+            }            
+            className="group p-4 bg-gray-800 shadow-lg rounded-lg hover:shadow-xl transition cursor-pointer hover:bg-gray-700"
+          >
+            <MangaCard id={manga.id} manga={manga} />
+          </div>
           ))}
         </div>
         <div className='w-4/12'>
-        <AsideComponent memoizedMangas={processedMangas} />
+          <AsideComponent memoizedMangas={processedMangas} />
         </div>
-
       </div>
       {loading ? (
         <div className="text-center mt-6 text-indigo-400">Loading more mangas...</div>

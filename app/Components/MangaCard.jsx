@@ -2,7 +2,6 @@
 import Image from "next/image";
 
 const MangaCard = ({ manga }) => {
-    console.log(manga);
     return (
         <div className="max-w-sm bg-gray-900 hover:scale-[101%] rounded-lg shadow-lg overflow-hidden group">
             <div className="relative h-60">
