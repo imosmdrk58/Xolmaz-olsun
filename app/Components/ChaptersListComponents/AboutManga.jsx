@@ -54,7 +54,7 @@ const AboutManga = ({ manga }) => {
                                             <Image width={24} height={24} src='/author.svg' alt="author" />
                                             <span>Author</span>
                                         </p>
-                                        <p className="pl-10  text-white">{manga.authorName}</p>
+                                        <p className="pl-10  text-white">{manga.authorName.id}</p>
                                     </li>
                                     <li className="flex flex-row gap-3">
                                         <p className="text-sm font-medium text-gray-400 flex items-center gap-2">

@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import MangaCard from "../Components/MangaCard";
-import AsideComponent from "../Components/AsideComponent";
+import MangaCard from "../Components/MangaListComponents/MangaCard";
+import AsideComponent from "../Components/MangaListComponents/AsideComponent";
 
 export default function MangaList() {
   const [mangas, setMangas] = useState([]);
@@ -54,7 +54,7 @@ export default function MangaList() {
       mangaList.map(async (manga) => {
         const {
           id,
-          attributes: { 
+          attributes: {
             title,
             links,
             availableTranslatedLanguages,
@@ -76,15 +76,15 @@ export default function MangaList() {
           acc[rel.type].push(rel);
           return acc;
         }, {});
-        
+
         // Extract specific data
         const coverArt = grouped.cover_art?.[0]?.attributes?.fileName;
         // const images = coverArt ? `https://og.mangadex.org/og-image/manga/${id}` : '';
-        const coverImageUrl=`https://mangadex.org/covers/${id}/${coverArt}.256.jpg`
+        const coverImageUrl = `https://mangadex.org/covers/${id}/${coverArt}.256.jpg`
         const authorName = grouped.author;
         const artistName = grouped.artist;
-        const creatorName = grouped.creator??"N/A";
-        const MangaStoryType = grouped.manga??"N/A";
+        const creatorName = grouped.creator ?? "N/A";
+        const MangaStoryType = grouped.manga ?? "N/A";
         let rating = 0;
         try {
           const ratingResponse = await fetch(`https://api.mangadex.org/statistics/manga/${id}`);
@@ -158,8 +158,8 @@ export default function MangaList() {
       <h1 className="text-4xl font-bold text-center mb-8 text-indigo-400">Discover Mangas</h1>
       {error && <div className="text-center text-red-500 mb-4">{error}</div>}
       <div className="flex flex-row justify-between items-start gap-3">
-        <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {processedLatestMangas.map((manga) => (
+        <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 space-y-4 lg:grid-cols-5 gap-1">
+          {processedLatestMangas.map((manga,index) => (
             <div
               key={manga.id}
               onClick={() =>
@@ -169,14 +169,69 @@ export default function MangaList() {
                   )}`
                 )
               }
-              className="group cursor-pointer"
+              className={`group cursor-pointer ${index==0?"mt-4":""}`}
             >
               <MangaCard id={manga.id} manga={manga} />
             </div>
           ))}
         </div>
         <div className='w-4/12'>
-          <AsideComponent memoizedMangas={processedMangas} />
+          <div className="bg-gray-900 text-white px-4 rounded-lg shadow-lg w-full">
+
+            {/* Section Header */}
+            <div className="mb-6 flex items-center justify-between gap-3">
+              <h2 className="flex items-center gap-2.5 w-full justify-center text-2xl font-bold text-yellow-300 tracking-wide">
+                <img src="/trophy.svg" alt="Trophy" className="w-6 h-6" />
+                <span>This Month's Rankings</span>
+              </h2>
+            </div>
+
+            {/* Tab Section */}
+            <div className="w-full bg-gradient-to-r from-gray-700 to-gray-800 p-2.5 rounded-lg mb-6">
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { 'Top': 'star.svg' },
+                  { 'Favourite': 'heart.svg' },
+                  { 'New': 'clock.svg' },
+                ].map((category, index) => {
+                  const categoryName = Object.keys(category)[0];
+                  const icon = category[categoryName];
+
+                  return (
+                    <button
+                      key={index}
+                      className="flex items-center justify-center gap-1.5 text-sm font-semibold text-gray-300 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    >
+                      <img
+                        src={`/${icon}`}
+                        alt={categoryName}
+                        className="w-4 h-4"
+                      />
+                      {categoryName}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div>
+              <ul className="flex flex-col">
+                {processedMangas.slice(0, 10).map((manga, index) => (
+                  <li
+                  onClick={() =>
+                    router.push(
+                      `/manga/${manga.id}/chapters?manga=${encodeURIComponent(
+                        JSON.stringify(manga)
+                      )}`
+                    )
+                  }
+                    key={manga.id}
+                  >
+                    <AsideComponent manga={manga} index={index} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
       {loading ? (

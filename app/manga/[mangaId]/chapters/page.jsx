@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import AboutManga from "../../../Components/AboutManga"
+import AboutManga from "../../../Components/ChaptersListComponents/AboutManga"
 export default function MangaChapters() {
   const { mangaId } = useParams();
   const [chapters, setChapters] = useState([]);
