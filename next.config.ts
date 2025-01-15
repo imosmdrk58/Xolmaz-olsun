@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
       'cmdxd98sb0x3yprd.mangadex.network',
       'uploads.mangadex.org',
       'api.mangadex.org',
-      'og.mangadex.org'
+      'og.mangadex.org',
+      'mangadex.org',
     ],
   },
 };

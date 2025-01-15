@@ -15,7 +15,7 @@ export default function MangaList() {
   const [error, setError] = useState(null);
   const router = useRouter();
 
- 
+
   const clearAndSaveToLocalStorage = (key, data) => {
     localStorage.setItem(key, JSON.stringify(data));
   };
@@ -54,18 +54,37 @@ export default function MangaList() {
       mangaList.map(async (manga) => {
         const {
           id,
-          attributes: { title, description, altTitles, contentRating, status, year, updatedAt, tags },
+          attributes: { 
+            title,
+            links,
+            availableTranslatedLanguages,
+            latestUploadedChapter,
+            originalLanguage,
+            description,
+            altTitles,
+            contentRating,
+            status,
+            year,
+            updatedAt,
+            tags
+          },
           relationships,
         } = manga;
 
-        const coverArt = relationships.find((rel) => rel.type === 'cover_art');
-        const coverImageUrl = coverArt ? `https://og.mangadex.org/og-image/manga/${id}` : '';
-
-        const author = relationships.find((rel) => rel.type === 'author');
-        const artist = relationships.find((rel) => rel.type === 'artist');
-        const authorName = author?.attributes?.name || 'Unknown Author';
-        const artistName = artist?.attributes?.name || 'Unknown Artist';
-
+        const grouped = relationships.reduce((acc, rel) => {
+          if (!acc[rel.type]) acc[rel.type] = [];
+          acc[rel.type].push(rel);
+          return acc;
+        }, {});
+        
+        // Extract specific data
+        const coverArt = grouped.cover_art?.[0]?.attributes?.fileName;
+        // const images = coverArt ? `https://og.mangadex.org/og-image/manga/${id}` : '';
+        const coverImageUrl=`https://mangadex.org/covers/${id}/${coverArt}.256.jpg`
+        const authorName = grouped.author;
+        const artistName = grouped.artist;
+        const creatorName = grouped.creator??"N/A";
+        const MangaStoryType = grouped.manga??"N/A";
         let rating = 0;
         try {
           const ratingResponse = await fetch(`https://api.mangadex.org/statistics/manga/${id}`);
@@ -91,6 +110,12 @@ export default function MangaList() {
           authorName,
           artistName,
           rating,
+          links,
+          creatorName,
+          MangaStoryType,
+          availableTranslatedLanguages,
+          latestUploadedChapter,
+          originalLanguage,
         };
       })
     );
@@ -116,7 +141,6 @@ export default function MangaList() {
 
     checkLastRefresh();
   }, [page]);
-
   useEffect(() => {
     (async () => {
       const processed = await processMangaData(mangas);
@@ -134,21 +158,21 @@ export default function MangaList() {
       <h1 className="text-4xl font-bold text-center mb-8 text-indigo-400">Discover Mangas</h1>
       {error && <div className="text-center text-red-500 mb-4">{error}</div>}
       <div className="flex flex-row justify-between items-start gap-3">
-        <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-3 gap-6">
+        <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {processedLatestMangas.map((manga) => (
             <div
-            key={manga.id}
-            onClick={() =>
-              router.push(
-                `/manga/${manga.id}/chapters?manga=${encodeURIComponent(
-                  JSON.stringify(manga)
-                )}`
-              )
-            }            
-            className="group p-4 bg-gray-800 shadow-lg rounded-lg hover:shadow-xl transition cursor-pointer hover:bg-gray-700"
-          >
-            <MangaCard id={manga.id} manga={manga} />
-          </div>
+              key={manga.id}
+              onClick={() =>
+                router.push(
+                  `/manga/${manga.id}/chapters?manga=${encodeURIComponent(
+                    JSON.stringify(manga)
+                  )}`
+                )
+              }
+              className="group cursor-pointer"
+            >
+              <MangaCard id={manga.id} manga={manga} />
+            </div>
           ))}
         </div>
         <div className='w-4/12'>
