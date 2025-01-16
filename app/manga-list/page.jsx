@@ -96,6 +96,28 @@ export default function MangaList() {
           console.error(`Error fetching rating for manga ID ${id}:`, err);
         }
 
+        const groupedTags = tags?.reduce((acc, tag) => {
+          const group = tag.attributes?.group || 'Unknown Group';
+          const tagName = tag.attributes?.name?.en || 'Unknown Tag';
+          
+          // Initialize the group if it doesn't exist
+          if (!acc[group]) {
+            acc[group] = new Set();
+          }
+          
+          // Add the tag to the appropriate group, using a Set to ensure uniqueness
+          acc[group].add(tagName);
+          
+          return acc;
+        }, {});
+        
+        // Convert grouped tags (Sets) to arrays
+        const groupedTagsArray = Object.keys(groupedTags).map((group) => ({
+          group,
+          tags: Array.from(groupedTags[group]),
+        }));
+        
+        
         return {
           id,
           title: title?.en || Object?.values(altTitles[0])[0] || 'Untitled',
@@ -105,7 +127,8 @@ export default function MangaList() {
           status: status || 'Unknown',
           year: year || 'N/A',
           updatedAt: updatedAt ? new Date(updatedAt) : 'N/A',
-          tags: tags.map((tag) => tag.attributes?.name?.en || 'Unknown Tag'),
+          tags: groupedTagsArray,
+          flatTags:tags.map((tag) => tag.attributes?.name?.en || 'Unknown Tag'),
           coverImageUrl,
           authorName,
           artistName,

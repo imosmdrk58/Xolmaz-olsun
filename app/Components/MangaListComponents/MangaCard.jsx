@@ -86,7 +86,7 @@ const MangaCard = ({ manga }) => {
                                 {manga.contentRating.toUpperCase()}
                             </span>
 
-                            {manga.tags.slice(0, 4).map((tag) => (
+                            {manga.flatTags.slice(0, 4).map((tag) => (
                                 <span
                                     key={tag}
                                     className="bg-gray-900 text-nowrap shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 p-1 rounded-lg border border-gray-800 text-xs transition-colors"

@@ -1,5 +1,6 @@
-import './globals.css'; // Import your Tailwind CSS or other global styles
-import TopNavbar from './Components/TopNavbar'; // Adjust the path based on your folder structure
+/* eslint-disable @next/next/no-sync-scripts */
+import './globals.css'; 
+import TopNavbar from './Components/TopNavbar'; 
 
 export const metadata = {
   title: 'Manga Reader',
@@ -9,6 +10,9 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+      </head>
       <body className="bg-gray-100 text-black">
         <TopNavbar />
         <main>{children}</main>
