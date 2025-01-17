@@ -123,6 +123,7 @@ export default function MangaList() {
           title: title?.en || Object?.values(altTitles[0])[0] || 'Untitled',
           description: description?.en || 'No description available for this manga.',
           altTitle: Object.values(altTitles[0] ?? { none: "N/A" })[0] || 'N/A',
+          altTitles,
           contentRating: contentRating || 'N/A',
           status: status || 'Unknown',
           year: year || 'N/A',

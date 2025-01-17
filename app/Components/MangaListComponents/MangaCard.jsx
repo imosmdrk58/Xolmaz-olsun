@@ -23,6 +23,7 @@ const MangaCard = ({ manga }) => {
         zh: "CN", // Chinese
     };
 
+    console.log(manga)
     const countryCode = langToCountryMap[manga.originalLanguage] || "UN"; // UN for unknown flag
     return (
         <>
