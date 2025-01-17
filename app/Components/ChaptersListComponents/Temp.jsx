@@ -77,7 +77,7 @@ const Temp = ({ manga, handleChapterClick }) => {
 
 
                 <div className="flex relative z-20 gap-6 flex-row">
-                <div className="relative w-52 h-[295px] group mb-auto select-none">
+                <div className="relative w-96 h-[295px] group mb-auto select-none">
   <a
     href={manga.coverImageUrl}
     target="_self"

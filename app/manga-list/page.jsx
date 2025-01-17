@@ -4,19 +4,20 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import MangaCard from "../Components/MangaListComponents/MangaCard";
 import AsideComponent from "../Components/MangaListComponents/AsideComponent";
-
+import SliderComponent from "../Components/MangaListComponents/SliderComponent";
 export default function MangaList() {
   const [mangas, setMangas] = useState([]);
   const [latestMangas, setLatestMangas] = useState([]);
+  const [randomMangas, setRandomMangas] = useState([]);
   const [processedMangas, setProcessedMangas] = useState([]);
   const [processedLatestMangas, setProcessedLatestMangas] = useState([]);
+  const [processedRandomMangas, setProcessedRandomMangas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [error, setError] = useState(null);
   const router = useRouter();
 
-
-  const clearAndSaveToLocalStorage = (key, data) => {
+  const saveToLocalStorage = (key, data) => {
     localStorage.setItem(key, JSON.stringify(data));
   };
 
@@ -25,21 +26,34 @@ export default function MangaList() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/manga?page=${page}`);
-      if (!response.ok) throw new Error('Failed to fetch mangas');
-      const data = await response.json();
-      const newMangas = data.data || [];
-      setMangas((prevMangas) => [...prevMangas, ...newMangas]);
+      const [mangaResponse, latestMangaResponse, randomMangaResponse] = await Promise.all([
+        fetch(`/api/manga?page=${page}`),
+        fetch(`/api/manga/latest?page=${page}`),
+        fetch(`/api/manga/random?page=${page}`),
+      ]);
 
-      const additionalResponse = await fetch(`/api/manga/latest?page=${page}`);
-      if (!additionalResponse.ok) throw new Error('Failed to fetch latest manga details');
-      const additionalData = await additionalResponse.json();
-      const newLatestMangas = additionalData.data || [];
-      setLatestMangas((prevMangas) => [...prevMangas, ...newLatestMangas]);
+      if (!mangaResponse.ok || !latestMangaResponse.ok || !randomMangaResponse.ok) {
+        throw new Error('Failed to fetch mangas');
+      }
 
-      clearAndSaveToLocalStorage('mangas', [...mangas, ...newMangas]);
-      clearAndSaveToLocalStorage('latestMangas', [...latestMangas, ...newLatestMangas]);
+      const mangaData = await mangaResponse.json();
+      const latestMangaData = await latestMangaResponse.json();
+      const randomMangaData = await randomMangaResponse.json();
 
+      const newMangas = mangaData.data || [];
+      const newLatestMangas = latestMangaData.data || [];
+      const newRandomMangas = randomMangaData.data || [];
+
+      // Merge and remove duplicates
+      const uniqueMangas = [...new Map([...mangas, ...newMangas].map((m) => [m.id, m])).values()];
+      const uniqueLatestMangas = [...new Map([...latestMangas, ...newLatestMangas].map((m) => [m.id, m])).values()];
+
+      setMangas(uniqueMangas);
+      setLatestMangas(uniqueLatestMangas);
+      setRandomMangas(newRandomMangas)
+      saveToLocalStorage('mangas', uniqueMangas);
+      saveToLocalStorage('latestMangas', uniqueLatestMangas);
+      saveToLocalStorage('randomMangas', newRandomMangas);
       localStorage.setItem('lastRefreshed', Date.now().toString());
     } catch (error) {
       setError(error.message || 'An unknown error occurred');
@@ -146,7 +160,7 @@ export default function MangaList() {
   };
 
   useEffect(() => {
-    const checkLastRefresh = async () => {
+    const initializeData = async () => {
       const lastRefreshed = parseInt(localStorage.getItem('lastRefreshed') || '0', 10);
       const currentTime = Date.now();
 
@@ -155,35 +169,40 @@ export default function MangaList() {
       } else {
         const storedMangas = JSON.parse(localStorage.getItem('mangas') || '[]');
         const storedLatestMangas = JSON.parse(localStorage.getItem('latestMangas') || '[]');
-
-        if (Array.isArray(storedMangas) && Array.isArray(storedLatestMangas)) {
-          setMangas(storedMangas);
-          setLatestMangas(storedLatestMangas);
-        }
+        const storedRandomMangas = JSON.parse(localStorage.getItem('randomMangas') || '[]');
+        setMangas(storedMangas);
+        setLatestMangas(storedLatestMangas);
+        setRandomMangas(storedRandomMangas)
       }
     };
 
-    checkLastRefresh();
-  }, [page]);
+    initializeData();
+  }, []);
+
   useEffect(() => {
     (async () => {
-      const processed = await processMangaData(mangas);
-      setProcessedMangas(processed);
-
-      const processedLatest = await processMangaData(latestMangas);
-      setProcessedLatestMangas(processedLatest);
+      setProcessedMangas(await processMangaData(mangas));
+      setProcessedLatestMangas(await processMangaData(latestMangas));
+      setProcessedRandomMangas(await processMangaData(randomMangas) )
     })();
   }, [mangas, latestMangas]);
 
   const loadMoreMangas = () => setPage((prevPage) => prevPage + 1);
 
   return (
-    <div className="min-h-screen w-full bg-gray-900 text-white p-6">
-      <h1 className="text-4xl font-bold text-center mb-8 text-indigo-400">Discover Mangas</h1>
-      {error && <div className="text-center text-red-500 mb-4">{error}</div>}
+    <div className="min-h-screen w-full bg-gray-900 text-white p-6">    
+  {error &&
+    <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
+      <div className="text-center">
+        <p className="text-lg text-red-500">{error}</p>
+        <p className="text-sm text-gray-400">Please refresh or try again later.</p>
+      </div>
+    </div>
+  }
+  <SliderComponent processedRandomMangas={processedRandomMangas}/>
       <div className="flex flex-row justify-between items-start gap-3">
         <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 space-y-4 lg:grid-cols-5 gap-1">
-          {processedLatestMangas.map((manga,index) => (
+          {processedLatestMangas.map((manga, index) => (
             <div
               key={manga.id}
               onClick={() =>
@@ -193,13 +212,13 @@ export default function MangaList() {
                   )}`
                 )
               }
-              className={`group cursor-pointer ${index==0?"mt-4":""}`}
+              className={`group cursor-pointer ${index == 0 ? "mt-4" : ""}`}
             >
               <MangaCard id={manga.id} manga={manga} />
             </div>
           ))}
         </div>
-        <div className='w-4/12'>
+       {processedMangas.length>0 && <div className='w-4/12'>
           <div className="bg-gray-900 text-white px-4 rounded-lg shadow-lg w-full">
 
             {/* Section Header */}
@@ -210,7 +229,7 @@ export default function MangaList() {
               </h2>
             </div>
 
-            {/* Tab Section */}
+            
             <div className="w-full bg-gradient-to-r from-gray-700 to-gray-800 p-2.5 rounded-lg mb-6">
               <div className="grid grid-cols-3 gap-3">
                 {[
@@ -256,10 +275,15 @@ export default function MangaList() {
               </ul>
             </div>
           </div>
-        </div>
+        </div>}
       </div>
       {loading ? (
-        <div className="text-center mt-6 text-indigo-400">Loading more mangas...</div>
+          <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
+            <div className="text-center">
+              <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
+              <p className="text-lg">Loading Mangas...</p>
+            </div>
+          </div>
       ) : (
         <div className="text-center mt-6">
           <button

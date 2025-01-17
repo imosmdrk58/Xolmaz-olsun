@@ -1,7 +1,7 @@
 import React from 'react';
 
 function AsideComponent({ manga, index }) {
-
+// console.log(manga)
   return (
     <div className='relative flex w-full gap-5 py-3.5 items-center transition-all duration-300 hover:bg-gray-800 rounded-lg'>
       <div className="relative left-4 top-0 flex h-[72px] w-10 items-center justify-center text-right">
@@ -16,7 +16,7 @@ function AsideComponent({ manga, index }) {
         >
           <img
             className="w-full h-full object-cover rounded-lg"
-            src={manga.coverImageUrl}
+            src={manga?.coverImageUrl}
             alt={manga?.title ?? 'No title'}
           />
         </div>
