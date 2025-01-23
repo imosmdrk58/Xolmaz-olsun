@@ -1,29 +1,31 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
 import Temp from "../../../Components/ChaptersListComponents/Temp";
+import { useQuery } from '@tanstack/react-query';
+import { useMemo, useCallback } from 'react';
 
 export default function MangaChapters() {
   const { mangaId } = useParams();
-  const [chapters, setChapters] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const mangaParam = searchParams.get('manga');
-  const manga = mangaParam ? JSON.parse(mangaParam) : null;
 
-  const fetchChapters = useCallback(async () => {
-    try {
-      setLoading(true);
+  // Extract the manga param once, and keep it stable
+  const searchParams = useMemo(() => new URLSearchParams(window.location.search), []);
+  const manga = useMemo(() => {
+    const mangaParam = searchParams.get('manga');
+    return mangaParam ? JSON.parse(mangaParam) : null;
+  }, [searchParams]);
+
+  // Fetch chapters using useQuery with stable keys
+  const { data: chapters, isLoading, isError, error } = useQuery({
+    queryKey: ['chapters', mangaId], // Ensure the queryKey is an array
+    queryFn: async () => {
       const res = await fetch(`/api/manga/${mangaId}/chapters`);
       if (!res.ok) throw new Error('Failed to fetch chapters');
       const data = await res.json();
-
-      const filteredChapters = data.chapters
+  
+      return data.chapters
         .filter((chapter) => chapter.pageCount !== "Unknown")
         .sort((a, b) => {
           const chapterA = parseFloat(a.chapter);
@@ -32,52 +34,43 @@ export default function MangaChapters() {
           if (isNaN(chapterB)) return -1;
           return chapterA - chapterB;
         });
-
-      // Update state only if there's a change
-      setChapters((prev) => {
-        if (JSON.stringify(prev) !== JSON.stringify(filteredChapters)) {
-          return filteredChapters;
-        }
-        return prev;
-      });
-    } catch (err) {
-      setError(err.message || 'An error occurred while fetching chapters.');
-    } finally {
-      setLoading(false);
-    }
-  }, [mangaId]);
-
-  useEffect(() => {
-    fetchChapters();
-  }, [fetchChapters]);
-
-  const handleChapterClick = useCallback(
-    (id) => {
-      router.push(`/chapter/${id}/read`);
     },
-    [router]
-  );
+    staleTime: 60000, // Cache the result for 1 minute
+  });
+  
 
-  if (loading) return (
-    <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
-      <div className="text-center">
-        <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
-        <p className="text-lg">Loading chapters...</p>
-      </div>
-    </div>
-  );
+  // Stable event handler
+  const handleChapterClick = useCallback((id) => {
+    router.push(`/chapter/${id}/read`);
+  }, [router]);
 
-  if (error) return (
-    <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
-      <div className="text-center">
-        <p className="text-lg text-red-500">{error}</p>
-        <p className="text-sm text-gray-400">Please refresh or try again later.</p>
+  // Loading state
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
+        <div className="text-center">
+          <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
+          <p className="text-lg">Loading chapters...</p>
+        </div>
       </div>
-    </div>
-  );
-  if (!chapters.length)
+    );
+
+  // Error state
+  if (isError)
+    return (
+      <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
+        <div className="text-center">
+          <p className="text-lg text-red-500">{error instanceof Error ? error.message : 'An error occurred while fetching chapters.'}</p>
+          <p className="text-sm text-gray-400">Please refresh or try again later.</p>
+        </div>
+      </div>
+    );
+
+  // Empty state
+  if (!chapters?.length)
     return <div className="text-center text-lg bg-gray-900 w-full h-screen text-white">No chapters found for this manga.</div>;
 
+  // Render content
   return (
     <div className="w-full min-h-screen bg-gray-900 text-white py-10 px-6 sm:px-12">
       <Temp manga={manga} handleChapterClick={handleChapterClick} />

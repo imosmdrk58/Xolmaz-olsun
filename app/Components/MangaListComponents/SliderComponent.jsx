@@ -1,12 +1,12 @@
 import React, { useState, useEffect,useRef } from 'react';
 import Image from 'next/image';
 const SliderComponent = ({ processedRandomMangas }) => {
+    console.log(processedRandomMangas)
     const [active, setActive] = useState(0);
     const firstPosition = 0;
     const lastPosition = processedRandomMangas.length - 1;
     const interactionTimeoutRef = useRef(null); // Ref to track the timeout for resetting user interaction
     const autoPlayRef = useRef(null); // Ref to track the auto-play interval
-
     const startAutoPlay = () => {
         return setInterval(() => {
             setActive((prevActive) => (prevActive + 1 > lastPosition ? 0 : prevActive + 1));

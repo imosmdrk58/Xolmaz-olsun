@@ -22,7 +22,6 @@ export async function GET(req: Request, { params }: { params: { authorId: string
       biography: authorData.attributes.biography || 'No biography available',
     };
 
-    console.log(`Fetched author info:`, authorInfo);
     return NextResponse.json({ author: authorInfo });
   } catch (error: any) {
     console.error('Error fetching author info:', error.response?.data || error.message || error);
