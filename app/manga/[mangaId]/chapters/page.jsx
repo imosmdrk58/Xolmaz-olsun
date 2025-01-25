@@ -10,21 +10,19 @@ export default function MangaChapters() {
   const { mangaId } = useParams();
   const router = useRouter();
 
-  // Extract the manga param once, and keep it stable
-  const searchParams = useMemo(() => new URLSearchParams(window.location.search), []);
   const manga = useMemo(() => {
+    const searchParams = new URLSearchParams(window.location.search);
     const mangaParam = searchParams.get('manga');
     return mangaParam ? JSON.parse(mangaParam) : null;
-  }, [searchParams]);
+  }, []);
 
-  // Fetch chapters using useQuery with stable keys
   const { data: chapters, isLoading, isError, error } = useQuery({
-    queryKey: ['chapters', mangaId], // Ensure the queryKey is an array
+    queryKey: ['chapters', mangaId],
     queryFn: async () => {
       const res = await fetch(`/api/manga/${mangaId}/chapters`);
       if (!res.ok) throw new Error('Failed to fetch chapters');
       const data = await res.json();
-  
+
       return data.chapters
         .filter((chapter) => chapter.pageCount !== "Unknown")
         .sort((a, b) => {
@@ -35,17 +33,14 @@ export default function MangaChapters() {
           return chapterA - chapterB;
         });
     },
-    staleTime: 60000, // Cache the result for 1 minute
+    staleTime: 60000,
   });
-  
 
-  // Stable event handler
   const handleChapterClick = useCallback((id) => {
     router.push(`/chapter/${id}/read`);
   }, [router]);
 
-  // Loading state
-  if (isLoading)
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
         <div className="text-center">
@@ -54,9 +49,9 @@ export default function MangaChapters() {
         </div>
       </div>
     );
+  }
 
-  // Error state
-  if (isError)
+  if (isError) {
     return (
       <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
         <div className="text-center">
@@ -65,12 +60,12 @@ export default function MangaChapters() {
         </div>
       </div>
     );
+  }
 
-  // Empty state
-  if (!chapters?.length)
+  if (!chapters?.length) {
     return <div className="text-center text-lg bg-gray-900 w-full h-screen text-white">No chapters found for this manga.</div>;
+  }
 
-  // Render content
   return (
     <div className="w-full min-h-screen bg-gray-900 text-white py-10 px-6 sm:px-12">
       <Temp manga={manga} handleChapterClick={handleChapterClick} />

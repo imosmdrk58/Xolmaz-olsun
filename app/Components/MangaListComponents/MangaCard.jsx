@@ -6,13 +6,13 @@ const MangaCard = ({ manga }) => {
     const getRatingColor = (rating) => {
         switch (rating) {
             case "safe":
-                return "bg-green-600";
+                return "bg-green-600 border-green-600";
             case "suggestive":
-                return "bg-yellow-600";
+                return "bg-yellow-600 border-yellow-600";
             case "erotica":
-                return "bg-red-600";
+                return "bg-red-600 border-red-600";
             default:
-                return "bg-gray-600";
+                return "bg-gray-600 border-gray-600";
         }
     };
     const langToCountryMap = {
@@ -27,7 +27,14 @@ const MangaCard = ({ manga }) => {
     const countryCode = langToCountryMap[manga.originalLanguage] || "UN"; // UN for unknown flag
     return (
         <>
-            <div className="max-w-xs min-h-[385px] bg-gray-800 overflow-hidden rounded-lg shadow-md  transform transition-transform duration-300 hover:scale-[101%] hover:shadow-lg">
+            <div className={`max-w-xs  min-h-[365px] bg-gray-800 overflow-hidden rounded-lg shadow-md  transform transition-transform duration-300 hover:scale-[101%] hover:shadow-lg`}>
+                <span
+                    className={`px-2 border-2 absolute bg-opacity-60 border-gray-500 backdrop-blur-lg top-1 left-1 z-10  py-1 text-[10px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 font-semibold rounded-lg text-white ${getRatingColor(
+                        manga.contentRating
+                    )}`}
+                >
+                    {manga.contentRating.toUpperCase()}
+                </span>
 
                 <span className="flex absolute top-1 right-1 font-bold z-10 text-[10px] justify-center items-center flex-row bg-gray-900   py-0.5 pr-2 pl-0 rounded-md ">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 6.35 6.35" className="icon">
@@ -47,11 +54,11 @@ const MangaCard = ({ manga }) => {
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-gray-900 to-transparent">
                         <div className="flex w-full flex-col items-center justify-between   p-3 pb-1 ">
                             <h3 className="text-xs font-bold text-white mb-3  flex justify-center items-start">
-                            <Flag
-                    code={countryCode}
-                    className="w-5  shadow-[0_0_4px_rgba(0,0,0,1)] shadow-black mt-0.5  mr-2"
-                    alt="flag"
-                />
+                                <Flag
+                                    code={countryCode}
+                                    className="w-5  shadow-[0_0_4px_rgba(0,0,0,1)] shadow-black mt-0.5  mr-2"
+                                    alt="flag"
+                                />
                                 {manga.title}
                             </h3>
 
@@ -79,18 +86,11 @@ const MangaCard = ({ manga }) => {
                     {/* Manga Info */}
                     <div className="space-y-2">
                         <div className="flex flex-wrap items-center gap-1">
-                            <span
-                                className={`px-2  py-1 text-[10px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 font-semibold rounded-lg text-white ${getRatingColor(
-                                    manga.contentRating
-                                )}`}
-                            >
-                                {manga.contentRating.toUpperCase()}
-                            </span>
 
                             {manga.flatTags.slice(0, 4).map((tag) => (
                                 <span
                                     key={tag}
-                                    className="bg-gray-900 text-nowrap shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 p-1 rounded-lg border border-gray-800 text-xs transition-colors"
+                                    className="bg-gray-900 min-w-14 text-center text-nowrap shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 p-1 rounded-lg border border-gray-800 text-xs transition-colors"
                                 >
                                     {tag}
                                 </span>

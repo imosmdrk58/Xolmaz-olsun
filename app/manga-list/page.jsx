@@ -130,7 +130,7 @@ export default function MangaList() {
     queryKey: ["mangas", page],
     queryFn: fetchMangas,
     keepPreviousData: true,
-    staleTime: 15 * 60 * 1000, // Cache data for 15 minutes
+    staleTime: 30 * 60 * 1000, // Cache data for 15 minutes
   });
 
   const processMutation = useMutation({
@@ -155,7 +155,6 @@ export default function MangaList() {
     }
   }, [data]);
 
-  if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error: {error.message}</p>;
 
   const loadMoreMangas = () => setPage((prevPage) => prevPage + 1);
@@ -165,25 +164,33 @@ export default function MangaList() {
   const processedRandomMangas = queryClient.getQueryData(["processedRandomMangas"]) || [];
 console.log(processedMangas)
   return (
-    <div className="min-h-screen w-full bg-gray-900 text-white p-6">    
-    {error &&
-      <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
-        <div className="text-center">
-          <p className="text-lg text-red-500">{error}</p>
-          <p className="text-sm text-gray-400">Please refresh or try again later.</p>
-        </div>
+<div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6">
+  
+  {error && (
+    <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
+      <div className="text-center">
+        <p className="text-lg text-red-500 font-semibold">{error}</p>
+        <p className="text-sm text-gray-400 mt-2">Please refresh or try again later.</p>
       </div>
-    }
-    <SliderComponent processedRandomMangas={processedRandomMangas}/>
-        <div className="flex flex-row justify-between items-start gap-3">
-          <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 space-y-4 lg:grid-cols-5 gap-1">
+    </div>
+  )}
+  {isLoading || !processedMangas || !processedLatestMangas.length>0 || !processedLatestMangas.length>0 ? (
+    <div className="flex justify-center items-center w-full h-screen">
+      <div className="text-center">
+        <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
+        <p className="text-lg font-semibold">Loading Mangas...</p>
+      </div>
+    </div>
+  ) : (<>
+   <SliderComponent processedRandomMangas={processedRandomMangas}/>
+        <div className="flex flex-row justify-between mt-7 items-start gap-3">
+          <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 space-y-4 lg:grid-cols-4 gap-1">
             {processedLatestMangas.map((manga, index) => (
               <div
                 key={manga.id}
                 onClick={() =>
-                  router.push(
-                    `/manga/${manga.id}/chapters?manga=${encodeURIComponent(
-                      JSON.stringify(manga)
+                  router.push(`
+                    /manga/${manga.id}/chapters?manga=${encodeURIComponent(JSON.stringify(manga)
                     )}`
                   )
                 }
@@ -194,7 +201,7 @@ console.log(processedMangas)
             ))}
           </div>
          {processedLatestMangas.length>0 && <div className='w-4/12'>
-            <div className="bg-gray-900 text-white px-4 rounded-lg shadow-lg w-full">
+            <div className="bg-gray-900   py-7   text-white px-4 rounded-lg shadow-lg w-full">
   
               {/* Section Header */}
               <div className="mb-6 flex items-center justify-between gap-3">
@@ -205,7 +212,7 @@ console.log(processedMangas)
               </div>
   
               
-              <div className="w-full bg-gradient-to-r from-gray-700 to-gray-800 p-2.5 rounded-lg mb-6">
+              <div className="w-full bg-gray-500 bg-opacity-10 p-2.5 rounded-lg mb-6">
                 <div className="grid grid-cols-3 gap-3">
                   {[
                     { 'Top': 'star.svg' },
@@ -218,7 +225,7 @@ console.log(processedMangas)
                     return (
                       <button
                         key={index}
-                        className="flex items-center justify-center gap-1.5 text-sm font-semibold text-gray-300 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                        className="flex bg-[#1a1919] items-center justify-center gap-1.5 text-sm font-semibold text-gray-300 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400"
                       >
                         <img
                           src={`/${icon}`}
@@ -239,8 +246,8 @@ console.log(processedMangas)
                       router.push(
                         `/manga/${manga.id}/chapters?manga=${encodeURIComponent(
                           JSON.stringify(manga)
-                        )}`
-                      )
+                        )}
+                      `)
                     }
                       key={manga.id}
                     >
@@ -252,23 +259,15 @@ console.log(processedMangas)
             </div>
           </div>}
         </div>
-        {processMangaData ? (
-            <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
-              <div className="text-center">
-                <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
-                <p className="text-lg">Loading Mangas...</p>
-              </div>
-            </div>
-        ) : (
-          <div className="text-center mt-6">
-            <button
-              onClick={loadMoreMangas}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-            >
-              Load More
-            </button>
-          </div>
-        )}
-      </div>
+    <div className="text-center mt-10">
+      <button
+        onClick={loadMoreMangas}
+        className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+      >
+        Load More
+      </button>
+    </div>
+    </>)}
+</div>
   );
 }

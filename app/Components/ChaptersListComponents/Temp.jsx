@@ -99,7 +99,7 @@ const Temp = ({ manga, handleChapterClick }) => {
       </svg>
     </div>
     <Image
-      className="rounded shadow-md w-full h-full transform group-hover:translate-y-0 transition-transform"
+      className="rounded shadow-md w-full min-w-44 h-full transform group-hover:translate-y-0 transition-transform"
       src={manga.coverImageUrl}
       alt="Cover image"
       width={500}

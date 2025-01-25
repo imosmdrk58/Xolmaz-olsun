@@ -71,11 +71,11 @@ const SliderComponent = ({ processedRandomMangas }) => {
     };
 
     return (
-        <div className="bg-gray-900 w-full overflow-hidden text-white font-sans">
+        <div className="bg-gray-900 rounded-[60px] w-full overflow-hidden text-white font-sans">
             <section
                 className="carousel h-[400px] relative flex justify-center items-center"
             >
-                <div className="list relative h-full w-full  z-10 flex items-center">
+                <div className="list relative  h-full w-full  z-10 flex items-center">
                     {processedRandomMangas.map((item, index) => (
                         <div
                             key={index}
@@ -84,7 +84,7 @@ const SliderComponent = ({ processedRandomMangas }) => {
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
                             }}
-                            className={`item rounded-xl overflow-hidden pl-12 absolute grid grid-cols-2 inset-0 transition-transform duration-700 ease-in-out ${active === index ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
+                            className={`item  overflow-hidden pl-12 absolute grid grid-cols-2 inset-0 transition-transform duration-700 ease-in-out ${active === index ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
                                 }`}
                         >
                             <div className="absolute w-full h-full backdrop-blur-lg bg-black bg-opacity-65"></div>
@@ -106,13 +106,13 @@ const SliderComponent = ({ processedRandomMangas }) => {
                                 <div className="mt-4 flex gap-3">
                                     <a
                                         href={`/read/${item.slug}`}
-                                        className="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-sm font-medium"
+                                        className="px-5 py-2 border-2 border-orange-500 bg-opacity-60 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-sm font-medium"
                                     >
                                         Read Now
                                     </a>
                                     <a
                                         href={`/${item.slug}`}
-                                        className="px-5 py-2 bg-white hover:bg-gray-200 text-orange-500 rounded-md text-sm font-medium border border-orange-500"
+                                        className="px-5 py-2 bg-white  bg-opacity-80 hover:bg-gray-200 text-orange-600 rounded-md text-sm font-medium border border-orange-500"
                                     >
                                         View Info
                                     </a>
