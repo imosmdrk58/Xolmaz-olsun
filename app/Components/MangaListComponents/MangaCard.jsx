@@ -29,7 +29,7 @@ const MangaCard = ({ manga }) => {
         <>
             <div className={`max-w-xs  min-h-[365px] bg-gray-800 overflow-hidden rounded-lg shadow-md  transform transition-transform duration-300 hover:scale-[101%] hover:shadow-lg`}>
                 <span
-                    className={`px-2 border-2 absolute bg-opacity-60 border-gray-500 backdrop-blur-lg top-1 left-1 z-10  py-1 text-[10px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 font-semibold rounded-lg text-white ${getRatingColor(
+                    className={`px-2 min-w-16 text-center border-2 absolute bg-opacity-60 border-gray-500 backdrop-blur-lg top-1 left-1 z-10  py-1 text-[10px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 font-semibold rounded-lg text-white ${getRatingColor(
                         manga.contentRating
                     )}`}
                 >

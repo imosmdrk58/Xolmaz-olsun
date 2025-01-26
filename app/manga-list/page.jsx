@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -75,25 +75,25 @@ const processMangaData = async (mangaList) => {
       const groupedTags = tags?.reduce((acc, tag) => {
         const group = tag.attributes?.group || 'Unknown Group';
         const tagName = tag.attributes?.name?.en || 'Unknown Tag';
-        
+
         // Initialize the group if it doesn't exist
         if (!acc[group]) {
           acc[group] = new Set();
         }
-        
+
         // Add the tag to the appropriate group, using a Set to ensure uniqueness
         acc[group].add(tagName);
-        
+
         return acc;
       }, {});
-      
+
       // Convert grouped tags (Sets) to arrays
       const groupedTagsArray = Object.keys(groupedTags).map((group) => ({
         group,
         tags: Array.from(groupedTags[group]),
       }));
-      
-      
+
+
       return {
         id,
         title: title?.en || Object?.values(altTitles[0])[0] || 'Untitled',
@@ -105,7 +105,7 @@ const processMangaData = async (mangaList) => {
         year: year || 'N/A',
         updatedAt: updatedAt ? new Date(updatedAt) : 'N/A',
         tags: groupedTagsArray,
-        flatTags:tags.map((tag) => tag.attributes?.name?.en || 'Unknown Tag'),
+        flatTags: tags.map((tag) => tag.attributes?.name?.en || 'Unknown Tag'),
         coverImageUrl,
         authorName,
         artistName,
@@ -123,14 +123,36 @@ const processMangaData = async (mangaList) => {
 
 export default function MangaList() {
   const [page, setPage] = useState(1);
+  const [storedData, setStoredData] = useState(null);
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const cachedData = localStorage.getItem("mangaData");
+    const cacheTimestamp = localStorage.getItem("cacheTimestamp");
+
+    if (cachedData && cacheTimestamp) {
+      const isStale = Date.now() - parseInt(cacheTimestamp, 10) > 30 * 60 * 1000; // 30 minutes
+      if (!isStale) {
+        setStoredData(JSON.parse(cachedData));
+      } else {
+        localStorage.removeItem("mangaData");
+        localStorage.removeItem("cacheTimestamp");
+      }
+    }
+  }, []);
 
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ["mangas", page],
     queryFn: fetchMangas,
+    enabled: !storedData, // Skip query if data is already loaded from localStorage
     keepPreviousData: true,
-    staleTime: 30 * 60 * 1000, // Cache data for 15 minutes
+    staleTime: 30 * 60 * 1000,
+    onSuccess: (fetchedData) => {
+      localStorage.setItem("mangaData", JSON.stringify(fetchedData));
+      localStorage.setItem("cacheTimestamp", Date.now().toString());
+      setStoredData(fetchedData);
+    },
   });
 
   const processMutation = useMutation({
@@ -150,10 +172,12 @@ export default function MangaList() {
   });
 
   useEffect(() => {
-    if (data) {
+    if (storedData) {
+      processMutation.mutate(storedData);
+    } else if (data) {
       processMutation.mutate(data);
     }
-  }, [data]);
+  }, [storedData, data]);
 
   if (isError) return <p>Error: {error.message}</p>;
 
@@ -162,27 +186,27 @@ export default function MangaList() {
   const processedMangas = queryClient.getQueryData(["processedMangas"]) || [];
   const processedLatestMangas = queryClient.getQueryData(["processedLatestMangas"]) || [];
   const processedRandomMangas = queryClient.getQueryData(["processedRandomMangas"]) || [];
-console.log(processedMangas)
+  console.log(processedMangas)
   return (
-<div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6">
-  
-  {error && (
-    <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
-      <div className="text-center">
-        <p className="text-lg text-red-500 font-semibold">{error}</p>
-        <p className="text-sm text-gray-400 mt-2">Please refresh or try again later.</p>
-      </div>
-    </div>
-  )}
-  {isLoading || !processedMangas || !processedLatestMangas.length>0 || !processedLatestMangas.length>0 ? (
-    <div className="flex justify-center items-center w-full h-screen">
-      <div className="text-center">
-        <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
-        <p className="text-lg font-semibold">Loading Mangas...</p>
-      </div>
-    </div>
-  ) : (<>
-   <SliderComponent processedRandomMangas={processedRandomMangas}/>
+    <div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6">
+
+      {error && (
+        <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
+          <div className="text-center">
+            <p className="text-lg text-red-500 font-semibold">{error}</p>
+            <p className="text-sm text-gray-400 mt-2">Please refresh or try again later.</p>
+          </div>
+        </div>
+      )}
+      {isLoading || !processedMangas || !processedLatestMangas.length > 0 || !processedLatestMangas.length > 0 ? (
+        <div className="flex justify-center items-center w-full h-screen">
+          <div className="text-center">
+            <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
+            <p className="text-lg font-semibold">Loading Mangas...</p>
+          </div>
+        </div>
+      ) : (<>
+        <SliderComponent processedRandomMangas={processedRandomMangas} />
         <div className="flex flex-row justify-between mt-7 items-start gap-3">
           <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 space-y-4 lg:grid-cols-4 gap-1">
             {processedLatestMangas.map((manga, index) => (
@@ -191,7 +215,7 @@ console.log(processedMangas)
                 onClick={() =>
                   router.push(`
                     /manga/${manga.id}/chapters?manga=${encodeURIComponent(JSON.stringify(manga)
-                    )}`
+                  )}`
                   )
                 }
                 className={`group cursor-pointer ${index == 0 ? "mt-4" : ""}`}
@@ -200,9 +224,9 @@ console.log(processedMangas)
               </div>
             ))}
           </div>
-         {processedLatestMangas.length>0 && <div className='w-4/12'>
+          {processedLatestMangas.length > 0 && <div className='w-4/12'>
             <div className="bg-gray-900   py-7   text-white px-4 rounded-lg shadow-lg w-full">
-  
+
               {/* Section Header */}
               <div className="mb-6 flex items-center justify-between gap-3">
                 <h2 className="flex items-center gap-2.5 w-full justify-center text-2xl font-bold text-yellow-300 tracking-wide">
@@ -210,8 +234,8 @@ console.log(processedMangas)
                   <span>This Month's Rankings</span>
                 </h2>
               </div>
-  
-              
+
+
               <div className="w-full bg-gray-500 bg-opacity-10 p-2.5 rounded-lg mb-6">
                 <div className="grid grid-cols-3 gap-3">
                   {[
@@ -221,7 +245,7 @@ console.log(processedMangas)
                   ].map((category, index) => {
                     const categoryName = Object.keys(category)[0];
                     const icon = category[categoryName];
-  
+
                     return (
                       <button
                         key={index}
@@ -242,13 +266,13 @@ console.log(processedMangas)
                 <ul className="flex flex-col">
                   {processedMangas.slice(0, 10).map((manga, index) => (
                     <li
-                    onClick={() =>
-                      router.push(
-                        `/manga/${manga.id}/chapters?manga=${encodeURIComponent(
-                          JSON.stringify(manga)
-                        )}
+                      onClick={() =>
+                        router.push(
+                          `/manga/${manga.id}/chapters?manga=${encodeURIComponent(
+                            JSON.stringify(manga)
+                          )}
                       `)
-                    }
+                      }
                       key={manga.id}
                     >
                       <AsideComponent manga={manga} index={index} />
@@ -259,15 +283,15 @@ console.log(processedMangas)
             </div>
           </div>}
         </div>
-    <div className="text-center mt-10">
-      <button
-        onClick={loadMoreMangas}
-        className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
-      >
-        Load More
-      </button>
+        <div className="text-center mt-10">
+          <button
+            onClick={loadMoreMangas}
+            className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            Load More
+          </button>
+        </div>
+      </>)}
     </div>
-    </>)}
-</div>
   );
 }
