@@ -1,7 +1,6 @@
-import React, { useState, useEffect,useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 const SliderComponent = ({ processedRandomMangas }) => {
-    console.log(processedRandomMangas)
     const [active, setActive] = useState(0);
     const firstPosition = 0;
     const lastPosition = processedRandomMangas.length - 1;
@@ -32,11 +31,11 @@ const SliderComponent = ({ processedRandomMangas }) => {
     }, []);
 
     const setSlider = () => {
-        const items = document.querySelectorAll('.list .item');
+        const items = document.querySelectorAll('.list .manga');
         const dots = document.querySelectorAll('.indicators ul li');
-        items.forEach((item, index) => {
-            if (index === active) item.classList.add('active');
-            else item.classList.remove('active');
+        items.forEach((manga, index) => {
+            if (index === active) manga.classList.add('active');
+            else manga.classList.remove('active');
         });
         dots.forEach((dot, index) => {
             if (index === active) dot.classList.add('active');
@@ -71,12 +70,12 @@ const SliderComponent = ({ processedRandomMangas }) => {
     };
 
     return (
-        <div className="bg-gray-900 rounded-[60px] w-full overflow-hidden text-white font-sans">
+        <div className="bg-gray-900 rounded-[50px] shadow-[0_0_15px_rgba(0,0,0,1)] shadow-slate-400 w-full overflow-hidden text-white font-sans">
             <section
                 className="carousel h-[400px] relative flex justify-center items-center"
             >
                 <div className="list relative  h-full w-full  z-10 flex items-center">
-                    {processedRandomMangas.map((item, index) => (
+                    {processedRandomMangas.map((manga, index) => (
                         <div
                             key={index}
                             style={{
@@ -84,17 +83,17 @@ const SliderComponent = ({ processedRandomMangas }) => {
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
                             }}
-                            className={`item  overflow-hidden pl-12 absolute grid grid-cols-2 inset-0 transition-transform duration-700 ease-in-out ${active === index ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
+                            className={`manga  overflow-hidden pl-12 absolute grid grid-cols-2 inset-0 transition-transform duration-700 ease-in-out ${active === index ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
                                 }`}
                         >
                             <div className="absolute w-full h-full backdrop-blur-lg bg-black bg-opacity-65"></div>
                             <div className="content relative z-20 flex flex-col justify-center gap-4 p-6 rounded-lg">
-                                <h2 className="text-3xl font-semibold text-white leading-snug">{item.title}</h2>
+                                <h2 className="text-3xl font-semibold text-white leading-snug">{manga.title}</h2>
                                 <p className="text-sm text-gray-300 leading-relaxed">
-                                    {item.description.slice(0, 250)}
+                                    {manga.description.slice(0, 250)}
                                 </p>
                                 <ul className="flex flex-wrap gap-2">
-                                    {item.flatTags.slice(0, 4).map((tag, idx) => (
+                                    {manga.flatTags.slice(0, 4).map((tag, idx) => (
                                         <li
                                             key={idx}
                                             className="border border-white bg-transparent text-white px-3 py-1 rounded text-xs font-medium"
@@ -105,14 +104,14 @@ const SliderComponent = ({ processedRandomMangas }) => {
                                 </ul>
                                 <div className="mt-4 flex gap-3">
                                     <a
-                                        href={`/read/${item.slug}`}
-                                        className="px-5 py-2 border-2 border-orange-500 bg-opacity-60 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-sm font-medium"
+                                        onClick={() => { handleMangaClicked(manga) }}
+                                        className="px-5 cursor-pointer py-2 border-2 border-orange-500 bg-opacity-60 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-sm font-medium"
                                     >
                                         Read Now
                                     </a>
                                     <a
-                                        href={`/${item.slug}`}
-                                        className="px-5 py-2 bg-white  bg-opacity-80 hover:bg-gray-200 text-orange-600 rounded-md text-sm font-medium border border-orange-500"
+                                        onClick={() => { handleMangaClicked(manga) }}
+                                        className="px-5 cursor-pointer py-2 bg-white  bg-opacity-80 hover:bg-gray-200 text-orange-600 rounded-md text-sm font-medium border border-orange-500"
                                     >
                                         View Info
                                     </a>
@@ -121,7 +120,7 @@ const SliderComponent = ({ processedRandomMangas }) => {
                             <div className="w-full h-full overflow-hidden flex justify-center items-center">
                                 <Image
                                     className="rounded w-[390px] border-[20px] border-white h-[550px] transform rotate-[15deg] transition-transform"
-                                    src={item.coverImageUrl}
+                                    src={manga.coverImageUrl}
                                     alt="Cover image"
                                     width={500}
                                     height={288}
@@ -133,20 +132,20 @@ const SliderComponent = ({ processedRandomMangas }) => {
                 </div>
 
                 <button
-                    className="absolute z-50 font-extrabold right-28 pb-2 bottom-2 h-12 w-12 flex justify-center items-center bg-white text-black text-3xl rounded-full shadow-lg hover:bg-gray-200 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="absolute  border-4 border-double border-orange-500 z-50 font-extrabold right-28 pb-2 bottom-4 h-14 w-14 flex justify-center items-center bg-white text-black text-3xl rounded-full shadow-lg hover:bg-gray-200 transition-all transform hover:scale-105 "
                     onClick={handlePrev}
                 >
                     &#8249;
                 </button>
                 <button
-                    className="absolute z-50 font-extrabold right-12 pb-2 bottom-2 h-12 w-12 flex justify-center items-center bg-white text-black text-3xl rounded-full shadow-lg hover:bg-gray-200 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="absolute z-50 border-4 border-double border-orange-500 font-extrabold right-12 pb-2 bottom-4 h-14 w-14 flex justify-center items-center bg-white text-black text-3xl rounded-full shadow-lg hover:bg-gray-200 transition-all transform hover:scale-105 "
                     onClick={handleNext}
                 >
                     &#8250;
                 </button>
 
 
-                <div className="indicators absolute bottom-6 flex items-center justify-center w-full">
+                <div className="indicators z-30 absolute bottom-6 flex items-center justify-center w-full">
                     <ul className="flex gap-2">
                         {processedRandomMangas.map((_, index) => (
                             <li

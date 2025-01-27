@@ -1,25 +1,31 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import MangaCard from "../Components/MangaListComponents/MangaCard";
 import AsideComponent from "../Components/MangaListComponents/AsideComponent";
 import SliderComponent from "../Components/MangaListComponents/SliderComponent";
 
+const MemoizedMangaCard = React.memo(MangaCard);
+const MemoizedAsideComponent = React.memo(AsideComponent);
+const MemoizedSliderComponent = React.memo(SliderComponent);
+
 const fetchMangas = async ({ queryKey }) => {
   const [_, page] = queryKey;
-  const [mangaResponse, latestMangaResponse, randomMangaResponse] = await Promise.all([
-    fetch(`/api/manga?page=${page}`),
+  const [mangaResponse, favouriteMangaResponse, latestMangaResponse, randomMangaResponse] = await Promise.all([
+    fetch(`/api/manga/rating?page=${page}`),
+    fetch(`/api/manga/favourite?page=${page}`), // Fetch for favorite mangas
     fetch(`/api/manga/latest?page=${page}`),
     fetch(`/api/manga/random?page=${page}`),
   ]);
 
-  if (!mangaResponse.ok || !latestMangaResponse.ok || !randomMangaResponse.ok) {
+  if (!mangaResponse.ok || !favouriteMangaResponse.ok || !latestMangaResponse.ok || !randomMangaResponse.ok) {
     throw new Error("Failed to fetch mangas");
   }
 
   return {
     mangas: await mangaResponse.json(),
+    favouriteMangas: await favouriteMangaResponse.json(), // Store favorite mangas
     latestMangas: await latestMangaResponse.json(),
     randomMangas: await randomMangaResponse.json(),
   };
@@ -42,7 +48,7 @@ const processMangaData = async (mangaList) => {
           status,
           year,
           updatedAt,
-          tags
+          tags,
         },
         relationships,
       } = manga;
@@ -53,10 +59,8 @@ const processMangaData = async (mangaList) => {
         return acc;
       }, {});
 
-      // Extract specific data
       const coverArt = grouped.cover_art?.[0]?.attributes?.fileName;
-      // const images = coverArt ? `https://og.mangadex.org/og-image/manga/${id}` : '';
-      const coverImageUrl = `https://mangadex.org/covers/${id}/${coverArt}.256.jpg`
+      const coverImageUrl = `https://mangadex.org/covers/${id}/${coverArt}.256.jpg`;
       const authorName = grouped.author;
       const artistName = grouped.artist;
       const creatorName = grouped.creator ?? "N/A";
@@ -75,31 +79,21 @@ const processMangaData = async (mangaList) => {
       const groupedTags = tags?.reduce((acc, tag) => {
         const group = tag.attributes?.group || 'Unknown Group';
         const tagName = tag.attributes?.name?.en || 'Unknown Tag';
-
-        // Initialize the group if it doesn't exist
-        if (!acc[group]) {
-          acc[group] = new Set();
-        }
-
-        // Add the tag to the appropriate group, using a Set to ensure uniqueness
-        acc[group].add(tagName);
-
+        if (!acc[group]) acc[group] = [];
+        acc[group].push(tagName);
         return acc;
       }, {});
 
-      // Convert grouped tags (Sets) to arrays
       const groupedTagsArray = Object.keys(groupedTags).map((group) => ({
         group,
-        tags: Array.from(groupedTags[group]),
+        tags: groupedTags[group],
       }));
-
 
       return {
         id,
         title: title?.en || Object?.values(altTitles[0])[0] || 'Untitled',
         description: description?.en || 'No description available for this manga.',
         altTitle: Object.values(altTitles[0] ?? { none: "N/A" })[0] || 'N/A',
-        altTitles,
         contentRating: contentRating || 'N/A',
         status: status || 'Unknown',
         year: year || 'N/A',
@@ -142,6 +136,10 @@ export default function MangaList() {
     }
   }, []);
 
+  const handleMangaClicked = (manga) => {
+    router.push(`/manga/${manga.id}/chapters?manga=${encodeURIComponent(JSON.stringify(manga))}`);
+  };
+
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ["mangas", page],
     queryFn: fetchMangas,
@@ -157,15 +155,17 @@ export default function MangaList() {
 
   const processMutation = useMutation({
     mutationFn: (data) => {
-      const { mangas, latestMangas, randomMangas } = data;
+      const { mangas, favouriteMangas, latestMangas, randomMangas } = data;
       return Promise.all([
         processMangaData(mangas.data || []),
+        processMangaData(favouriteMangas.data || []),
         processMangaData(latestMangas.data || []),
         processMangaData(randomMangas.data || []),
       ]);
     },
-    onSuccess: ([processedMangas, processedLatestMangas, processedRandomMangas]) => {
+    onSuccess: ([processedMangas, processedFavouriteMangas, processedLatestMangas, processedRandomMangas]) => {
       queryClient.setQueryData(["processedMangas"], processedMangas);
+      queryClient.setQueryData(["processedFavouriteMangas"], processedFavouriteMangas);
       queryClient.setQueryData(["processedLatestMangas"], processedLatestMangas);
       queryClient.setQueryData(["processedRandomMangas"], processedRandomMangas);
     },
@@ -184,20 +184,12 @@ export default function MangaList() {
   const loadMoreMangas = () => setPage((prevPage) => prevPage + 1);
 
   const processedMangas = queryClient.getQueryData(["processedMangas"]) || [];
+  const processedFavouriteMangas = queryClient.getQueryData(["processedFavouriteMangas"]) || [];
   const processedLatestMangas = queryClient.getQueryData(["processedLatestMangas"]) || [];
   const processedRandomMangas = queryClient.getQueryData(["processedRandomMangas"]) || [];
-  console.log(processedMangas)
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6">
-
-      {error && (
-        <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
-          <div className="text-center">
-            <p className="text-lg text-red-500 font-semibold">{error}</p>
-            <p className="text-sm text-gray-400 mt-2">Please refresh or try again later.</p>
-          </div>
-        </div>
-      )}
       {isLoading || !processedMangas || !processedLatestMangas.length > 0 || !processedLatestMangas.length > 0 ? (
         <div className="flex justify-center items-center w-full h-screen">
           <div className="text-center">
@@ -205,93 +197,28 @@ export default function MangaList() {
             <p className="text-lg font-semibold">Loading Mangas...</p>
           </div>
         </div>
-      ) : (<>
-        <SliderComponent processedRandomMangas={processedRandomMangas} />
-        <div className="flex flex-row justify-between mt-7 items-start gap-3">
-          <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 space-y-4 lg:grid-cols-4 gap-1">
-            {processedLatestMangas.map((manga, index) => (
-              <div
-                key={manga.id}
-                onClick={() =>
-                  router.push(`
-                    /manga/${manga.id}/chapters?manga=${encodeURIComponent(JSON.stringify(manga)
-                  )}`
-                  )
-                }
-                className={`group cursor-pointer ${index == 0 ? "mt-4" : ""}`}
-              >
-                <MangaCard id={manga.id} manga={manga} />
-              </div>
-            ))}
+      ) : (
+        <>
+          <MemoizedSliderComponent processedRandomMangas={processedRandomMangas} />
+          <div className="flex flex-row justify-between mt-7 items-start gap-3">
+            <MemoizedMangaCard handleMangaClicked={handleMangaClicked} processedLatestMangas={processedLatestMangas} />
+            <MemoizedAsideComponent
+              handleMangaClicked={handleMangaClicked}
+              processedMangas={processedMangas}
+              processedLatestMangas={processedLatestMangas}
+              processedFavouriteMangas={processedFavouriteMangas}
+            />
           </div>
-          {processedLatestMangas.length > 0 && <div className='w-4/12'>
-            <div className="bg-gray-900   py-7   text-white px-4 rounded-lg shadow-lg w-full">
-
-              {/* Section Header */}
-              <div className="mb-6 flex items-center justify-between gap-3">
-                <h2 className="flex items-center gap-2.5 w-full justify-center text-2xl font-bold text-yellow-300 tracking-wide">
-                  <img src="/trophy.svg" alt="Trophy" className="w-6 h-6" />
-                  <span>This Month's Rankings</span>
-                </h2>
-              </div>
-
-
-              <div className="w-full bg-gray-500 bg-opacity-10 p-2.5 rounded-lg mb-6">
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { 'Top': 'star.svg' },
-                    { 'Favourite': 'heart.svg' },
-                    { 'New': 'clock.svg' },
-                  ].map((category, index) => {
-                    const categoryName = Object.keys(category)[0];
-                    const icon = category[categoryName];
-
-                    return (
-                      <button
-                        key={index}
-                        className="flex bg-[#1a1919] items-center justify-center gap-1.5 text-sm font-semibold text-gray-300 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400"
-                      >
-                        <img
-                          src={`/${icon}`}
-                          alt={categoryName}
-                          className="w-4 h-4"
-                        />
-                        {categoryName}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div>
-                <ul className="flex flex-col">
-                  {processedMangas.slice(0, 10).map((manga, index) => (
-                    <li
-                      onClick={() =>
-                        router.push(
-                          `/manga/${manga.id}/chapters?manga=${encodeURIComponent(
-                            JSON.stringify(manga)
-                          )}
-                      `)
-                      }
-                      key={manga.id}
-                    >
-                      <AsideComponent manga={manga} index={index} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>}
-        </div>
-        <div className="text-center mt-10">
-          <button
-            onClick={loadMoreMangas}
-            className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
-          >
-            Load More
-          </button>
-        </div>
-      </>)}
+          <div className="text-center mt-10">
+            <button
+              onClick={loadMoreMangas}
+              className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+            >
+              Load More
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

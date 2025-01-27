@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Flag from "react-world-flags";
 
-const MangaCard = ({ manga }) => {
+const MangaCard = ({ processedLatestMangas,handleMangaClicked }) => {
     const getRatingColor = (rating) => {
         switch (rating) {
             case "safe":
@@ -23,10 +23,16 @@ const MangaCard = ({ manga }) => {
         zh: "CN", // Chinese
     };
 
-    // console.log(manga)
-    const countryCode = langToCountryMap[manga.originalLanguage] || "UN"; // UN for unknown flag
     return (
         <>
+         <div className="grid w-8/12 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 space-y-4 lg:grid-cols-4 gap-1">
+            {processedLatestMangas.map((manga, index) => (
+              <div
+                key={manga.id}
+                onClick={() =>{handleMangaClicked(manga)}
+                }
+                className={`group cursor-pointer ${index == 0 ? "mt-4" : ""}`}
+              >
             <div className={`max-w-xs  min-h-[365px] bg-gray-800 overflow-hidden rounded-lg shadow-md  transform transition-transform duration-300 hover:scale-[101%] hover:shadow-lg`}>
                 <span
                     className={`px-2 min-w-16 text-center border-2 absolute bg-opacity-60 border-gray-500 backdrop-blur-lg top-1 left-1 z-10  py-1 text-[10px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 font-semibold rounded-lg text-white ${getRatingColor(
@@ -55,7 +61,7 @@ const MangaCard = ({ manga }) => {
                         <div className="flex w-full flex-col items-center justify-between   p-3 pb-1 ">
                             <h3 className="text-xs font-bold text-white mb-3  flex justify-center items-start">
                                 <Flag
-                                    code={countryCode}
+                                    code={langToCountryMap[manga.originalLanguage] || "UN"}
                                     className="w-5  shadow-[0_0_4px_rgba(0,0,0,1)] shadow-black mt-0.5  mr-2"
                                     alt="flag"
                                 />
@@ -111,6 +117,9 @@ const MangaCard = ({ manga }) => {
                     </p>
                 </div>
             </div>
+            </div>
+            ))}
+          </div>
         </>
     );
 };

@@ -16,7 +16,7 @@ old_*.png
 # next.js
 /.next/
 /out/
-
+/app/Components/ChaptersListComponents/Temp.jsx
 # production
 /build
 
