@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
       </head>
-      <body className="bg-gray-100 text-black">
+      <body className="bg-gray-900 text-black">
         <TanstackProvider>
         <TopNavbar />
         <main>{children}</main>

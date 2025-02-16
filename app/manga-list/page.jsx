@@ -10,25 +10,74 @@ const MemoizedMangaCard = React.memo(MangaCard);
 const MemoizedAsideComponent = React.memo(AsideComponent);
 const MemoizedSliderComponent = React.memo(SliderComponent);
 
-const fetchMangas = async ({ queryKey }) => {
-  const [_, page] = queryKey;
-  const [mangaResponse, favouriteMangaResponse, latestMangaResponse, randomMangaResponse] = await Promise.all([
-    fetch(`/api/manga/rating?page=${page}`),
-    fetch(`/api/manga/favourite?page=${page}`), // Fetch for favorite mangas
-    fetch(`/api/manga/latest?page=${page}`),
-    fetch(`/api/manga/random?page=${page}`),
-  ]);
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
-  if (!mangaResponse.ok || !favouriteMangaResponse.ok || !latestMangaResponse.ok || !randomMangaResponse.ok) {
-    throw new Error("Failed to fetch mangas");
+// Helper functions for localStorage
+const getFromStorage = (key) => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const item = localStorage.getItem(key);
+    const timestamp = localStorage.getItem(`${key}_timestamp`);
+    
+    if (!item || !timestamp) return null;
+    // Check if data is stale
+    if (Date.now() - parseInt(timestamp) > CACHE_DURATION) {
+      localStorage.removeItem(key);
+      localStorage.removeItem(`${key}_timestamp`);
+      return null;
+    }
+    
+    return JSON.parse(item);
+  } catch (error) {
+    console.error(`Error reading ${key} from localStorage:`, error);
+    return null;
   }
+};
 
-  return {
-    mangas: await mangaResponse.json(),
-    favouriteMangas: await favouriteMangaResponse.json(), // Store favorite mangas
-    latestMangas: await latestMangaResponse.json(),
-    randomMangas: await randomMangaResponse.json(),
-  };
+const saveToStorage = (key, data) => {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+    localStorage.setItem(`${key}_timestamp`, Date.now().toString());
+  } catch (error) {
+    console.error(`Error saving ${key} to localStorage:`, error);
+  }
+};
+
+// Fetch functions for each manga type
+const fetchMangaType = async (type, page) => {
+  const cachedData = getFromStorage(`manga_${type}_${page}`);
+  if (cachedData) return cachedData;
+
+  const response = await fetch(`/api/manga/${type}?page=${page}`);
+  if (!response.ok) throw new Error(`Failed to fetch ${type} mangas`);
+  
+  const data = await response.json();
+  saveToStorage(`manga_${type}_${page}`, data);
+  return data;
+};
+
+const fetchAllMangaTypes = async ({ queryKey }) => {
+  const [_, page] = queryKey;
+  
+  try {
+    const [rating, favourite, latest, random] = await Promise.all([
+      fetchMangaType('rating', page),
+      fetchMangaType('favourite', page),
+      fetchMangaType('latest', page),
+      fetchMangaType('random', page)
+    ]);
+
+    return {
+      mangas: rating,
+      favouriteMangas: favourite,
+      latestMangas: latest,
+      randomMangas: random
+    };
+  } catch (error) {
+    console.error('Error fetching manga data:', error);
+    throw error;
+  }
 };
 
 const processMangaData = async (mangaList) => {
@@ -117,40 +166,22 @@ const processMangaData = async (mangaList) => {
 
 export default function MangaList() {
   const [page, setPage] = useState(1);
-  const [storedData, setStoredData] = useState(null);
   const router = useRouter();
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const cachedData = localStorage.getItem("mangaData");
-    const cacheTimestamp = localStorage.getItem("cacheTimestamp");
-
-    if (cachedData && cacheTimestamp) {
-      const isStale = Date.now() - parseInt(cacheTimestamp, 10) > 30 * 60 * 1000; // 30 minutes
-      if (!isStale) {
-        setStoredData(JSON.parse(cachedData));
-      } else {
-        localStorage.removeItem("mangaData");
-        localStorage.removeItem("cacheTimestamp");
-      }
-    }
-  }, []);
-
-  const handleMangaClicked = (manga) => {
-    router.push(`/manga/${manga.id}/chapters?manga=${encodeURIComponent(JSON.stringify(manga))}`);
-  };
+  const [isDataProcessed, setIsDataProcessed] = useState(false);
 
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ["mangas", page],
-    queryFn: fetchMangas,
-    enabled: !storedData, // Skip query if data is already loaded from localStorage
-    keepPreviousData: true,
-    staleTime: 30 * 60 * 1000,
-    onSuccess: (fetchedData) => {
-      localStorage.setItem("mangaData", JSON.stringify(fetchedData));
-      localStorage.setItem("cacheTimestamp", Date.now().toString());
-      setStoredData(fetchedData);
-    },
+    queryFn: fetchAllMangaTypes,
+    staleTime: CACHE_DURATION,
+    cacheTime: CACHE_DURATION,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: 2,
+    onError: (error) => {
+      console.error('Error in manga query:', error);
+    }
   });
 
   const processMutation = useMutation({
@@ -168,29 +199,47 @@ export default function MangaList() {
       queryClient.setQueryData(["processedFavouriteMangas"], processedFavouriteMangas);
       queryClient.setQueryData(["processedLatestMangas"], processedLatestMangas);
       queryClient.setQueryData(["processedRandomMangas"], processedRandomMangas);
+      setIsDataProcessed(true);
     },
+    onError: (error) => {
+      console.error('Error processing manga data:', error);
+    }
   });
 
   useEffect(() => {
-    if (storedData) {
-      processMutation.mutate(storedData);
-    } else if (data) {
+    if (data && !isDataProcessed) {
       processMutation.mutate(data);
     }
-  }, [storedData, data]);
+  }, [data, isDataProcessed]);
 
-  if (isError) return <p>Error: {error.message}</p>;
+  const handleMangaClicked = (manga) => {
+    router.push(`/manga/${manga.id}/chapters?manga=${encodeURIComponent(JSON.stringify(manga))}`);
+  };
 
-  const loadMoreMangas = () => setPage((prevPage) => prevPage + 1);
+  const loadMoreMangas = () => {
+    setPage((prevPage) => prevPage + 1);
+  };
 
+  // Get processed data from query client
   const processedMangas = queryClient.getQueryData(["processedMangas"]) || [];
   const processedFavouriteMangas = queryClient.getQueryData(["processedFavouriteMangas"]) || [];
   const processedLatestMangas = queryClient.getQueryData(["processedLatestMangas"]) || [];
   const processedRandomMangas = queryClient.getQueryData(["processedRandomMangas"]) || [];
 
+  // Show loading state if data is not ready
+  const isLoadingState = isLoading || !isDataProcessed || !processedLatestMangas.length;
+
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500">Error: {error.message}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6">
-      {isLoading || !processedMangas || !processedLatestMangas.length > 0 || !processedLatestMangas.length > 0 ? (
+    <div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 pt-6 px-3 to-gray-900 text-white">
+      {isLoadingState ? (
         <div className="flex justify-center items-center w-full h-screen">
           <div className="text-center">
             <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
@@ -201,7 +250,10 @@ export default function MangaList() {
         <>
           <MemoizedSliderComponent processedRandomMangas={processedRandomMangas} />
           <div className="flex flex-row justify-between mt-7 items-start gap-3">
-            <MemoizedMangaCard handleMangaClicked={handleMangaClicked} processedLatestMangas={processedLatestMangas} />
+            <MemoizedMangaCard 
+              handleMangaClicked={handleMangaClicked} 
+              processedLatestMangas={processedLatestMangas} 
+            />
             <MemoizedAsideComponent
               handleMangaClicked={handleMangaClicked}
               processedMangas={processedMangas}
