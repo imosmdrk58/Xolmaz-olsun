@@ -1,8 +1,9 @@
+import Image from 'next/image';
 import React, { useState } from 'react';
 
-function AsideComponent({ 
-  processedMangas, 
-  processedLatestMangas, 
+function AsideComponent({
+  processedMangas,
+  processedLatestMangas,
   processedFavouriteMangas,
   handleMangaClicked,
 }) {
@@ -12,22 +13,21 @@ function AsideComponent({
   };
 
   // Choose which manga list to display based on the selected category
-  const mangaToDisplay = selectedCategory === 'Top'?processedMangas:selectedCategory === 'Favourite' ?processedFavouriteMangas:processedLatestMangas
+  const mangaToDisplay = selectedCategory === 'Top' ? processedMangas : selectedCategory === 'Favourite' ? processedFavouriteMangas : processedLatestMangas
   return (
     <>
       {mangaToDisplay.length > 0 && (
-        <div className='w-4/12'>
-          <div className="bg-gray-900 py-7 text-white px-4 rounded-lg shadow-lg w-full">
+        <div className='w-5/12'>
+          <div className="bg-gray-900 pl-7  text-white  rounded-lg shadow-lg w-full">
 
             {/* Section Header */}
-            <div className="mb-6 flex items-center justify-between gap-3">
-              <h2 className="flex items-center gap-2.5 w-full justify-center text-2xl font-bold text-yellow-300 tracking-wide">
+            <div className=" pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase ">
+              <h1 className=" border-b-4 border-purple-900 flex flex-row w-fit gap-4 items-center  pb-2">
                 <img src="/trophy.svg" alt="Trophy" className="w-6 h-6" />
                 <span>{selectedCategory === 'Top' ? "Top Manga" : selectedCategory === 'Favourite' ? "Favourite Manga" : "New Manga"}</span>
-              </h2>
+              </h1>
             </div>
-
-            <div className="w-full bg-gray-500 bg-opacity-10 p-2.5 rounded-lg mb-6">
+            <div className="w-full  p-3 rounded-lg mb-2">
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { 'Top': 'star.svg' },
@@ -36,24 +36,42 @@ function AsideComponent({
                 ].map((category, index) => {
                   const categoryName = Object.keys(category)[0];
                   const icon = category[categoryName];
+
                   return (
-                    <button
-                      key={index}
-                      onClick={() => handleCategoryChange(categoryName)}
-                      className={`flex items-center justify-center gap-1.5 text-sm font-semibold py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 
-                        ${selectedCategory === categoryName ? 'bg-gray-700 text-white' : 'bg-[#1a1919] text-gray-300'}`}
-                    >
-                      <img
-                        src={`/${icon}`}
-                        alt={categoryName}
-                        className="w-4 h-4"
-                      />
+                    <span
+                    key={index}
+                    onClick={() => handleCategoryChange(categoryName)}
+                    className={`relative cursor-pointer flex justify-center items-center min-w-[120px] px-4 py-2 rounded-xl overflow-hidden
+                      ${
+                        selectedCategory === categoryName
+                          ? "brightness-150 shadow-[0_0_10px_rgba(0,0,0,1)] shadow-purple-500"
+                          : ""
+                      } 
+                      before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-500 before:content-[''] group-hover:before:opacity-100
+                    `}
+                    style={{
+                      background: selectedCategory === categoryName
+                        ? "linear-gradient(#321c4f, #1a0f35)"  // Dark purple gradient
+                        : "linear-gradient(#3b235a, #24143f)", // Slightly lighter purple
+                    }}
+                  >
+                    <Image
+                      src={`/${icon}`}
+                      alt={categoryName}
+                      width={32}
+                      height={32}
+                      className="w-4 h-4"
+                    />
+                    <span className="font-semibold text-[16px] flex p-2 pr-0 text-purple-300">
                       {categoryName}
-                    </button>
+                    </span>
+                  </span>
+                  
                   );
                 })}
               </div>
             </div>
+
 
             <div>
               <ul className="flex flex-col">
@@ -71,11 +89,11 @@ function AsideComponent({
                       <div className="flex items-center gap-5 pl-12.8">
                         {/* Manga Cover */}
                         <div
-                          className="relative w-[48px] h-[48px] overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:scale-105"
+                          className="relative w-[48px] h-[48px] rounded-lg shadow-md transition-all duration-300 hover:scale-105"
                           title={manga?.title ?? 'Unavailable'}
                         >
                           <img
-                            className="w-full h-full object-cover rounded-lg"
+                            className="w-full min-w-12 h-full object-cover rounded-lg"
                             src={manga?.coverImageUrl}
                             alt={manga?.title ?? 'No title'}
                           />
@@ -85,7 +103,7 @@ function AsideComponent({
                           {/* Manga Title */}
                           <h3>
                             <div
-                              className="font-semibold text-white text-lg hover:text-yellow-300 transition duration-300"
+                              className="font-semibold line-clamp-1 text-white text-lg hover:text-yellow-300 transition duration-300"
                             >
                               {manga?.title ?? 'Untitled Manga'}
                             </div>

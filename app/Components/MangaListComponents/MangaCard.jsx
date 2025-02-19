@@ -32,8 +32,11 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => {
     };
 
     return (
-        <>
-            <div className="grid w-10/12 mx-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className=" flex w-full flex-col bg-black/10">
+        <div className="ml-20 pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase ">
+                <h1 className=" border-b-4 border-purple-900 w-fit pb-2">LATEST RELEASES</h1>
+            </div>
+            <div className="grid w-[93%] ml-20 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
                 {processedLatestMangas.map((manga, index) => (
                     <motion.div
                         key={manga.id}
@@ -125,7 +128,7 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => {
                     </motion.div>
                 ))}
             </div>
-        </>
+        </div>
     );
 };
 

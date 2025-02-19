@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-sync-scripts */
-import './globals.css'; 
-import TopNavbar from './Components/TopNavbar'; 
+import './globals.css';
+import TopNavbar from './Components/TopNavbar';
 import TanstackProvider from '@/components/providers/TanstackProvider';
 
 export const metadata = {
@@ -14,10 +14,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
       </head>
-      <body className="bg-gray-900 text-black">
+      <body
+        style={{
+          fontFamily: "'Poppins', sans-serif",
+          lineHeight: "1.6",
+          WebkitTextSizeAdjust: "100%",
+          WebkitFontSmoothing: "antialiased",
+          textRendering: "optimizeLegibility",
+          MozOsxFontSmoothing: "grayscale",
+          touchAction: "manipulation",
+        }}
+        className="bg-gray-900 text-white"
+      >
+
         <TanstackProvider>
-        <TopNavbar />
-        <main>{children}</main>
+          <TopNavbar />
+          <main>{children}</main>
         </TanstackProvider>
       </body>
     </html>

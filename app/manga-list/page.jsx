@@ -238,7 +238,7 @@ export default function MangaList() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 pt-6 px-3 to-gray-900 text-white">
+    <div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 pt-1 px-3 to-gray-900 text-white">
       {isLoadingState ? (
         <div className="flex justify-center items-center w-full h-screen">
           <div className="text-center">
@@ -248,32 +248,11 @@ export default function MangaList() {
         </div>
       ) : (
         <>
-          <div className="-mt-10 w-full h-fit">
-          <div
-              className="absolute top-2/3 left-[10%] -translate-y-1/2 w-[40%] sm:w-[50%] lg:w-[20%] h-[40%] sm:h-[50%] lg:h-[60%]"
-              style={{
-                background: "rgba(168, 85, 247, 0.6)", // purple-500/80
-                filter: "blur(180px)",
-              }}
-            ></div>
-            <div
-              className="absolute top-2/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] sm:w-[50%] lg:w-[20%] h-[40%] sm:h-[50%] lg:h-[60%]"
-              style={{
-                background: "rgba(168, 85, 247,0.6)", // purple-500/80
-                filter: "blur(180px)",
-              }}
-            ></div>
-            <div
-              className="absolute top-2/3 right-[10%] -translate-y-1/2 w-[40%] sm:w-[50%] lg:w-[20%] h-[40%] sm:h-[50%] lg:h-[60%]"
-              style={{
-                background: "rgba(168, 85, 247, 0.6)", // purple-500/80
-                filter: "blur(180px)",
-              }}
-            ></div>
+          <div className=" w-full h-fit">
             <MemoizedSliderComponent processedRandomMangas={processedRandomMangas} />
           </div>
 
-          <div className="flex flex-row justify-between  items-start gap-3">
+          <div className="flex flex-row justify-between  items-start">
             <MemoizedMangaCard
               handleMangaClicked={handleMangaClicked}
               processedLatestMangas={processedLatestMangas}
