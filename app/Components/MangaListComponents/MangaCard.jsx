@@ -1,6 +1,14 @@
 'use client';
 import Image from "next/image";
 import Flag from "react-world-flags";
+import { motion } from "framer-motion";
+
+const stagger = 0.25;
+
+const variants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1 },
+};
 
 const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => {
     const getRatingColor = (rating) => {
@@ -27,10 +35,14 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => {
         <>
             <div className="grid w-10/12 mx-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {processedLatestMangas.map((manga, index) => (
-                    <div
+                    <motion.div
                         key={manga.id}
                         onClick={() => { handleMangaClicked(manga) }}
                         className="group cursor-pointer"
+                        variants={variants}
+                        initial="hidden"
+                        animate="visible"
+                        transition={{ delay: index * stagger, ease: "easeInOut", duration: 0.5 }}
                     >
                         <div className="bg-gray-800 overflow-hidden rounded-xl shadow-lg transform transition-all duration-300 hover:scale-[102%] hover:shadow-xl min-h-[440px]">
                             <span
@@ -65,7 +77,7 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => {
                                                 className="w-6 shadow-lg shadow-black mt-0.5 mr-2"
                                                 alt="flag"
                                             />
-                                            {manga.title}
+                                            {manga.title.length > 40 ? `${manga.title.slice(0, 40)}...` : manga.title}
                                         </h3>
 
                                         <div className="flex flex-row w-full items-center justify-between px-2">
@@ -101,18 +113,16 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => {
                                 </div>
 
                                 <p className="text-xs text-gray-400 mt-4 text-center">
-                                    Last updated:{" "}
-                                    {(() => {
+                                    Last updated: {(() => {
                                         const timeDifference = Math.floor((new Date() - new Date(manga.updatedAt)) / 60000);
                                         const hours = Math.floor(timeDifference / 60);
                                         const minutes = timeDifference % 60;
-                                        return `${hours > 0 ? `${hours} hour${hours > 1 ? "s" : ""}` : ""} ${minutes > 0 ? `${minutes} min${minutes > 1 ? "s" : ""}` : ""
-                                            } ago`;
+                                        return `${hours > 0 ? `${hours} hour${hours > 1 ? "s" : ""}` : ""} ${minutes > 0 ? `${minutes} min${minutes > 1 ? "s" : ""}` : ""} ago`;
                                     })()}
                                 </p>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
             </div>
         </>

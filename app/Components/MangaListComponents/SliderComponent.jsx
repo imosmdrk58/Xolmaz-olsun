@@ -72,8 +72,8 @@ const SliderComponent = ({ processedRandomMangas }) => {
     };
 
     return (
-        <div className="bg-gray-900 w-full overflow-hidden text-white font-sans">
-            <section className="carousel h-[420px] relative flex justify-center items-center">
+        <div className=" w-full overflow-x-hidden text-white font-sans">
+            <section className="carousel h-[550px] relative flex justify-center items-center">
                 <button
                     className="h-[70px] -mr-6 z-50 border-4 border-double border-orange-500 font-extrabold pb-2 w-[70px] flex justify-center items-center bg-white bg-opacity-55 text-black text-3xl rounded-full shadow-lg hover:bg-gray-200 transition-all transform hover:scale-105"
                     onClick={handlePrev}
@@ -81,6 +81,7 @@ const SliderComponent = ({ processedRandomMangas }) => {
                     &#8249;
                 </button>
                 <div className="list relative h-full w-full z-10 flex items-center">
+
                     {processedRandomMangas.map((manga, index) => (
                         <div
                             key={index}
@@ -89,12 +90,12 @@ const SliderComponent = ({ processedRandomMangas }) => {
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
                             }}
-                            className={`manga rounded-lg overflow-hidden pl-16 absolute grid grid-cols-2 inset-0 transition-transform duration-700 ease-in-out ${active === index ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}
+                            className={`manga my-10  shadow-[0_0_40px_rgba(0,0,0,1)] shadow-purple-500/40  rounded-lg overflow-hidden pl-16 absolute grid grid-cols-2 inset-0 transition-transform duration-700 ease-in-out ${active === index ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black opacity-50 pointer-events-none"></div>
                             <div className="absolute w-full h-full backdrop-blur-lg bg-black bg-opacity-65"></div>
                             <div className="content relative z-20 flex flex-col justify-center gap-6 p-8">
-                                <h2 className="text-4xl font-semibold text-white leading-snug">{manga.title}</h2>
+                                <h2 className="text-4xl font-semibold text-white leading-snug">{manga.title.length > 40 ? `${manga.title.slice(0, 40)}...` : manga.title}</h2>
                                 <p className="text-base text-gray-300 leading-relaxed">
                                     {manga.description.slice(0, 250)}
                                 </p>
@@ -137,7 +138,7 @@ const SliderComponent = ({ processedRandomMangas }) => {
                     ))}
                 </div>
 
-                <div className="indicators z-30 absolute bottom-8 flex items-center justify-center w-full">
+                <div className="indicators z-30 absolute bottom-14 flex items-center justify-center w-full">
                     <ul className="flex gap-3">
                         {processedRandomMangas.map((_, index) => (
                             <li

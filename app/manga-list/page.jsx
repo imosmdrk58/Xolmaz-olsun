@@ -18,7 +18,7 @@ const getFromStorage = (key) => {
   try {
     const item = localStorage.getItem(key);
     const timestamp = localStorage.getItem(`${key}_timestamp`);
-    
+
     if (!item || !timestamp) return null;
     // Check if data is stale
     if (Date.now() - parseInt(timestamp) > CACHE_DURATION) {
@@ -26,7 +26,7 @@ const getFromStorage = (key) => {
       localStorage.removeItem(`${key}_timestamp`);
       return null;
     }
-    
+
     return JSON.parse(item);
   } catch (error) {
     console.error(`Error reading ${key} from localStorage:`, error);
@@ -51,7 +51,7 @@ const fetchMangaType = async (type, page) => {
 
   const response = await fetch(`/api/manga/${type}?page=${page}`);
   if (!response.ok) throw new Error(`Failed to fetch ${type} mangas`);
-  
+
   const data = await response.json();
   saveToStorage(`manga_${type}_${page}`, data);
   return data;
@@ -59,7 +59,7 @@ const fetchMangaType = async (type, page) => {
 
 const fetchAllMangaTypes = async ({ queryKey }) => {
   const [_, page] = queryKey;
-  
+
   try {
     const [rating, favourite, latest, random] = await Promise.all([
       fetchMangaType('rating', page),
@@ -248,11 +248,35 @@ export default function MangaList() {
         </div>
       ) : (
         <>
-          <MemoizedSliderComponent processedRandomMangas={processedRandomMangas} />
-          <div className="flex flex-row justify-between mt-7 items-start gap-3">
-            <MemoizedMangaCard 
-              handleMangaClicked={handleMangaClicked} 
-              processedLatestMangas={processedLatestMangas} 
+          <div className="-mt-10 w-full h-fit">
+          <div
+              className="absolute top-2/3 left-[10%] -translate-y-1/2 w-[40%] sm:w-[50%] lg:w-[20%] h-[40%] sm:h-[50%] lg:h-[60%]"
+              style={{
+                background: "rgba(168, 85, 247, 0.6)", // purple-500/80
+                filter: "blur(180px)",
+              }}
+            ></div>
+            <div
+              className="absolute top-2/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] sm:w-[50%] lg:w-[20%] h-[40%] sm:h-[50%] lg:h-[60%]"
+              style={{
+                background: "rgba(168, 85, 247,0.6)", // purple-500/80
+                filter: "blur(180px)",
+              }}
+            ></div>
+            <div
+              className="absolute top-2/3 right-[10%] -translate-y-1/2 w-[40%] sm:w-[50%] lg:w-[20%] h-[40%] sm:h-[50%] lg:h-[60%]"
+              style={{
+                background: "rgba(168, 85, 247, 0.6)", // purple-500/80
+                filter: "blur(180px)",
+              }}
+            ></div>
+            <MemoizedSliderComponent processedRandomMangas={processedRandomMangas} />
+          </div>
+
+          <div className="flex flex-row justify-between  items-start gap-3">
+            <MemoizedMangaCard
+              handleMangaClicked={handleMangaClicked}
+              processedLatestMangas={processedLatestMangas}
             />
             <MemoizedAsideComponent
               handleMangaClicked={handleMangaClicked}
