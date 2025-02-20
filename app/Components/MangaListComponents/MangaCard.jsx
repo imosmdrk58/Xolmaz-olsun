@@ -3,133 +3,89 @@ import Image from "next/image";
 import Flag from "react-world-flags";
 import { motion } from "framer-motion";
 
-const stagger = 0.25;
-
+const stagger = 0.2;
 const variants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1 },
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1 },
 };
 
-const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => {
-    const getRatingColor = (rating) => {
-        switch (rating) {
-            case "safe":
-                return "bg-green-600 border-green-600";
-            case "suggestive":
-                return "bg-yellow-600 border-yellow-600";
-            case "erotica":
-                return "bg-red-600 border-red-600";
-            default:
-                return "bg-gray-600 border-gray-600";
-        }
-    };
-    const langToCountryMap = {
-        ja: "JP",
-        ms: "MY",
-        ko: "KR",
-        en: "US",
-        zh: "CN",
-    };
+const ratingColors = {
+    safe: "bg-green-600 border-green-600",
+    suggestive: "bg-yellow-600 border-yellow-600",
+    erotica: "bg-red-600 border-red-600",
+    default: "bg-gray-600 border-gray-600",
+};
 
-    return (
-        <div className=" flex w-full flex-col bg-black/10">
-        <div className="ml-20 pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase ">
-                <h1 className=" border-b-4 border-purple-900 w-fit pb-2">LATEST RELEASES</h1>
-            </div>
-            <div className="grid w-[93%] ml-20 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
-                {processedLatestMangas.map((manga, index) => (
-                    <motion.div
-                        key={manga.id}
-                        onClick={() => { handleMangaClicked(manga) }}
-                        className="group cursor-pointer"
-                        variants={variants}
-                        initial="hidden"
-                        animate="visible"
-                        transition={{ delay: index * stagger, ease: "easeInOut", duration: 0.5 }}
-                    >
-                        <div className="bg-gray-800 overflow-hidden rounded-xl shadow-lg transform transition-all duration-300 hover:scale-[102%] hover:shadow-xl min-h-[440px]">
-                            <span
-                                className={`px-3 min-w-20 text-center border-2 absolute bg-opacity-70 backdrop-blur-lg top-2 left-2 z-10 py-1.5 text-xs shadow-lg font-semibold rounded-lg text-white ${getRatingColor(
-                                    manga.contentRating
-                                )}`}
-                            >
-                                {manga.contentRating.toUpperCase()}
-                            </span>
+const langToCountry = { ja: "JP", ms: "MY", ko: "KR", en: "US", zh: "CN" };
 
-                            <span className="flex absolute top-2 right-2 font-bold z-10 text-xs justify-center items-center flex-row bg-gray-900 bg-opacity-90 py-1 px-3 rounded-lg">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35" className="icon mr-1">
-                                    <path fill={manga.status === "completed" ? "#00c9f5" : manga.status === "ongoing" ? "#04d000" : "#da7500"} d="M4.233 3.175a1.06 1.06 0 0 1-1.058 1.058 1.06 1.06 0 0 1-1.058-1.058 1.06 1.06 0 0 1 1.058-1.058 1.06 1.06 0 0 1 1.058 1.058"></path>
-                                </svg>
-                                <span>{manga.status.charAt(0).toUpperCase() + manga.status.slice(1).toLowerCase()}</span>
-                            </span>
-
-                            <div className="relative h-80">
-                                <Image
-                                    src={manga.coverImageUrl || '/placeholder.jpg'}
-                                    alt={manga.title}
-                                    fill
-                                    className="object-cover transition-transform duration-500 "
-                                    placeholder="blur"
-                                    blurDataURL="/placeholder.jpg"
-                                />
-                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-gray-900 to-transparent pt-8">
-                                    <div className="flex w-full flex-col items-center justify-between p-4 pb-2">
-                                        <h3 className="text-sm font-bold text-white mb-4 flex justify-center items-start">
-                                            <Flag
-                                                code={langToCountryMap[manga.originalLanguage] || "UN"}
-                                                className="w-6 shadow-lg shadow-black mt-0.5 mr-2"
-                                                alt="flag"
-                                            />
-                                            {manga.title.length > 40 ? `${manga.title.slice(0, 40)}...` : manga.title}
-                                        </h3>
-
-                                        <div className="flex flex-row w-full items-center justify-between px-2">
-                                            <div className="flex items-center gap-2 text-sm text-gray-300">
-                                                <img src="/star.svg" alt="Rating" className="w-4 h-4" />
-                                                <span>{manga?.rating?.rating?.average || "N/A"}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-sm text-gray-300">
-                                                <img src="/comment.svg" alt="Comments" className="w-4 h-4" />
-                                                <span>{manga?.rating?.comments?.repliesCount || 0}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-sm text-gray-300">
-                                                <img src="/heart.svg" alt="Likes" className="w-4 h-4" />
-                                                <span>{manga?.rating?.follows || 0}</span>
-                                            </div>
+const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => (
+    <div className="w-full flex flex-col bg-black/10">
+        <div className="mx-20 pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase ">
+            <h1 className=" border-b-4 border-purple-900 w-fit pb-2">      Latest Releases
+            </h1>
+        </div>
+        <div className="grid w-[93%] ml-20 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+            {processedLatestMangas.map((manga, index) => (
+                <motion.div
+                    key={manga.id}
+                    onClick={() => handleMangaClicked(manga)}
+                    className="group cursor-pointer"
+                    variants={variants}
+                    initial="hidden"
+                    animate="visible"
+                    transition={{ delay: index * stagger, ease: "easeInOut", duration: 0.5 }}
+                >
+                    <div className="bg-gray-800 shadow-lg transform transition-all duration-300 hover:scale-[102%] hover:shadow-xl min-h-[440px] overflow-hidden relative">
+                        <span className={`px-3 text-center border-2 absolute top-1 left-1 z-10 py-[6px] min-w-24 text-xs font-semibold  text-white bg-opacity-70 backdrop-blur-lg ${ratingColors[manga.contentRating] || ratingColors.default}`}>
+                            {manga.contentRating.toUpperCase()}
+                        </span>
+                        <span className="absolute top-1 right-1 z-10 text-xs bg-gray-900 bg-opacity-90 py-1 px-3  flex items-center font-bold">
+                            <svg width="24" height="24" viewBox="0 0 6.35 6.35" className="mr-1" fill={manga.status === "completed" ? "#00c9f5" : manga.status === "ongoing" ? "#04d000" : "#da7500"}>
+                                <circle cx="3.175" cy="3.175" r="1.058" />
+                            </svg>
+                            {manga.status.charAt(0).toUpperCase() + manga.status.slice(1).toLowerCase()}
+                        </span>
+                        <div className="relative h-80">
+                            <Image src={manga.coverImageUrl || '/placeholder.jpg'} alt={manga.title} fill className="object-cover transition-transform duration-500" placeholder="blur" blurDataURL="/placeholder.jpg" />
+                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-gray-900 to-transparent p-4">
+                                <h3 className="text-sm font-bold text-white flex items-start">
+                                    <Flag code={langToCountry[manga.originalLanguage] || "UN"} className="w-6 shadow-lg shadow-black mt-0.5 mr-2" />
+                                    {manga.title.length > 40 ? `${manga.title.slice(0, 40)}...` : manga.title}
+                                </h3>
+                                <div className="flex justify-between mt-2 text-gray-300 text-sm">
+                                    {["star", "comment", "heart"].map((icon, i) => (
+                                        <div key={i} className="flex items-center gap-2">
+                                            <img src={`/${icon}.svg`} alt={icon} className="w-4 h-4" />
+                                            <span>{
+                                                icon === "comment" ? (manga?.rating?.comments?.repliesCount > 1000 ? manga?.rating?.comments?.repliesCount.toString()[0] + "K" : manga?.rating?.comments?.repliesCount || 0) :
+                                                    icon === "heart" ? (manga?.rating?.follows > 1000 ? manga?.rating?.follows?.toString()[0] + "K" : manga?.rating?.follows || 0) :
+                                                        manga?.rating?.rating?.average?.toFixed(2) || "N/A"
+                                            }</span>
                                         </div>
-                                    </div>
+                                    ))}
                                 </div>
-                            </div>
-
-                            <div className="p-4 bg-gray-800">
-                                <div className="space-y-3">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        {manga.flatTags.slice(0, 4).map((tag) => (
-                                            <span
-                                                key={tag}
-                                                className="bg-gray-900 min-w-16 text-center text-nowrap shadow-lg shadow-black/20 px-3 py-1.5 rounded-lg border border-gray-700 text-sm transition-colors hover:bg-gray-800"
-                                            >
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <p className="text-xs text-gray-400 mt-4 text-center">
-                                    Last updated: {(() => {
-                                        const timeDifference = Math.floor((new Date() - new Date(manga.updatedAt)) / 60000);
-                                        const hours = Math.floor(timeDifference / 60);
-                                        const minutes = timeDifference % 60;
-                                        return `${hours > 0 ? `${hours} hour${hours > 1 ? "s" : ""}` : ""} ${minutes > 0 ? `${minutes} min${minutes > 1 ? "s" : ""}` : ""} ago`;
-                                    })()}
-                                </p>
                             </div>
                         </div>
-                    </motion.div>
-                ))}
-            </div>
+                        <div className="p-3 bg-gray-800">
+                            <div className="flex flex-wrap gap-1">
+                                {manga.flatTags.slice(0, 4).map(tag => (
+                                    <span key={tag} className="bg-gray-900 min-w-16 text-center shadow-lg px-3 py-1.5  border border-gray-700 text-sm transition-colors hover:bg-gray-800">
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+                            <p className="text-xs w-full  absolute flex justify-center items-center text-center bottom-1  text-gray-400 mt-4 ">
+                                Last updated: {(() => {
+                                    const minutes = Math.floor((new Date() - new Date(manga.updatedAt)) / 60000);
+                                    return `${Math.floor(minutes / 60)}h ${minutes % 60}m ago`;
+                                })()}
+                            </p>
+                        </div>
+                    </div>
+                </motion.div>
+            ))}
         </div>
-    );
-};
+    </div>
+);
 
 export default MangaCard;

@@ -28,19 +28,19 @@ const SliderComponent = ({ processedRandomMangas }) => {
 
     return (
         <div className="w-full overflow-hidden text-white font-sans bg-black/10 pb-10 pt-7">
-            <div className="mx-20 pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase ">
+            <div className="mx-28 pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase ">
                 <h1 className=" border-b-4 border-purple-900 w-fit pb-2">Randomized Recomendation</h1>
             </div>
 
-            <section className="carousel flex justify-start w-full items-center relative gap-4">
-                <button onClick={handlePrev} className="border-2 border-purple-500 bg-opacity-20 hover:bg-opacity-30 bg-purple-500 p-5 rounded-full hover:bg-purple-600 transition">
+            <section className="carousel flex justify-center w-full items-center relative gap-4">
+                <button onClick={handlePrev} className="border-2 border-purple-500 bg-opacity-20 hover:bg-opacity-30 bg-purple-500 p-5 rounded-lg hover:bg-purple-600 transition">
                     <Image className=" brightness-200" src="/previous.svg" alt="prev" width={20} height={20} />
                 </button>
-                <div className="list flex gap-6 items-center overflow-hidden">
+                <div className="list flex gap-2 items-center overflow-hidden">
                     {visibleMangas.map((manga, index) => (
                         <div
                             key={index}
-                            className="relative w-[245px] h-[340px] flex-shrink-0 rounded-lg overflow-hidden shadow-xl bg-gray-900 hover:scale-105 transition border border-gray-700"
+                            className="relative w-[245px] h-[340px] flex-shrink-0  overflow-hidden shadow-xl bg-gray-900 hover:scale-105 transition border border-gray-700"
                             onMouseEnter={() => setHoveredIndex(index)}
                             onMouseLeave={() => setHoveredIndex(null)}
                         >
@@ -53,14 +53,14 @@ const SliderComponent = ({ processedRandomMangas }) => {
 
                             {/* Description on Hover */}
                             {hoveredIndex === index && (
-                                <div className="absolute inset-0 flex flex-col justify-start p-4 bg-black bg-opacity-80 text-white transition-opacity duration-300">
+                                <div className="absolute inset-0 flex flex-col justify-start p-4 bg-black bg-opacity-80 text-purple-300 transition-opacity duration-300">
                                     <p className="text-[12px] tracking-tight line-clamp-[15] ">{manga.description || "No description available."}</p>
                                 </div>
                             )}
                         </div>
                     ))}
                 </div>
-                <button onClick={handlePrev} className="border-2 border-purple-500 bg-opacity-20 hover:bg-opacity-30 bg-purple-500 p-5 rounded-full hover:bg-purple-600 transition">
+                <button onClick={handleNext} className="border-2 border-purple-500 bg-opacity-20 hover:bg-opacity-30 bg-purple-500 p-5 rounded-lg hover:bg-purple-600 transition">
                     <Image className=" brightness-200" src="/next.svg" alt="next" width={20} height={20} />
                 </button>
             </section>

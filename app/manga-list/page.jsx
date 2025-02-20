@@ -238,7 +238,7 @@ export default function MangaList() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 pt-1 px-3 to-gray-900 text-white">
+    <div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 pt-1 to-gray-900 text-white">
       {isLoadingState ? (
         <div className="flex justify-center items-center w-full h-screen">
           <div className="text-center">
