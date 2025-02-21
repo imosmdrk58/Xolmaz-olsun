@@ -1,33 +1,30 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 import React from 'react';
-import AboutManga from '../../../Components/ChaptersListComponents/AboutManga';
-import ChapterList from '../../../Components/ChaptersListComponents/ChapterList';
+import AboutManga from '../Components/ChaptersListComponents/AboutManga';
+import ChapterList from '../Components/ChaptersListComponents/ChapterList';
 
 const MemoizedAboutManga = React.memo(AboutManga);
 const MemoizedChapterList = React.memo(ChapterList);
 
 export default function MangaChapters() {
-  const { mangaId } = useParams();
-  const router = useRouter();
-
+  const { mangaId } = useParams(); // Fix: Match route param name
+  const navigate = useNavigate();
+  const location = useLocation();
+  const manga = location.state?.manga || null;
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [manga, setManga] = useState(null); // Use state to store the manga object
-
-  // Fetch manga object from query params
+  const [extraInfo, setExtraInfo] = useState(null);
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const mangaParam = searchParams.get('manga');
-    if (mangaParam) {
-      setManga(JSON.parse(mangaParam)); // Update manga state
+    if (!manga) {
+      setError('No manga data found.');
+      setLoading(false);
+      return;
     }
-  }, [window.location.search]); // Re-run when the URL changes
 
-  useEffect(() => {
     const fetchChapters = async () => {
       try {
         setLoading(true);
@@ -62,11 +59,11 @@ export default function MangaChapters() {
     };
 
     fetchChapters();
-  }, [mangaId]);
+  }, [mangaId, manga]);
 
   const handleChapterClick = useCallback((id) => {
-    router.push(`/chapter/${id}/read`);
-  }, [router]);
+    navigate(`/manga/${mangaId}/chapter/${id.id}/read`, { state: { chapterInfo: id,mangaInfo:manga,extraInfo } });
+  }, [navigate, mangaId]);
 
   if (loading)
     return (
@@ -93,8 +90,8 @@ export default function MangaChapters() {
 
   return (
     <div className="w-full min-h-screen bg-gray-900 text-white py-10 px-6 sm:px-12">
-      <MemoizedAboutManga manga={manga} handleChapterClick={handleChapterClick} />
-      <MemoizedChapterList chapters={chapters} handleChapterClick={handleChapterClick} />
+      <MemoizedAboutManga setExtraInfo={setExtraInfo} manga={manga} handleChapterClick={handleChapterClick} />
+      <MemoizedChapterList manga={manga} chapters={chapters} handleChapterClick={handleChapterClick} />
     </div>
   );
 }

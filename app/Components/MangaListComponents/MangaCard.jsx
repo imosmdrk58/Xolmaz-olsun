@@ -74,7 +74,7 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => (
                                     </span>
                                 ))}
                             </div>
-                            <p className="text-xs w-full  absolute flex justify-center items-center text-center bottom-1  text-gray-400 mt-4 ">
+                            <p className="text-xs w-full pr-6 absolute flex justify-center items-center text-center bottom-1  text-gray-400 mt-4 ">
                                 Last updated: {(() => {
                                     const minutes = Math.floor((new Date() - new Date(manga.updatedAt)) / 60000);
                                     return `${Math.floor(minutes / 60)}h ${minutes % 60}m ago`;

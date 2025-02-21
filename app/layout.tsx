@@ -1,14 +1,15 @@
+"use client"
 /* eslint-disable @next/next/no-sync-scripts */
 import './globals.css';
 import TopNavbar from './Components/TopNavbar';
 import TanstackProvider from '@/components/providers/TanstackProvider';
+import { BrowserRouter as Router,Routes, Route  } from 'react-router-dom';
+import Home from "./page"
+import MangaChapters from "./Core/MangaChapters"
+import MangaList from "./Core/MangaList"
+import ReadChapter from "./Core/ReadChapter"
 
-export const metadata = {
-  title: 'Manga Reader',
-  description: 'Discover and read your favorite manga seamlessly.',
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout() {
   return (
     <html lang="en">
       <head>
@@ -26,10 +27,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }}
         className="bg-gray-900 text-white"
       >
-
         <TanstackProvider>
-          <TopNavbar />
-          <main>{children}</main>
+          <Router>
+            <TopNavbar />
+            <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/manga-list" element={<MangaList />} />
+      <Route path="/manga/:mangaId/chapters" element={<MangaChapters />} />
+      <Route path="/manga/:mangaId/chapter/:chapterId/read" element={<ReadChapter />} />
+    </Routes>
+          </Router>
         </TanstackProvider>
       </body>
     </html>

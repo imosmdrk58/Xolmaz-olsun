@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import MangaCard from "../Components/MangaListComponents/MangaCard";
 import AsideComponent from "../Components/MangaListComponents/AsideComponent";
 import SliderComponent from "../Components/MangaListComponents/SliderComponent";
-
+console.log("here i am")
 const MemoizedMangaCard = React.memo(MangaCard);
 const MemoizedAsideComponent = React.memo(AsideComponent);
 const MemoizedSliderComponent = React.memo(SliderComponent);
@@ -166,7 +166,7 @@ const processMangaData = async (mangaList) => {
 
 export default function MangaList() {
   const [page, setPage] = useState(1);
-  const router = useRouter();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDataProcessed, setIsDataProcessed] = useState(false);
 
@@ -213,9 +213,9 @@ export default function MangaList() {
   }, [data, isDataProcessed]);
 
   const handleMangaClicked = (manga) => {
-    router.push(`/manga/${manga.id}/chapters?manga=${encodeURIComponent(JSON.stringify(manga))}`);
+    navigate(`/manga/${manga.id}/chapters`, { state: { manga } });
   };
-
+  
   const loadMoreMangas = () => {
     setPage((prevPage) => prevPage + 1);
   };
@@ -249,7 +249,7 @@ export default function MangaList() {
       ) : (
         <>
           <div className=" w-full h-fit">
-            <MemoizedSliderComponent processedRandomMangas={processedRandomMangas} />
+            <MemoizedSliderComponent handleMangaClicked={handleMangaClicked} processedRandomMangas={processedRandomMangas} />
           </div>
 
           <div className="flex flex-row justify-between  items-start">

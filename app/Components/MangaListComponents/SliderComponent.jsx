@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
-const SliderComponent = ({ processedRandomMangas }) => {
+const SliderComponent = ({ processedRandomMangas,handleMangaClicked }) => {
     const [visibleMangas, setVisibleMangas] = useState([]);
     const [hoveredIndex, setHoveredIndex] = useState(null);
     const autoPlayRef = useRef(null);
@@ -33,9 +33,17 @@ const SliderComponent = ({ processedRandomMangas }) => {
             </div>
 
             <section className="carousel flex justify-center w-full items-center relative gap-4">
-                <button onClick={handlePrev} className="border-2 border-purple-500 bg-opacity-20 hover:bg-opacity-30 bg-purple-500 p-5 rounded-lg hover:bg-purple-600 transition">
+                <span
+                    onClick={() => handlePrev()}
+                    className={`relative cursor-pointer brightness-150 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center items-center p-5 rounded-xl overflow-hidden
+                                      before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-500 before:content-[''] group-hover:before:opacity-100
+                                    `}
+                    style={{
+                        background: "linear-gradient(#3b235a, #24143f)",
+                    }}
+                >
                     <Image className=" brightness-200" src="/previous.svg" alt="prev" width={20} height={20} />
-                </button>
+                </span>
                 <div className="list flex gap-2 items-center overflow-hidden">
                     {visibleMangas.map((manga, index) => (
                         <div
@@ -53,16 +61,24 @@ const SliderComponent = ({ processedRandomMangas }) => {
 
                             {/* Description on Hover */}
                             {hoveredIndex === index && (
-                                <div className="absolute inset-0 flex flex-col justify-start p-4 bg-black bg-opacity-80 text-purple-300 transition-opacity duration-300">
+                                <div onClick={()=>{handleMangaClicked(manga)}} className="absolute cursor-pointer inset-0 flex flex-col justify-start p-4 bg-black bg-opacity-80 text-purple-300 transition-opacity duration-300">
                                     <p className="text-[12px] tracking-tight line-clamp-[15] ">{manga.description || "No description available."}</p>
                                 </div>
                             )}
                         </div>
                     ))}
                 </div>
-                <button onClick={handleNext} className="border-2 border-purple-500 bg-opacity-20 hover:bg-opacity-30 bg-purple-500 p-5 rounded-lg hover:bg-purple-600 transition">
+                <span
+                    onClick={() => handleNext()}
+                    className={`relative cursor-pointer brightness-150 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center items-center p-5 rounded-xl overflow-hidden
+                                      before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-500 before:content-[''] group-hover:before:opacity-100
+                                    `}
+                    style={{
+                        background: "linear-gradient(#3b235a, #24143f)",
+                    }}
+                >
                     <Image className=" brightness-200" src="/next.svg" alt="next" width={20} height={20} />
-                </button>
+                </span>
             </section>
         </div>
     );
