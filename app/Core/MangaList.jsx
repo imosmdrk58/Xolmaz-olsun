@@ -5,7 +5,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import MangaCard from "../Components/MangaListComponents/MangaCard";
 import AsideComponent from "../Components/MangaListComponents/AsideComponent";
 import SliderComponent from "../Components/MangaListComponents/SliderComponent";
-console.log("here i am")
 const MemoizedMangaCard = React.memo(MangaCard);
 const MemoizedAsideComponent = React.memo(AsideComponent);
 const MemoizedSliderComponent = React.memo(SliderComponent);
@@ -67,7 +66,7 @@ const fetchAllMangaTypes = async ({ queryKey }) => {
       fetchMangaType('latest', page),
       fetchMangaType('random', page)
     ]);
-
+    console.log(latest)
     return {
       mangas: rating,
       favouriteMangas: favourite,
@@ -215,7 +214,7 @@ export default function MangaList() {
   const handleMangaClicked = (manga) => {
     navigate(`/manga/${manga.id}/chapters`, { state: { manga } });
   };
-  
+
   const loadMoreMangas = () => {
     setPage((prevPage) => prevPage + 1);
   };
