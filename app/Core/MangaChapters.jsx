@@ -90,7 +90,7 @@ export default function MangaChapters() {
 
   return (
     <div className="w-full min-h-screen bg-gray-900 text-white py-10 px-6 sm:px-12">
-      <MemoizedAboutManga setExtraInfo={setExtraInfo} manga={manga} handleChapterClick={handleChapterClick} />
+      <MemoizedAboutManga last={chapters[chapters.length-1]} setExtraInfo={setExtraInfo} manga={manga} handleChapterClick={handleChapterClick} />
       <MemoizedChapterList manga={manga} chapters={chapters} handleChapterClick={handleChapterClick} />
     </div>
   );

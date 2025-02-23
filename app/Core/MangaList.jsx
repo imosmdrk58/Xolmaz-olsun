@@ -144,6 +144,7 @@ const processMangaData = async (mangaList) => {
         altTitle: Object.values(altTitles[0] ?? { none: "N/A" })[0] || 'N/A',
         contentRating: contentRating || 'N/A',
         status: status || 'Unknown',
+        altTitles,
         year: year || 'N/A',
         updatedAt: updatedAt ? new Date(updatedAt) : 'N/A',
         tags: groupedTagsArray,

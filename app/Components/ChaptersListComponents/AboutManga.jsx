@@ -3,7 +3,7 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react'
 import Flag from "react-world-flags";
 
-const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
+const AboutManga = ({ manga, handleChapterClick,setExtraInfo,last }) => {
     const getRatingColor = (rating) => {
         switch (rating) {
             case "safe":
@@ -135,7 +135,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
                                 </div>
 
                                 <div className="flex flex-row  gap-2">
-                                    <div className="font-normal text-xs sm:text-base sm:truncate flex-shrink-0 ">
+                                    <div className="font-normal  text-xs sm:text-base sm:truncate -mt-10 ">
                                         {authorData}
                                     </div>
                                 </div>
@@ -143,8 +143,8 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
                             <div className=" relative mt-4 flex flex-col  gap-2">
                                 <div className="grid grid-cols-9 w-full items-center">
                                     <button
-                                        onClick={() => handleChapterClick(manga.latestUploadedChapter)}
-                                        className="flex flex-grow col-span-2 bg-[#cc5233] bg-opacity-40 border-2 border-[#cc5233] whitespace-nowrap px-3 rounded relative items-center overflow-hidden shadow-sm transition hover:bg-opacity-60"
+                                        onClick={() => handleChapterClick(last)}
+                                        className="flex flex-grow col-span-2 bg-[#4d229e] bg-opacity-40 border-2 border-[#4d229e] whitespace-nowrap px-3 rounded relative items-center overflow-hidden shadow-sm transition hover:bg-opacity-60"
                                         style={{ minHeight: '3rem' }}
                                     >
                                         <span className="flex items-center gap-5 justify-center font-medium select-none w-full pointer-events-none text-white">
@@ -213,7 +213,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
                                         <div className="space-y-2">
                                             <div className="flex flex-wrap items-center gap-2">
                                                 <span
-                                                    className={`inline-flex items-center rounded-md text-sm min-h-[1.75rem] px-3 py-1 text-[11px] shadow-[0_0_6px_rgba(0,0,0,1)] shadow-slate-400 font-semibold text-white transition-transform duration-150 ease-out hover:scale-105 ${getRatingColor(
+                                                    className={`inline-flex items-center rounded-md text-sm min-h-[1.75rem] px-3 py-1 text-[11px] shadow-[0_0_3px_rgba(0,0,0,1)] shadow-purple-500 font-semibold text-white transition-transform duration-150 ease-out hover:scale-105 ${getRatingColor(
                                                         manga.contentRating
                                                     )}`}
                                                 >
@@ -223,7 +223,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
                                                 {manga.flatTags.map((tag, index) => (
                                                     <span
                                                         key={index}
-                                                        className=" inline-flex items-center rounded-md text-sm min-h-[1.75rem] px-3 py-1 text-[11px] shadow-[0_0_6px_rgba(0,0,0,1)] shadow-slate-400 font-semibold text-white transition-transform duration-150 ease-out hover:scale-105"
+                                                        className=" inline-flex items-center rounded-md text-sm min-h-[1.75rem] px-3 py-1 text-[11px] shadow-[0_0_3px_rgba(0,0,0,1)] shadow-purple-500 font-semibold text-white transition-transform duration-150 ease-out hover:scale-105"
                                                     >
                                                         {tag}
                                                     </span>
@@ -233,7 +233,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
                                     </div>
                                     <div className="py-4 text-sm mt-2 bg-gray-900 rounded-lg ">
 
-                                        <div className="flex flex-col items-start shadow-sm shadow-slate-400 p-4 rounded-lg">
+                                        <div className="flex flex-col items-start shadow-sm shadow-purple-500 p-4 rounded-lg">
                                             <h2 className="text-lg font-bold text-white mb-2 border-b w-full border-gray-700 pb-1">Manga Description</h2>
                                             <p className="text-gray-300 leading-relaxed tracking-wide">
                                                 {manga.description}
@@ -248,7 +248,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
                                             <div className="flex gap-2 flex-wrap">
                                                 <a
                                                     href="/author/049feddc-1bb9-41ee-96b8-200c7b3e25cc/eguchi-hiro"
-                                                    className="inline-flex items-center rounded-md text-sm px-3 py-1 text-[11px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 font-semibold text-white transition-transform duration-150 ease-out hover:scale-105"
+                                                    className="inline-flex items-center rounded-md text-sm px-3 py-1 text-[11px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-purple-500 font-semibold text-white transition-transform duration-150 ease-out hover:scale-105"
                                                 >
                                                     {authorData}
                                                 </a>
@@ -260,7 +260,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
                                             <div className="flex gap-2 flex-wrap">
                                                 <a
                                                     href="/author/049feddc-1bb9-41ee-96b8-200c7b3e25cc/eguchi-hiro"
-                                                    className="inline-flex items-center rounded-md text-sm px-3 py-1 text-[11px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 font-semibold text-white  transition-transform duration-150 ease-out hover:scale-105"
+                                                    className="inline-flex items-center rounded-md text-sm px-3 py-1 text-[11px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-purple-500 font-semibold text-white  transition-transform duration-150 ease-out hover:scale-105"
                                                 >
                                                     {artistData}
                                                 </a>
@@ -276,7 +276,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
                                                             {tagGroup.tags.slice(0, tagGroup.group === "genre" || tagGroup.group === "format" ? 2 : tagGroup.tags.length).map((tag) => (
                                                                 <span
                                                                     key={tag}
-                                                                    className="inline-flex items-center rounded-md text-sm px-3 py-1 text-[11px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 font-semibold text-white transition-transform duration-150 ease-out hover:scale-105"
+                                                                    className="inline-flex items-center rounded-md text-sm px-3 py-1 text-[11px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-purple-500 font-semibold text-white transition-transform duration-150 ease-out hover:scale-105"
                                                                 >
                                                                     {tag}
                                                                 </span>
@@ -291,7 +291,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
                                             <div className="flex gap-2 flex-wrap">
                                                 <a
                                                     href="/titles?demos=josei"
-                                                    className="inline-flex items-center rounded-md text-sm px-3 py-1 text-[11px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-slate-400 font-semibold text-white  transition-transform duration-150 ease-out hover:scale-105"
+                                                    className="inline-flex items-center rounded-md text-sm px-3 py-1 text-[11px] shadow-[0_0_4px_rgba(0,0,0,1)] shadow-purple-500 font-semibold text-white  transition-transform duration-150 ease-out hover:scale-105"
                                                 >
                                                     {manga.MangaStoryType[0].related ? manga.MangaStoryType[0].related : manga.MangaStoryType}
                                                 </a>
@@ -332,7 +332,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                 >
-                                                                    <span className=" inline-flex items-center rounded-md text-sm min-h-[1.75rem] px-3 py-1 text-[11px] shadow-[0_0_6px_rgba(0,0,0,1)] shadow-slate-400 font-semibold text-white transition-transform duration-150 ease-out hover:scale-105">
+                                                                    <span className=" inline-flex items-center rounded-md text-sm min-h-[1.75rem] px-3 py-1 text-[11px] shadow-[0_0_3px_rgba(0,0,0,1)] shadow-purple-500 font-semibold text-white transition-transform duration-150 ease-out hover:scale-105">
                                                                         {key === "al" && "AniList"}
                                                                         {key === "amz" && "Amazon"}
                                                                         {key === "bw" && "BookWalker"}
@@ -355,7 +355,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo }) => {
                                             </div>
                                         )}
 
-
+{console.log(manga)}
                                         {/* Alternative Titles */}
                                         {manga.altTitles && manga.altTitles.length > 0 && (
                                             <div className="w-full">

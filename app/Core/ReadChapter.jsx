@@ -89,13 +89,13 @@ export default function ReadChapter() {
           scrollbarWidth: "thin",
           scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)", // Purple scrollbar
         }}
-        className={`${isCollapsed ? "w-fit h-fit flex justify-center items-center absolute top-1/2 left-4" : "w-80 h-[90vh] py-6 px-5"}  bg-gray-800 shadow-2xl rounded-xl  flex flex-col overflow-y-auto border border-gray-700 transition-all duration-300 ${isCollapsed ? 'h-16' : 'h-[90vh]'}`}
+        className={`${isCollapsed ? "w-fit h-fit flex justify-center items-center absolute top-1/2 left-4 shadow-[0_0_10px_rgba(0,0,0,1)] shadow-purple-500" : "w-80 h-[88vh] -mb-6 py-6 px-5"}  bg-gray-800 shadow-2xl rounded-xl  flex flex-col overflow-y-auto border border-gray-700 transition-all duration-300 `}
       >
         <div className=' flex flex-row justify-start gap-4 items-center'>
           <span
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`relative cursor-pointer flex justify-center items-center w-fit p-4 rounded-xl overflow-hidden
-                    brightness-150 shadow-[0_0_10px_rgba(0,0,0,1)] shadow-purple-500
+            className={`relative cursor-pointer min-w-14 flex justify-center items-center w-fit p-4 rounded-xl overflow-hidden
+                    brightness-150
                               before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-500 before:content-[''] group-hover:before:opacity-100
                             `}
             style={{ background: "linear-gradient(#3b235a, #24143f)" }}
@@ -258,7 +258,7 @@ export default function ReadChapter() {
           </div>
         )}
         {pages.slice(currentIndex, currentIndex + panels).map((page, index) => (
-          <Image
+          <img
             key={imageKey + index} // Unique key for each image
             src={page}
             alt={`Page ${currentIndex + index + 1}`}
