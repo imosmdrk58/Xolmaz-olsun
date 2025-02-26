@@ -19,7 +19,7 @@ function AsideComponent({
     <>
       {mangaToDisplay.length > 0 && (
         <div className='w-5/12'>
-          <div className="bg-black/20 pl-7  text-white shadow-lg w-full">
+          <div className=" pl-7  text-white shadow-lg w-full">
 
             {/* Section Header */}
             <div className=" pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase ">

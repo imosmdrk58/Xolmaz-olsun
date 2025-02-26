@@ -187,11 +187,15 @@ export default function MangaList() {
   const processMutation = useMutation({
     mutationFn: (data) => {
       const { mangas, favouriteMangas, latestMangas, randomMangas } = data;
+      const cachedDataMangas = getFromStorage(`proccessedmanga_${"rating"}_${page}`);
+      const cachedDataFavouriteMangas = getFromStorage(`proccessedmanga_${"favourite"}_${page}`);
+      const cachedDataLatestMangas = getFromStorage(`proccessedmanga_${"latest"}_${page}`);
+      const cachedDataRandomMangas = getFromStorage(`proccessedmanga_${"random"}_${page}`);
       return Promise.all([
-        processMangaData(mangas.data || []),
-        processMangaData(favouriteMangas.data || []),
-        processMangaData(latestMangas.data || []),
-        processMangaData(randomMangas.data || []),
+        cachedDataMangas?cachedDataMangas:processMangaData(mangas.data || []),
+        cachedDataFavouriteMangas?cachedDataFavouriteMangas:processMangaData(favouriteMangas.data || []),
+        cachedDataLatestMangas?cachedDataLatestMangas:processMangaData(latestMangas.data || []),
+        cachedDataRandomMangas?cachedDataRandomMangas:processMangaData(randomMangas.data || []),
       ]);
     },
     onSuccess: ([processedMangas, processedFavouriteMangas, processedLatestMangas, processedRandomMangas]) => {
@@ -199,6 +203,10 @@ export default function MangaList() {
       queryClient.setQueryData(["processedFavouriteMangas"], processedFavouriteMangas);
       queryClient.setQueryData(["processedLatestMangas"], processedLatestMangas);
       queryClient.setQueryData(["processedRandomMangas"], processedRandomMangas);
+      saveToStorage(`proccessedmanga_${"rating"}_${page}`, processedMangas);
+      saveToStorage(`proccessedmanga_${"favourite"}_${page}`, processedFavouriteMangas);
+      saveToStorage(`proccessedmanga_${"latest"}_${page}`, processedLatestMangas);
+      saveToStorage(`proccessedmanga_${"random"}_${page}`, processedRandomMangas);
       setIsDataProcessed(true);
     },
     onError: (error) => {
@@ -238,7 +246,7 @@ export default function MangaList() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 pt-1 to-gray-900 text-white">
+    <div className="min-h-screen w-full  text-white">
       {isLoadingState ? (
         <div className="flex justify-center items-center w-full h-screen">
           <div className="text-center">

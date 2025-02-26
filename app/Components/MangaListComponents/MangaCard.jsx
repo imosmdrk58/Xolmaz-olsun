@@ -19,7 +19,7 @@ const ratingColors = {
 const langToCountry = { ja: "JP", ms: "MY", ko: "KR", en: "US", zh: "CN" };
 
 const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => (
-    <div className="w-full flex flex-col bg-black/20">
+    <div className="w-full flex flex-col ">
         <div className="mx-20 pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase ">
             <h1 className=" border-b-4 border-purple-900 w-fit pb-2">      Latest Releases
             </h1>
@@ -29,7 +29,7 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => (
                 <motion.div
                     key={manga.id}
                     onClick={() => handleMangaClicked(manga)}
-                    className="group flex justify-center min-h-[400px] items-center h-fit cursor-pointer w-full"
+                    className="group flex justify-center min-h-[400px] items-start h-fit cursor-pointer w-full"
                     variants={variants}
                     initial="hidden"
                     animate="visible"
@@ -82,7 +82,7 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => (
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-3 flex flex-col justify-between">
+                            <div className="mt-3 flex flex-col min-h-[100px] justify-between">
 
                                 <div className="flex flex-wrap gap-1">
                                     {manga.flatTags.slice(0, 4).map(tag => (

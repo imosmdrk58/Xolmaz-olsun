@@ -12,74 +12,59 @@ const TopNavbar = () => {
   };
 
   return (
-    <header className="sticky top-0 w-full z-50 bg-[#0a1130] bg-opacity-60 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,1)] shadow-purple-500/80">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-1">
-
-        {/* Logo - Left */}
-        <Link href="/" className="flex items-center space-x-4 ">
-          <div className="relative overflow-hidden rounded-full p-0.5 pr-0 pb-0">
-            <Image
-              src="/logo-2.png"
-              alt="Logo"
-              width={50}
-              height={50}
-              className="object-contain h-16 w-16 relative"
-            />
-            <div className="absolute inset-0 rounded-full shadow-inner shadow-purple-500/80"></div>
-          </div>
-
-          <span className="text-purple-300 tracking-wide text-2xl font-bold font-serif">Manga Reader</span>
-        </Link>
-
-        {/* Navigation Links - Center/Right */}
-        <nav className="hidden md:flex space-x-6 text-white text-lg font-medium">
-          <Link href="/browse" className="hover:text-yellow-400 transition">Browse</Link>
-          <Link href="/latest" className="hover:text-yellow-400 transition">Latest</Link>
-          <Link href="/popular" className="hover:text-yellow-400 transition">Popular</Link>
-          <Link href="/genres" className="hover:text-yellow-400 transition">Genres</Link>
-          <Link href="/search" className="hover:text-yellow-400 transition">Search</Link>
-          <Link href="/favorites" className="hover:text-yellow-400 transition">Favorites</Link>
-        </nav>
-
-        {/* Mobile Menu Button - Right */}
-        <button
-          onClick={toggleMobileMenu}
-          className="md:hidden text-white focus:outline-none hover:text-yellow-400 transition duration-300"
-        >
-          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
-            ></path>
+    <header className="sticky px-20  z-50 bg-gray-950 bg-opacity-90 backdrop-blur-md flex items-center justify-between h-20">
+    {/* Left Section - Logo and Navigation */}
+    <div className="flex items-center">
+      <a href="/" className="flex items-center mr-6">
+        <div className="hidden md:block">
+          <Image className="rounded-full" src="/logo.svg" width={60} height={60} alt="logo" />
+        </div>
+        <div className="block md:hidden">
+          <svg width="25" height="25" viewBox="0 0 24 24" fill="white">
+            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
           </svg>
+        </div>
+      </a>
+      
+      {/* Navigation Links - Spotify style */}
+      <div className="hidden md:flex space-x-7 text-gray-400">
+        <a href="#" className="font-bold text-white hover:text-white">Home</a>
+        <a href="#" className="font-medium hover:text-white">Search</a>
+        <a href="#" className="font-medium hover:text-white">Library</a>
+      </div>
+    </div>
+  
+    {/* Middle - Search Bar */}
+    <div className="hidden lg:block flex-grow max-w-2xl mx-4">
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input 
+          type="text" 
+          className="bg-gray-800 block w-full pl-10 pr-3 py-2 rounded-full text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          placeholder="Search Manga"
+        />
+      </div>
+    </div>
+  
+    {/* Right - Controls and Profile */}
+    <div className="flex items-center space-x-5">
+      <button className="hidden sm:block text-sm font-medium bg-black border border-gray-700 hover:border-white text-white py-3 px-5 rounded-full">
+        Upgrade
+      </button>
+      
+      {/* User Profile */}
+      <div className="flex items-center space-x-2">
+        <button className="bg-purple-500 p-0.5 rounded-full flex items-center justify-center focus:outline-none">
+          <span className="sr-only">User menu</span>
+          <Image src="/user.png" width={40} height={40} alt="user" className="bg-white p-1 rounded-full" />
         </button>
       </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="md:hidden absolute top-full left-0 w-full bg-[#0a1130] shadow-lg text-white p-4 space-y-3 text-center"
-          >
-            {["Browse", "Latest", "Popular", "Genres", "Search", "Favorites"].map((item) => (
-              <Link
-                key={item}
-                href={`/${item.toLowerCase()}`}
-                className="block py-2 text-lg hover:text-yellow-400 transition"
-                onClick={toggleMobileMenu}
-              >
-                {item}
-              </Link>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+    </div>
+  </header>
   );
 };
 

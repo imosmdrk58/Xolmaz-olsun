@@ -355,7 +355,6 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo,last }) => {
                                             </div>
                                         )}
 
-{console.log(manga)}
                                         {/* Alternative Titles */}
                                         {manga.altTitles && manga.altTitles.length > 0 && (
                                             <div className="w-full">

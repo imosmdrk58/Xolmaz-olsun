@@ -36,14 +36,15 @@ export default function RootLayout() {
           touchAction: "manipulation",
         }}
         className="bg-gray-900 text-white"
-      >
+        >
+
         <TanstackProvider>
           <Suspense fallback={<div className="flex justify-center items-center w-full h-screen">
-          <div className="text-center">
-            <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
-            <p className="text-lg font-semibold">Loading Mangas...</p>
-          </div>
-        </div>}>
+            <div className="text-center">
+              <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
+              <p className="text-lg font-semibold">Loading Mangas...</p>
+            </div>
+          </div>}>
             {isClient && ( // Only render Router on the client
               <Router>
                 <TopNavbar />
