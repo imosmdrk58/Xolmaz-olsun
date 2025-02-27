@@ -12,7 +12,7 @@ const TopNavbar = () => {
   };
 
   return (
-    <header className="sticky px-20  z-50 bg-gray-950 bg-opacity-90 backdrop-blur-md flex items-center justify-between h-20">
+    <header className="fixed px-20 top-0  w-full  z-50 bg-gradient-to-b from-purple-900/30 to-gray-950/60 bg-opacity-90 backdrop-blur-md flex items-center justify-between h-20">
     {/* Left Section - Logo and Navigation */}
     <div className="flex items-center">
       <a href="/" className="flex items-center mr-6">

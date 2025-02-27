@@ -3,7 +3,7 @@
 import './globals.css';
 import TopNavbar from './Components/TopNavbar';
 import TanstackProvider from '@/components/providers/TanstackProvider';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useState } from "react";
 
 // Dynamically import components
@@ -12,6 +12,17 @@ const MangaChapters = lazy(() => import("./Core/MangaChapters"));
 const MangaList = lazy(() => import("./Core/MangaList"));
 const ReadChapter = lazy(() => import("./Core/ReadChapter"));
 const NotFound = lazy(() => import("./Core/NotFound"));
+
+// NavbarWrapper component to conditionally render the navbar
+const NavbarWrapper = () => {
+  const location = useLocation();
+  // Don't show navbar on home page
+  if (location.pathname === '/') {
+    return null;
+  }
+  return <TopNavbar />;
+};
+
 export default function RootLayout() {
   const [isClient, setIsClient] = useState(false);
 
@@ -36,25 +47,29 @@ export default function RootLayout() {
           touchAction: "manipulation",
         }}
         className="bg-gray-900 text-white"
-        >
-
+      >
         <TanstackProvider>
-          <Suspense fallback={<div className="flex justify-center items-center w-full h-screen">
-            <div className="text-center">
-              <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
-              <p className="text-lg font-semibold">Loading Mangas...</p>
+          <Suspense fallback={
+            <div className="flex justify-center items-center w-full h-screen">
+              <div className="text-center">
+                <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
+                <p className="text-lg font-semibold">Loading Mangas...</p>
+              </div>
             </div>
-          </div>}>
+          }>
             {isClient && ( // Only render Router on the client
               <Router>
-                <TopNavbar />
+                {/* NavbarWrapper will conditionally render the navbar */}
+                <NavbarWrapper />
+                <div className='mt-20'>
                 <Routes>
-                  <Route path="/" element={<Home />} />
+                  <Route path="/" element={<div className='-mt-20'><Home /></div>} />
                   <Route path="/manga-list" element={<MangaList />} />
                   <Route path="/manga/:mangaId/chapters" element={<MangaChapters />} />
                   <Route path="/manga/:mangaId/chapter/:chapterId/read" element={<ReadChapter />} />
                   <Route path="*" element={<NotFound />} /> {/* Handle 404 */}
                 </Routes>
+                </div>
               </Router>
             )}
           </Suspense>

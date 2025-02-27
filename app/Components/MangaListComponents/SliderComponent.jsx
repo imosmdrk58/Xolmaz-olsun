@@ -84,10 +84,21 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
 
                                 {/* Description on Hover */}
                                 {hoveredIndex === index && (
-                                    <div onClick={() => { handleMangaClicked(manga) }} className="absolute cursor-pointer inset-0 flex flex-col justify-start p-4 bg-black bg-opacity-80 text-purple-300 transition-opacity duration-300">
-                                        <p className="text-[12px] tracking-tight line-clamp-[15] ">{manga.description || "No description available."}</p>
+                                    <div className="absolute inset-0 flex flex-col justify-start p-4 bg-black bg-opacity-50 backdrop-blur-md rounded-lg shadow-lg transition-opacity duration-300">
+                                        <p className="text-sm text-gray-300 tracking-tight line-clamp-[10] leading-relaxed">
+                                            {manga.description || "No description available."}
+                                        </p>
+
+                                        <button
+                                            onClick={() => handleMangaClicked(manga)}
+                                            className="mt-3 flex items-center absolute bottom-6 -ml-1 gap-3 justify-center w-fit min-w-56 p-2 rounded-lg border-2 border-[#4d229e] bg-[#4d229e]/40 shadow-md text-white text-sm font-medium transition-all duration-300 hover:bg-[#4d229e]/60 hover:scale-[101%]"
+                                        >
+                                            <Image className="brightness-200" src="/list.svg" alt="list" width={20} height={20} />
+                                            Read Latest
+                                        </button>
                                     </div>
                                 )}
+
                             </div>
                         </motion.div>
                     ))}
