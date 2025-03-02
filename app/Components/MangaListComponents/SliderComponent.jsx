@@ -84,18 +84,25 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
 
                                 {/* Description on Hover */}
                                 {hoveredIndex === index && (
-                                    <div className="absolute inset-0 flex flex-col justify-start p-4 bg-black bg-opacity-50 backdrop-blur-md rounded-lg shadow-lg transition-opacity duration-300">
-                                        <p className="text-sm text-gray-300 tracking-tight line-clamp-[10] leading-relaxed">
+                                    <div className="absolute inset-0 flex flex-col justify-start p-4 bg-purple-950 bg-opacity-80 backdrop-blur-md rounded-lg shadow-lg transition-opacity duration-300">
+                                        <div className="absolute inset-x-0 top-0 bg-gradient-to-t from-transparent via-stone-900 to-stone-950 p-4">
+                                            <h1 className=" w-full mt-3 flex-nowrap flex flex-row font-extrabold items-start justify-center text-xs tracking-[2px]  text-white">
+                                                <Flag code={langToCountry[manga.originalLanguage] || "UN"} className="w-6 shadow-lg shadow-black  mr-4" />
+                                                {manga.title.length > 40 ? `${manga.title.slice(0, 25)}...` : manga.title}
+                                            </h1>
+                                        </div>
+                                        <p className="text-xs mt-14 text-gray-300 tracking-tight font-semibold line-clamp-[10] leading-relaxed">
                                             {manga.description || "No description available."}
                                         </p>
-
+                                        <div className="absolute flex justify-center items-center inset-x-0 bottom-0 bg-gradient-to-t from-stone-950 via-stone-900 to-transparent p-4">
                                         <button
                                             onClick={() => handleMangaClicked(manga)}
-                                            className="mt-3 flex items-center absolute bottom-6 -ml-1 gap-3 justify-center w-fit min-w-56 p-2 rounded-lg border-2 border-[#4d229e] bg-[#4d229e]/40 shadow-md text-white text-sm font-medium transition-all duration-300 hover:bg-[#4d229e]/60 hover:scale-[101%]"
+                                            className="mt-3 flex  w-full items-center -ml-1 gap-3 justify-center   p-2 rounded-lg border-2 border-[#4d229e] bg-[#4d229e]/40 shadow-md text-white text-sm font-medium transition-all duration-300 hover:bg-[#4d229e]/60 hover:scale-[101%]"
                                         >
-                                            <Image className="brightness-200" src="/list.svg" alt="list" width={20} height={20} />
-                                            Read Latest
+                                            <Image className="brightness-200 mt-0.5" src="/list.svg" alt="list" width={20} height={20} />
+                                            Read Now
                                         </button>
+                                        </div>
                                     </div>
                                 )}
 

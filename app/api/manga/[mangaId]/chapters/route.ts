@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 
-const chaptersPerPage = 100;  // Adjust the number of chapters per request
+const chaptersPerPage = 90;  // Adjust the number of chapters per request
 const totalChaptersToFetch = 500; // Total chapters you want to fetch
 
 export async function GET(req: Request, { params }: { params: { mangaId: string } }) {
@@ -21,12 +21,6 @@ export async function GET(req: Request, { params }: { params: { mangaId: string 
       const fetchedChapters = response.data.data;
       console.log(`Fetched ${fetchedChapters.length} chapters `);
 
-      // If no chapters are returned, break the loop
-      if (fetchedChapters.length === 0) {
-        console.log('No more chapters available, stopping fetch.');
-        break;
-      }
-
       // Map the fetched data and format it
       const chapters = fetchedChapters.map((chapter: any) => ({
         id: chapter.id,
@@ -42,6 +36,11 @@ export async function GET(req: Request, { params }: { params: { mangaId: string 
 
       allChapters = [...allChapters, ...chapters];
 
+      // If no chapters are returned, break the loop
+      if (fetchedChapters.length === 0 || fetchedChapters.length < chaptersPerPage) {
+        console.log('No more chapters available, stopping fetch.');
+        break;
+      }
       // Ensure we only break if the number of chapters fetched exceeds the required total
       if (allChapters.length >= totalChaptersToFetch) {
         break;

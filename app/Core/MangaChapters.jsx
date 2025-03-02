@@ -86,7 +86,7 @@ export default function MangaChapters() {
     );
 
   if (!chapters.length)
-    return <div className="text-center text-lg bg-gray-900 w-full h-screen text-white">No chapters found for this manga.</div>;
+    return <div className="text-center flex justify-center items-center font-bold text-red-500 text-lg bg-gray-900 w-full h-[88vh]">No chapters found for this manga.</div>;
 
   return (
     <div className="w-full min-h-screen bg-gray-900 text-white py-10 px-6 sm:px-12">

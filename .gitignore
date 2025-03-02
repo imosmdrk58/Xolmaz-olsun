@@ -9,7 +9,8 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
+extra.ts
+uploads
 # testing
 /coverage
 
