@@ -105,8 +105,8 @@ export default function ReadChapter() {
 
       const result = await apiResponse.json();
       console.log("OCR Result:", result);
-      setFullOCRResult(result.data)
-      setTextResult(result.status === "error" ? "No Text Found" : result.data.map(item => item.text).join(" "));
+      setFullOCRResult(result.text.data)
+      setTextResult(result.status === "error" ? "No Text Found" : result.text.data.map(item => item.text).join(" "));
       setShowMessage(true);
 
       setTimeout(() => setShowMessage(false), 5000);
