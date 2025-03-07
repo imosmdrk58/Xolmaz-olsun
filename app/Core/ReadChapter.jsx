@@ -19,7 +19,8 @@ export default function ReadChapter() {
   const [imageCache, setImageCache] = useState([]);
   const [imageKey, setImageKey] = useState(0); // Key to force image re-fetch
   const [showMessage, setShowMessage] = useState(false); // State for message box visibility
-
+  const [fullOCRResult, setFullOCRResult] = useState("");
+  setFullOCRResult
   const { data: pages, isLoading, isError } = useQuery({
     queryKey: ['chapterPages', chapterId],
     queryFn: async () => {
@@ -46,45 +47,78 @@ export default function ReadChapter() {
     setImageKey((prevKey) => prevKey + 1); // Change key to force re-fetch
   };
 
+  // const handleUpload = async (imageUrl) => {
+  //   if (!imageUrl) return alert("No image found!");
+
+  //   try {
+  //     // Fetch the image and convert it to a Blob
+  //     const response = await fetch(imageUrl);
+  //     const blob = await response.blob();
+  //     const file = new File([blob], "image.jpg", { type: blob.type });
+
+  //     // Append file to FormData
+  //     const formData = new FormData();
+  //     formData.append("file", file);
+
+  //     // Send to backend
+  //     const apiResponse = await fetch("/api/readTextAndReplace", {
+  //       method: "POST",
+  //       body: formData, // Do NOT set Content-Type
+  //     });
+
+  //     if (!apiResponse.ok) throw new Error("API request failed");
+
+  //     const result = await apiResponse.json();
+  //     console.log("Processed Result:", result);
+
+  //     setTextResult(result.IsErroredOnProcessing ? "No Text Found" : result.ParsedResults[0].ParsedText);
+  //     setShowMessage(true); // Show the message box
+
+  //     // Hide the message box after 5 seconds
+  //     setTimeout(() => {
+  //       setShowMessage(false);
+  //     }, 5000);
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     alert("Something went wrong!");
+  //   }
+  // };
+
+
   const handleUpload = async (imageUrl) => {
     if (!imageUrl) return alert("No image found!");
 
     try {
-      // Fetch the image and convert it to a Blob
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const file = new File([blob], "image.jpg", { type: blob.type });
 
-      // Append file to FormData
       const formData = new FormData();
       formData.append("file", file);
 
-      // Send to backend
       const apiResponse = await fetch("/api/readTextAndReplace", {
         method: "POST",
-        body: formData, // Do NOT set Content-Type
+        body: formData,
       });
 
       if (!apiResponse.ok) throw new Error("API request failed");
 
       const result = await apiResponse.json();
-      console.log("Processed Result:", result);
+      console.log("OCR Result:", result);
+      setFullOCRResult(result.data)
+      setTextResult(result.status === "error" ? "No Text Found" : result.data.map(item => item.text).join(" "));
+      setShowMessage(true);
 
-      setTextResult(result.IsErroredOnProcessing ? "No Text Found" : result.ParsedResults[0].ParsedText);
-      setShowMessage(true); // Show the message box
-
-      // Hide the message box after 5 seconds
-      setTimeout(() => {
-        setShowMessage(false);
-      }, 5000);
+      setTimeout(() => setShowMessage(false), 5000);
     } catch (error) {
       console.error("Error:", error);
       alert("Something went wrong!");
     }
   };
 
+  console.log(textResult)
   return (
-    <div className="flex flex-row justify-between items-center h-[87vh] bg-gray-900 text-white">
+    pages && <div className="flex flex-row justify-between items-center h-[87vh] bg-gray-900 text-white">
       {/* Sidebar */}
       <InfoSidebar chapterInfo={chapterInfo} extraInfo={extraInfo} isCollapsed={isCollapsed} mangaInfo={mangaInfo} setIsCollapsed={setIsCollapsed} />
       {/* Main Content */}
@@ -132,15 +166,18 @@ export default function ReadChapter() {
               ))}
             </div>
           ) : (
-            pages.slice(currentIndex, currentIndex + panels).map((page, index) => (
-              <div key={index} className="relative max-w-full max-h-full flex justify-center items-center">
+            pages && pages.slice(currentIndex, currentIndex + panels).map((page, index) => (
+              <div key={index} className="relative h-[75vh] flex justify-center items-center">
+              <div className="relative w-[380px] h-[75vh]">
                 <Image
                   key={imageKey}
                   src={page}
                   alt={`Page ${currentIndex + index + 1}`}
                   height={1680}
                   width={1680}
-                  className={`object-contain w-auto h-[75vh] rounded-lg shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"}`}
+                  className={`object-contain w-full h-full rounded-lg shadow-xl transition-all ${
+                    imageCache.includes(page) ? "block" : "hidden"
+                  }`}
                   priority={index === 0}
                   loading={index === 0 ? undefined : "lazy"}
                   onLoadingComplete={() => handleImageLoad(page)}
@@ -148,31 +185,101 @@ export default function ReadChapter() {
                   placeholder="blur"
                   blurDataURL="/placeholder.jpg"
                 />
+                
+                {/* Text Overlay Container - Positioned absolutely within the image container */}
+                <div className='absolute top-0 left-0 w-full h-full overflow-hidden'>
+                  {fullOCRResult &&
+                    fullOCRResult.map((item, i) => {
+                      const [[x1, y1], [x2], , [, y4]] = item.bbox;
+            
+                      // Define the original image dimensions
+                      const originalImageWidth = 1680;
+                      const originalImageHeight = 1680;
+            
+                      // Get actual rendered image dimensions
+                      // We need to account for the object-contain scaling
+                      const imageAspectRatio = originalImageWidth / originalImageHeight;
+                      const containerAspectRatio = 380 / (window.innerHeight * 0.75);
+                      
+                      // Determine how the image is actually displayed (letterboxed or pillarboxed)
+                      let renderedWidth, renderedHeight;
+                      if (imageAspectRatio > containerAspectRatio) {
+                        // Image is letterboxed (black bars on top and bottom)
+                        renderedWidth = 380;
+                        renderedHeight = 380 / imageAspectRatio;
+                      } else {
+                        // Image is pillarboxed (black bars on sides)
+                        renderedHeight = window.innerHeight * 0.75;
+                        renderedWidth = renderedHeight * imageAspectRatio;
+                      }
+                      
+                      // Calculate the offset from the container edges
+                      const offsetX = (380 - renderedWidth) / 2;
+                      const offsetY = (810 - renderedHeight) / 15;
+                      
+                      // Calculate scaling factors for the actually rendered image
+                      const scaleX = renderedWidth / originalImageWidth;
+                      const scaleY = renderedHeight / originalImageHeight*1.4;
+            
+                      // Apply scaling to the coordinates and dimensions with offsets
+                      const scaledX = (x1 * scaleX) + offsetX;
+                      const scaledY = (y1 * scaleY) + offsetY - 70;
+                      const scaledWidth = (x2 - x1) * scaleX;
+                      const scaledHeight = (y4 - y1) * scaleY;
+                      
+                      // Ensure text doesn't go below a certain threshold to avoid the nav bar
+                      const maxY = window.innerHeight * 0.75 - 50; // 50px buffer from bottom
+                      const adjustedY = scaledY;
+            
+                      return (
+                        <div
+                          key={i}
+                          className="absolute bg-white w-fit h-[10px]  text-black font-bold text-[10px] flex justify-center items-center overflow-hidden rounded-sm"
+                          style={{
+                            top: `${adjustedY}px`,
+                            left: `${scaledX}px`,
+                            // width: `${scaledWidth}px`,
+                            // height: `${scaledHeight}px`,
+                            // maxHeight: `${Math.min(scaledHeight, 30)}px`,
+                            // maxWidth: `${Math.min(scaledWidth, 200)}px`,
+                          }}
+                        >
+                          {item.text}
+                        </div>
+                      );
+                    })}
+                </div>
+                
                 {/* Loading spinner for single page mode */}
                 {!imageCache.includes(page) && (
-                  <div className="absolute w-full h-[80vh] flex justify-center items-center bg-black/50 rounded-lg shadow-lg">
-                    <div className="flex justify-center items-center w-full h-screen">
-                      <div className="text-center flex flex-col justify-center items-center">
-                        <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
-                        <span className="ml-2 text-indigo-400 font-medium">Loading...</span>
-                      </div>
+                  <div className="absolute inset-0 w-full h-full flex justify-center items-center bg-black/50 rounded-lg shadow-lg">
+                    <div className="text-center flex flex-col justify-center items-center">
+                      <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
+                      <span className="ml-2 text-indigo-400 font-medium">Loading...</span>
                     </div>
                   </div>
                 )}
-                <div className='w-screen h-screen '>
+              </div>
+            
+              {/* Translate button - positioned outside the image container */}
+              <div className="absolute bottom-2 -right-96">
                 <button
-                  disabled={panels == 2}
+                  disabled={panels === 2}
                   onClick={() => handleUpload(page)}
-                  className={`absolute bottom-0  right-12 z-50 w-fit gap-4 text-sm cursor-pointer brightness-150 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center items-center p-5 rounded-xl overflow-hidden
-                  before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-500 before:content-[''] group-hover:before:opacity-100`}
+                  className={`relative z-50 w-fit gap-4 text-sm cursor-pointer brightness-150 
+                    shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center 
+                    items-center p-5 rounded-xl overflow-hidden 
+                    before:absolute before:inset-0 before:opacity-0 
+                    before:transition-opacity before:duration-500 before:content-[''] 
+                    group-hover:before:opacity-100`}
                   style={{
                     background: "linear-gradient(#3b235a, #24143f)",
                   }}
                 >
                   Translate
                 </button>
-                </div>
               </div>
+            </div>
             ))
           )}
         </div>
@@ -180,7 +287,7 @@ export default function ReadChapter() {
       </div>
 
       {/* Floating Message Box */}
-      {true && (
+      {showMessage && (
         <div className="absolute z-50 text-wrap w-fit max-w-72 top-12 border-purple-500 border right-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg transition-opacity duration-300 ">
           <button
             className="absolute top-1 right-1 text-white bg-purple-600 hover:bg-gray-500 rounded-full p-1 px-2.5"

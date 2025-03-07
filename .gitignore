@@ -13,7 +13,7 @@ extra.ts
 uploads
 # testing
 /coverage
-
+apiVersion.ts
 # next.js
 /.next/
 /out/
