@@ -4,6 +4,9 @@
 /node_modules
 /.pnp
 .pnp.*
+Audiotest.jsx
+TranslatorTest.jsx
+AIAudio/
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
