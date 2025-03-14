@@ -159,14 +159,14 @@ export default function ReadChapter() {
             ) : (
               pages.slice(currentIndex, currentIndex + panels).map((page, index) => (
                 <div key={index} className="relative h-[75vh] flex justify-center items-center">
-                  <div className="relative w-[380px] h-[75vh]">
+                  <div className={`relative w-[380px] h-[75vh]  ${layout === "horizontal" ? "" : "overflow-y-scroll"}`}>
                     <Image
                       key={imageKey}
                       src={page}
                       alt={`Page ${currentIndex + index + 1}`}
                       height={1680}
                       width={1680}
-                      className={`object-contain w-full h-full rounded-lg shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"}`}
+                      className={`object-contain  rounded-lg ${layout === "horizontal" ? "w-full h-full" : "w-full h-auto"} shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"}`}
                       priority={index === 0}
                       loading={index === 0 ? undefined : "lazy"}
                       onLoadingComplete={() => handleImageLoad(page)}
