@@ -32,7 +32,7 @@ export default function TextToSpeech({ text, handleUpload, page }) {
         <div className="flex items-center gap-2">
             {text.length <= 0 ? (
                 <button
-                    onClick={() => handleUpload(page)}
+                    onClick={() => handleUpload(page, "speak")}
                     disabled={isSpeaking}
                     className="relative z-50 w-fit my-5 min-w-32 brightness-150 text-sm cursor-pointer  
                         shadow-[0_0_7px_rgba(0,0,0,1)] shadow-blue-500 flex justify-center 

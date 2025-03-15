@@ -25,6 +25,7 @@ export default function ReadChapter() {
   const [translatedText, setTranslatedText] = useState("");
   const [pageTranslations, setPageTranslations] = useState({});
   const [isLoadingOCR, setIsLoadingOCR] = useState(false); // Loading state for OCR
+  const [isItTextToSpeech, setIsItTextToSpeech] = useState(false); // Loading state for OCR
 
   const handleTranslate = async (text, targetLang = "en") => {
     if (!text || !text.trim()) return "";
@@ -44,13 +45,6 @@ export default function ReadChapter() {
     }
   };
 
-  useEffect(() => {
-    if (textResult) {
-      handleTranslate(textResult).then((translated) => {
-        setTranslatedText(translated);
-      });
-    }
-  }, [textResult]);
 
   const { data: pages, isLoading, isError } = useQuery({
     queryKey: ['chapterPages', chapterId],
@@ -93,7 +87,14 @@ export default function ReadChapter() {
     setImageKey((prevKey) => prevKey + 1);
   };
 
-  const handleUpload = async (imageUrl) => {
+  // useEffect(()=>{
+  //   if(isItTextToSpeech)
+  //   pages.map((page)=>{
+  //     handleUpload(page,"speak" )
+  //   })
+  // },[setIsItTextToSpeech,isItTextToSpeech])
+
+  const handleUpload = async (imageUrl,from) => {
     if (!imageUrl) return alert("No image found!");
 
     setIsLoadingOCR(true); // Set loading state
@@ -128,6 +129,16 @@ export default function ReadChapter() {
 
       setFullOCRResult(ocrResult);
       setTextResult(processedText);
+      
+      if (from==="translate") {
+        handleTranslate(processedText).then((translated) => {
+          setTranslatedText(translated);
+        });
+      }
+      else{
+        setIsItTextToSpeech(true)
+        setTranslatedText(processedText);
+      }
       setShowMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -175,7 +186,7 @@ export default function ReadChapter() {
                       blurDataURL="/placeholder.jpg"
                     />
 
-                    {!isLoadingOCR ? <OCROverlay fullOCRResult={fullOCRResult} /> : ""}
+                    {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim()!=="en"  ? <OCROverlay fullOCRResult={fullOCRResult} /> : ""}
                     {!imageCache.includes(page) && (
                       <LoadingSpinner />
                     )}
@@ -183,10 +194,10 @@ export default function ReadChapter() {
 
                   <div className="absolute bottom-2 -right-96">
                     {!isLoadingOCR ? (<>
-                      <TextToSpeech page={page} handleUpload={handleUpload} text={textResult} />
-                      <button
+                      <TextToSpeech  page={page} handleUpload={handleUpload} text={textResult} />
+                      { chapterInfo?.translatedLanguage?.trim()!=="en" &&<button
                         disabled={panels === 2}
-                        onClick={() => handleUpload(page)}
+                        onClick={() => handleUpload(page,"translate")}
                         className={`relative z-50 w-fit min-w-32 gap-4 text-sm cursor-pointer brightness-150 
                                                 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center 
                                                 items-center p-5 rounded-xl overflow-hidden 
@@ -195,7 +206,7 @@ export default function ReadChapter() {
                                                 group-hover:before:opacity-100  ${pageTranslations[page] ? 'bg-green-800' : 'bg-purple-800'}`}
                       >
                         {pageTranslations[page] ? "Translated" : "Translate"}
-                      </button>
+                      </button>}
                     </>) : (
                       <div className="h-fit w-full flex justify-center items-center rounded-lg shadow-lg">
                         <div className="flex justify-center items-center w-full h-fit">

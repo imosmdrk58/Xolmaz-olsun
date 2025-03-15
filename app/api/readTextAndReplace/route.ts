@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-require-imports */
 import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
-const EasyOCRWrapper = require("easyocr-js");
-
+import EasyOCRWrapper from "easyocr-js"
 export async function POST(req: Request): Promise<Response> {
     try {
         const formData = await req.formData();
@@ -30,10 +28,7 @@ export async function POST(req: Request): Promise<Response> {
         }
 
         try {
-            const ocr = new EasyOCRWrapper({
-                lang: "en",
-                path: path.join("node_modules", "easyocr-js"),
-            });
+            const ocr = new EasyOCRWrapper();
             await ocr.init("en");
             const result = await ocr.readText(imagePath);
             await ocr.close();
