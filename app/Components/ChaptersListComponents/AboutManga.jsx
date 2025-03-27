@@ -32,7 +32,6 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo,last }) => {
         uk: "UA", // Ukrainian
         vi: "VN", // Vietnamese
     };
-
     const countryCode = langToCountryMap[manga?.originalLanguage] || "UN"; // UN for unknown flag
     const [authorData, setAuthorData] = useState("N/A");
     const [artistData, setArtistData] = useState("N/A");
@@ -54,7 +53,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo,last }) => {
                     const data = await response.json();
                     const name = data.author?.name || "N/A";
                     setData(name);
-                    setExtraInfo((prev) => ({ ...prev, [nameType]: storedData }));
+                    setExtraInfo((prev) => ({ ...prev, [nameType]: name }));
                     localStorage.setItem(`manga_${manga.id}_${nameType}`, name);
                 }
             } catch (err) {

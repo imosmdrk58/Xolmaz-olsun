@@ -62,7 +62,7 @@ export default function MangaChapters() {
   }, [mangaId, manga]);
 
   const handleChapterClick = useCallback((id) => {
-    navigate(`/manga/${mangaId}/chapter/${id.id}/read`, { state: { chapterInfo: id,mangaInfo:manga,extraInfo } });
+    navigate(`/manga/${mangaId}/chapter/${id.id}/read`, { state: { chapterInfo: id,mangaInfo:manga,artist_author_info:extraInfo } });
   }, [navigate, mangaId]);
 
   if (loading)
@@ -87,7 +87,7 @@ export default function MangaChapters() {
 
   if (!chapters.length)
     return <div className="text-center flex justify-center items-center font-bold text-red-500 text-lg bg-gray-900 w-full h-[88vh]">No chapters found for this manga.</div>;
-
+console.log(extraInfo)
   return (
     <div className="w-full min-h-screen bg-gray-900 text-white py-10 px-6 sm:px-12">
       <MemoizedAboutManga last={chapters[chapters.length-1]} setExtraInfo={setExtraInfo} manga={manga} handleChapterClick={handleChapterClick} />

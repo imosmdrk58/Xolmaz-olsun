@@ -13,7 +13,7 @@ export default function ReadChapter() {
   const { mangaId, chapterId } = useParams();
   const location = useLocation();
   const [textResult, setTextResult] = useState("");
-  const { chapterInfo, mangaInfo, extraInfo } = location.state || {};
+  const { chapterInfo, mangaInfo, artist_author_info } = location.state || {};
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [layout, setLayout] = useState('horizontal');
   const [panels, setPanels] = useState(1);
@@ -151,7 +151,7 @@ export default function ReadChapter() {
   return (
     pages && (
       <div className="flex flex-row justify-between items-center h-[87vh] bg-gray-900 text-white">
-        <InfoSidebar chapterInfo={chapterInfo} extraInfo={extraInfo} isCollapsed={isCollapsed} mangaInfo={mangaInfo} setIsCollapsed={setIsCollapsed} />
+        <InfoSidebar chapterInfo={chapterInfo} extraInfo={artist_author_info} isCollapsed={isCollapsed} mangaInfo={mangaInfo} setIsCollapsed={setIsCollapsed} />
         <div
           style={{
             scrollbarWidth: "thin",
