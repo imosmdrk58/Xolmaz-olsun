@@ -46,7 +46,7 @@ export default function RootLayout() {
           MozOsxFontSmoothing: "grayscale",
           touchAction: "manipulation",
         }}
-        className="bg-gray-900 text-white"
+        className="bg-[#070920]  text-white"
       >
         <TanstackProvider>
           <Suspense fallback={

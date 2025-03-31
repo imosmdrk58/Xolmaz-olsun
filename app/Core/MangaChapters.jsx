@@ -67,7 +67,7 @@ export default function MangaChapters() {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
+      <div className="flex justify-center items-center w-full h-screen bg-[#070920] backdrop-blur-md text-white">
         <div className="text-center">
           <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
           <p className="text-lg">Loading chapters...</p>
@@ -77,7 +77,7 @@ export default function MangaChapters() {
 
   if (error)
     return (
-      <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
+      <div className="flex justify-center items-center w-full h-screen bg-[#070920] backdrop-blur-md text-white">
         <div className="text-center">
           <p className="text-lg text-red-500">{error}</p>
           <p className="text-sm text-gray-400">Please refresh or try again later.</p>
@@ -86,10 +86,10 @@ export default function MangaChapters() {
     );
 
   if (!chapters.length)
-    return <div className="text-center flex justify-center items-center font-bold text-red-500 text-lg bg-gray-900 w-full h-[88vh]">No chapters found for this manga.</div>;
+    return <div className="text-center flex justify-center items-center font-bold text-red-500 text-lg bg-[#070920] backdrop-blur-md w-full h-[88vh]">No chapters found for this manga.</div>;
 console.log(extraInfo)
   return (
-    <div className="w-full min-h-screen bg-gray-900 text-white py-10 px-6 sm:px-12">
+    <div className="w-full min-h-screen bg-[#070920] backdrop-blur-md text-white py-10 px-6 sm:px-12">
       <MemoizedAboutManga last={chapters[chapters.length-1]} setExtraInfo={setExtraInfo} manga={manga} handleChapterClick={handleChapterClick} />
       <MemoizedChapterList manga={manga} chapters={chapters} handleChapterClick={handleChapterClick} />
     </div>

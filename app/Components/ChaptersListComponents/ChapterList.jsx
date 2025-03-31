@@ -4,7 +4,7 @@ import React from 'react';
 const ChapterList = ({ chapters, handleChapterClick, manga }) => {
   return (
     <div className="w-full">
-      <div className="bg-gray-900 rounded-xl shadow-xl p-6">
+      <div className="bg-[#070920] backdrop-blur-md rounded-xl shadow-xl p-6">
         {/* Header Section */}
         <div className="space-y-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
@@ -48,7 +48,7 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
               >
                 {/* Chapter Number Badge */}
                 <div className="absolute right-4 top-4">
-                  <div className="bg-gray-900 text-purple-500 px-3 py-1 rounded-lg text-sm font-medium">
+                  <div className="bg-[#070920] backdrop-blur-md text-purple-500 px-3 py-1 rounded-lg text-sm font-medium">
                     Chapter {chapter.chapter}
                   </div>
                 </div>

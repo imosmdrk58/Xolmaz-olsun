@@ -26,6 +26,7 @@ export default function ReadChapter() {
   const [pageTranslations, setPageTranslations] = useState({});
   const [isLoadingOCR, setIsLoadingOCR] = useState(false); // Loading state for OCR
   const [isItTextToSpeech, setIsItTextToSpeech] = useState(false); // Loading state for OCR
+  const [allAtOnce, setAllAtOnce] = useState(false); // Loading state for OCR
 
   const handleTranslate = async (text, targetLang = "en") => {
     if (!text || !text.trim()) return "";
@@ -94,7 +95,7 @@ export default function ReadChapter() {
   //   })
   // },[setIsItTextToSpeech,isItTextToSpeech])
 
-  const handleUpload = async (imageUrl,from) => {
+  const handleUpload = async (imageUrl, from) => {
     if (!imageUrl) return alert("No image found!");
 
     setIsLoadingOCR(true); // Set loading state
@@ -129,13 +130,13 @@ export default function ReadChapter() {
 
       setFullOCRResult(ocrResult);
       setTextResult(processedText);
-      
-      if (from==="translate") {
+
+      if (from === "translate") {
         handleTranslate(processedText).then((translated) => {
           setTranslatedText(translated);
         });
       }
-      else{
+      else {
         setIsItTextToSpeech(true)
         setTranslatedText(processedText);
       }
@@ -150,14 +151,14 @@ export default function ReadChapter() {
 
   return (
     pages && (
-      <div className="flex flex-row justify-between items-center h-[87vh] bg-gray-900 text-white">
+      <div className="flex flex-row w-full justify-between items-start h-full -mt-5 bg-[#070920] backdrop-blur-md text-white">
         <InfoSidebar chapterInfo={chapterInfo} extraInfo={artist_author_info} isCollapsed={isCollapsed} mangaInfo={mangaInfo} setIsCollapsed={setIsCollapsed} />
         <div
           style={{
             scrollbarWidth: "thin",
             scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)",
           }}
-          className="flex flex-col h-[91.2vh] flex-1 mt-3 overflow-y-scroll"
+          className="flex flex-col h-[91.2vh] flex-1 w-full  overflow-y-scroll"
         >
           <div
             className={`flex flex-1 ${layout === "horizontal"
@@ -168,16 +169,16 @@ export default function ReadChapter() {
             {isLoading ? (
               <LoadingSpinner />
             ) : (
-              pages.slice(currentIndex, currentIndex + panels).map((page, index) => (
+              layout === "horizontal" ? pages.slice(currentIndex, currentIndex + panels).map((page, index) => (
                 <div key={index} className="relative h-[75vh] flex justify-center items-center">
-                  <div className={`relative w-[380px] h-[75vh]  ${layout === "horizontal" ? "" : "overflow-y-scroll"}`}>
+                  <div className={`relative w-[380px] h-[75vh] `}>
                     <Image
                       key={imageKey}
                       src={page}
                       alt={`Page ${currentIndex + index + 1}`}
                       height={1680}
                       width={1680}
-                      className={`object-contain  rounded-lg ${layout === "horizontal" ? "w-full h-full" : "w-full h-auto"} shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"}`}
+                      className={`object-contain  rounded-lg w-full h-full shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"}`}
                       priority={index === 0}
                       loading={index === 0 ? undefined : "lazy"}
                       onLoadingComplete={() => handleImageLoad(page)}
@@ -186,27 +187,29 @@ export default function ReadChapter() {
                       blurDataURL="/placeholder.jpg"
                     />
 
-                    {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim()!=="en"  ? <OCROverlay fullOCRResult={fullOCRResult} /> : ""}
+                    {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim() !== "en" ? <OCROverlay fullOCRResult={fullOCRResult} /> : ""}
                     {!imageCache.includes(page) && (
                       <LoadingSpinner />
                     )}
                   </div>
 
-                  <div className="absolute bottom-2 -right-96">
+                  <div className="fixed flex flex-col justify-end items-end bottom-28  right-3">
                     {!isLoadingOCR ? (<>
-                      <TextToSpeech  page={page} handleUpload={handleUpload} text={textResult} />
-                      { chapterInfo?.translatedLanguage?.trim()!=="en" &&<button
-                        disabled={panels === 2}
-                        onClick={() => handleUpload(page,"translate")}
-                        className={`relative z-50 w-fit min-w-32 gap-4 text-sm cursor-pointer brightness-150 
-                                                shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center 
-                                                items-center p-5 rounded-xl overflow-hidden 
-                                                before:absolute before:inset-0 before:opacity-0 
-                                                before:transition-opacity before:duration-500 before:content-[''] 
-                                                group-hover:before:opacity-100  ${pageTranslations[page] ? 'bg-green-800' : 'bg-purple-800'}`}
-                      >
-                        {pageTranslations[page] ? "Translated" : "Translate"}
-                      </button>}
+                      <TextToSpeech page={page} handleUpload={handleUpload} text={textResult} />
+                      {chapterInfo?.translatedLanguage?.trim() !== "en" && <button
+                          disabled={panels === 2}
+                          onClick={() => handleUpload(page, "translate")}
+                          className={`font-sans mt-3 before:bg-opacity-60  min-w-[182px] transition-colors flex gap-4 justify-start  items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page] ? "bg-orange-400 bg-opacity-60 shadow-[0px_0px_5px_rgba(0,0,0,1)] shadow-orange-500 ":"bg-[#1a063e]"} backdrop-blur-md  lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-4 py-2 ease-in-out overflow-hidden border rounded-full group`}
+                          type="submit"
+                        >
+                          <img
+                            src="/translate.svg"
+                            alt="translate"
+                            className="w-12  h-12  group-hover:border-2 group-hover:border-orange-500  transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2  transform group-hover:rotate-[360deg]"
+                          />
+
+                          {pageTranslations[page] ? "Translated" : "Translate"}
+                        </button>}
                     </>) : (
                       <div className="h-fit w-full flex justify-center items-center rounded-lg shadow-lg">
                         <div className="flex justify-center items-center w-full h-fit">
@@ -219,10 +222,65 @@ export default function ReadChapter() {
                     )}
                   </div>
                 </div>
-              ))
+              )) :
+                pages.map((page, index) => (
+                  <div key={index} className="relative h-[75vh] flex justify-center items-center">
+                    <div className={`relative w-[380px] h-auto`}>
+                      <Image
+                        key={imageKey}
+                        src={page}
+                        alt={`Page ${currentIndex + index + 1}`}
+                        height={1680}
+                        width={1680}
+                        className={`object-contain  rounded-lg w-full h-full shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"}`}
+                        priority={index === 0}
+                        loading={index === 0 ? undefined : "lazy"}
+                        onLoadingComplete={() => handleImageLoad(page)}
+                        onError={handleImageError}
+                        placeholder="blur"
+                        blurDataURL="/placeholder.jpg"
+                      />
+
+                      {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim() !== "en" ? <OCROverlay fullOCRResult={fullOCRResult} /> : ""}
+                      {!imageCache.includes(page) && (
+                        <LoadingSpinner />
+                      )}
+                    </div>
+
+                    <div className="absolute flex flex-col justify-center items-center -right-96">
+                      {!isLoadingOCR ? (<>
+                        <TextToSpeech page={page} handleUpload={handleUpload} text={textResult} />
+                        {chapterInfo?.translatedLanguage?.trim() !== "en" && <button
+                          disabled={panels === 2}
+                          onClick={() => handleUpload(page, "translate")}
+                          className={`font-sans mt-3 before:bg-opacity-60  min-w-[182px] transition-colors flex gap-4 justify-start  items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page] ? "bg-orange-400 bg-opacity-60 shadow-[0px_0px_5px_rgba(0,0,0,1)] shadow-orange-500 ":"bg-[#070920]"} backdrop-blur-md  lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-4 py-2 ease-in-out overflow-hidden border-2 rounded-full group`}
+                          type="submit"
+                        >
+                          <img
+                            src="/translate.svg"
+                            alt="translate"
+                            className="w-12  h-12  group-hover:border-2 group-hover:border-orange-500  transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2  transform group-hover:rotate-[360deg]"
+                          />
+
+                          {pageTranslations[page] ? "Translated" : "Translate"}
+                        </button>}
+                      </>) : (
+                        <div className="h-fit w-full flex justify-center items-center rounded-lg shadow-lg">
+                          <div className="flex justify-center items-center w-full h-fit">
+                            <div className="text-center flex flex-col justify-center items-center">
+                              <div className="spinner-border -mt-36 -ml-36  animate-spin h-8 w-8 border-t-4 border-indigo-500 rounded-full mb-4" />
+
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
             )}
           </div>
-          <BottomSettings currentIndex={currentIndex} layout={layout} pages={pages} panels={panels} setCurrentIndex={setCurrentIndex} setLayout={setLayout} setPanels={setPanels} />
+
+          <BottomSettings allAtOnce={allAtOnce} setAllAtOnce={setAllAtOnce} currentIndex={currentIndex} layout={layout} pages={pages} panels={panels} setCurrentIndex={setCurrentIndex} setLayout={setLayout} setPanels={setPanels} />
         </div>
 
         {showMessage && (

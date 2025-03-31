@@ -24,7 +24,7 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => (
             <h1 className=" border-b-4 border-purple-900 w-fit pb-2">      Latest Releases
             </h1>
         </div>
-        <div className="grid w-[93%] ml-20 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+        <div className="grid w-[95%] gap-y-4 ml-16 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
             {processedLatestMangas.map((manga, index) => (
                 <motion.div
                     key={manga.id}
@@ -35,7 +35,7 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => (
                     animate="visible"
                     transition={{ delay: index * stagger, ease: "easeInOut", duration: 0.5 }}
                 >
-                    <div className="w-[250px] overflow-hidden rounded-[20px] bg-[#1b233d]  p-[5px] shadow-[0_7px_20px_0_rgba(100,100,111,0.2)] transition-transform duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] hover:scale-[102%]">
+                    <div className="w-[250px] overflow-hidden rounded-[20px] bg-[#0c0221]  p-[5px] shadow-[0px_0px_6px_0_rgba(100,100,111,0.7)] transition-transform duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] hover:scale-[102%]">
                         <div className="relative flex h-[250px]  flex-col rounded-[15px] bg-gradient-to-tr from-[#049fbb] to-[#50f6ff]"
                         >
                             <Image src={manga.coverImageUrl || '/placeholder.jpg'} alt={manga.title} fill className="object-cover transition-transform duration-500 relative -mt-[1px] flex h-[250px] flex-col rounded-[15px] bg-gradient-to-tr from-[#049fbb] to-[#50f6ff]" placeholder="blur" blurDataURL="/placeholder.jpg" />
@@ -46,9 +46,9 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => (
                                 </h1>
 
                             </div>
-                            <div className="relative z-20 h-[30px] mt-1 w-[140px] -skew-x-[40deg] rounded-br-[10px] bg-[#1b233d] shadow-[-10px_-10px_0_0_#1b233d] before:absolute before:right-[-2px] before:top-0 before:h-[9px] before:w-[129px] before:rounded-tl-[10px] before:shadow-[-5px_-5px_0_1px_#1b233d,-3px_-5px_0_1px_#1b233d]" />
+                            <div className="relative z-20 h-[30px] mt-1 w-[140px] -skew-x-[40deg] rounded-br-[10px] bg-[#0c0221] shadow-[-10px_-10px_0_0_#0c0221] before:absolute before:right-[-2px] before:top-0 before:h-[9px] before:w-[129px] before:rounded-tl-[10px] before:shadow-[-5px_-5px_0_1px_#0c0221,-3px_-5px_0_1px_#0c0221]" />
 
-                            <div className="absolute  left-0 top-[34px] h-[55px] w-[125px] before:absolute before:h-full before:w-full before:rounded-tl-[15px] before:shadow-[-5px_-5px_0_2px_#1b233d]" />
+                            <div className="absolute  left-0 top-[34px] h-[55px] w-[125px] before:absolute before:h-full before:w-full before:rounded-tl-[15px] before:shadow-[-5px_-5px_0_2px_#0c0221]" />
 
                             <div className="absolute top-0 flex h-[30px] w-full justify-between">
                                 <div className="h-full aspect-square pb-[2px]">
@@ -86,7 +86,7 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => (
 
                                 <div className="flex flex-wrap gap-1">
                                     {manga.flatTags.slice(0, 4).map(tag => (
-                                        <span key={tag} className="bg-gray-900 min-w-16 shadow-lg px-3 py-1.5  border border-gray-700  transition-colors hover:bg-gray-800 text-center flex flex-row font-bold items-start justify-center text-[10px] tracking-[1.5px] text-white">
+                                        <span key={tag} className="bg-[#070920] backdrop-blur-md min-w-16 shadow-lg px-3 py-1.5  border border-gray-700  transition-colors hover:bg-gray-800 text-center flex flex-row font-bold items-start justify-center text-[10px] tracking-[1.5px] text-white">
                                             {tag}
                                         </span>
                                     ))}

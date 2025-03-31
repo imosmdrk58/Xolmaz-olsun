@@ -230,7 +230,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo,last }) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="py-4 text-sm mt-2 bg-gray-900 rounded-lg ">
+                                    <div className="py-4 text-sm mt-2 bg-[#070920] backdrop-blur-md rounded-lg ">
 
                                         <div className="flex flex-col items-start shadow-sm shadow-purple-500 p-4 rounded-lg">
                                             <h2 className="text-lg font-bold text-white mb-2 border-b w-full border-gray-700 pb-1">Manga Description</h2>

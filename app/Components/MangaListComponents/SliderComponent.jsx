@@ -36,15 +36,54 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
     };
 
     return (
-        <div className="w-full overflow-hidden text-white font-sans  pb-10 pt-7">
-            <div className="mx-28 pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase ">
-                <h1 className=" border-b-4 border-purple-900 w-fit pb-2">Randomized Recomendation</h1>
+        <div className="w-full overflow-hidden text-white font-sans px-10  pb-10 pt-7">
+            <div className=" flex mb-5  relative justify-center items-center w-full px-10 ">
+                <h1 className=" relative h-16 gap-5   flex z-10 px-8 justify-center items-center [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]  scale-[102%] backdrop-blur-3xl w-fit text-xl font-bold text-purple-200 tracking-wide uppercase   bg-[#2b045a]">
+                    <img
+                        src="/random.png"
+                        alt="random"
+                        className=" w-10 h-10 filter invert brightness-200 contrast-200"
+                    />
+                    Randomized Recomendation
+                    <img
+                        src="/random.png"
+                        alt="random"
+                        className=" w-10 h-10 rotate-180 filter invert brightness-200 contrast-200"
+                    />
+                </h1>
+                <div
+                    className="flex  justify-center items-center h-[70px] scale-x-[140%] absolute   w-96 antialiased px-12 overflow-visible  bg-[#7a1feab5] backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono  py-4 text-3xl font-bold text-purple-200 tracking-wide uppercase ">
+
+                </div>
+                {/* 2nd */}
+                <div
+                    className="flex -z-10 justify-center items-center h-14 scale-x-[160%] absolute   w-96 antialiased px-12 overflow-visible  bg-[#7a23e6b5]  backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono  py-4 text-3xl font-bold text-purple-200 tracking-wide uppercase ">
+
+                </div>
+                <div
+                    className="flex -z-10 justify-center items-center h-12 scale-x-[155%] absolute   w-96 antialiased px-12 overflow-visible  bg-[#2d055d]  backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono  py-4 text-3xl font-bold text-purple-200 tracking-wide uppercase ">
+
+                </div>
+                {/* 3rd */}
+                <div
+                    className="flex -z-10 justify-center items-center h-8  scale-x-[103%] absolute  w-[50%] antialiased px-12 overflow-visible  bg-[#e6e023b5]  backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono   text-3xl font-bold text-purple-200 tracking-wide uppercase ">
+                </div>
+                <div
+                    className="flex -z-10 justify-center items-center h-6   absolute  w-[50%] antialiased px-12 overflow-visible  bg-[#5b6106]  backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono   text-3xl font-bold text-purple-200 tracking-wide uppercase ">
+                </div>
+                {/* 4th */}
+                {/* <div
+                    className="flex -z-30 justify-center items-center h-4  scale-x-[103%] absolute w-[85%] antialiased px-12 overflow-visible  bg-[#e6e023b5]  backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono   text-3xl font-bold text-purple-200 tracking-wide uppercase ">
+                </div>
+                <div
+                    className="flex -z-30 justify-center items-center h-2  absolute w-[85%] antialiased px-12 overflow-visible  bg-[#5b6106] backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono   text-3xl font-bold text-purple-200 tracking-wide uppercase ">
+                </div> */}
             </div>
 
             <section className="carousel flex justify-center w-full items-center relative gap-4">
                 <span
                     onClick={() => handlePrev()}
-                    className={`relative cursor-pointer brightness-150 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center items-center p-5 rounded-xl overflow-hidden
+                    className={`relative cursor-pointer brightness-150 shadow-[0px_0px_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center items-center p-7 rounded-xl overflow-hidden
                                       before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-500 before:content-[''] group-hover:before:opacity-100
                                     `}
                     style={{
@@ -53,7 +92,7 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
                 >
                     <Image className=" brightness-200" src="/previous.svg" alt="prev" width={20} height={20} />
                 </span>
-                <div className="list flex gap-2 items-center overflow-hidden">
+                <div className="list flex w-full  justify-between  gap-2 items-center overflow-hidden">
                     {visibleMangas.map((manga, index) => (
                         <motion.div
                             key={manga.id}
@@ -95,13 +134,13 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
                                             {manga.description || "No description available."}
                                         </p>
                                         <div className="absolute flex justify-center items-center inset-x-0 bottom-0 bg-gradient-to-t from-stone-950 via-stone-900 to-transparent p-4">
-                                        <button
-                                            onClick={() => handleMangaClicked(manga)}
-                                            className="mt-3 flex  w-full items-center -ml-1 gap-3 justify-center   p-2 rounded-lg border-2 border-[#4d229e] bg-[#4d229e]/40 shadow-md text-white text-sm font-medium transition-all duration-300 hover:bg-[#4d229e]/60 hover:scale-[101%]"
-                                        >
-                                            <Image className="brightness-200 mt-0.5" src="/list.svg" alt="list" width={20} height={20} />
-                                            Read Now
-                                        </button>
+                                            <button
+                                                onClick={() => handleMangaClicked(manga)}
+                                                className="mt-3 flex  w-full items-center -ml-1 gap-3 justify-center   p-2 rounded-lg border-2 border-[#4d229e] bg-[#4d229e]/40 shadow-md text-white text-sm font-medium transition-all duration-300 hover:bg-[#4d229e]/60 hover:scale-[101%]"
+                                            >
+                                                <Image className="brightness-200 mt-0.5" src="/list.svg" alt="list" width={20} height={20} />
+                                                Read Now
+                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -112,7 +151,7 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
                 </div>
                 <span
                     onClick={() => handleNext()}
-                    className={`relative cursor-pointer brightness-150 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center items-center p-5 rounded-xl overflow-hidden
+                    className={`relative cursor-pointer brightness-150 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center items-center p-7 rounded-xl overflow-hidden
                                       before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-500 before:content-[''] group-hover:before:opacity-100
                                     `}
                     style={{
