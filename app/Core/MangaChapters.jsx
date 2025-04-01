@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import React from 'react';
 import AboutManga from '../Components/ChaptersListComponents/AboutManga';
 import ChapterList from '../Components/ChaptersListComponents/ChapterList';
+import LoadingSpinner from '../Components/LoadingSpinner';
 
 const MemoizedAboutManga = React.memo(AboutManga);
 const MemoizedChapterList = React.memo(ChapterList);
@@ -62,17 +63,12 @@ export default function MangaChapters() {
   }, [mangaId, manga]);
 
   const handleChapterClick = useCallback((id) => {
-    navigate(`/manga/${mangaId}/chapter/${id.id}/read`, { state: { chapterInfo: id,mangaInfo:manga,artist_author_info:extraInfo } });
+    navigate(`/manga/${mangaId}/chapter/${id.id}/read`, { state: { chapterInfo: id, mangaInfo: manga, artist_author_info: extraInfo } });
   }, [navigate, mangaId]);
 
   if (loading)
     return (
-      <div className="flex justify-center items-center w-full h-screen bg-[#070920] backdrop-blur-md text-white">
-        <div className="text-center">
-          <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
-          <p className="text-lg">Loading chapters...</p>
-        </div>
-      </div>
+      <LoadingSpinner text="Loading chapters..." />
     );
 
   if (error)
@@ -87,10 +83,10 @@ export default function MangaChapters() {
 
   if (!chapters.length)
     return <div className="text-center flex justify-center items-center font-bold text-red-500 text-lg bg-[#070920] backdrop-blur-md w-full h-[88vh]">No chapters found for this manga.</div>;
-console.log(extraInfo)
+  console.log(extraInfo)
   return (
     <div className="w-full min-h-screen bg-[#070920] backdrop-blur-md text-white py-10 px-6 sm:px-12">
-      <MemoizedAboutManga last={chapters[chapters.length-1]} setExtraInfo={setExtraInfo} manga={manga} handleChapterClick={handleChapterClick} />
+      <MemoizedAboutManga last={chapters[chapters.length - 1]} setExtraInfo={setExtraInfo} manga={manga} handleChapterClick={handleChapterClick} />
       <MemoizedChapterList manga={manga} chapters={chapters} handleChapterClick={handleChapterClick} />
     </div>
   );

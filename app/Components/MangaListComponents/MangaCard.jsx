@@ -35,7 +35,7 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => (
                     animate="visible"
                     transition={{ delay: index * stagger, ease: "easeInOut", duration: 0.5 }}
                 >
-                    <div className="w-[250px] overflow-hidden rounded-[20px] bg-[#0c0221]  p-[5px] shadow-[0px_0px_6px_0_rgba(100,100,111,0.7)] transition-transform duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] hover:scale-[102%]">
+                    <div className="w-[250px] overflow-hidden rounded-[20px] rounded-b-none bg-[#0c0221]  p-[5px] shadow-[0px_0px_6px_0_rgba(100,100,111,0.7)] transition-transform duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] hover:scale-[102%]">
                         <div className="relative flex h-[250px]  flex-col rounded-[15px] bg-gradient-to-tr from-[#049fbb] to-[#50f6ff]"
                         >
                             <Image src={manga.coverImageUrl || '/placeholder.jpg'} alt={manga.title} fill className="object-cover transition-transform duration-500 relative -mt-[1px] flex h-[250px] flex-col rounded-[15px] bg-gradient-to-tr from-[#049fbb] to-[#50f6ff]" placeholder="blur" blurDataURL="/placeholder.jpg" />

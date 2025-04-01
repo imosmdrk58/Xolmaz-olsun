@@ -1,14 +1,22 @@
 "use client";
 
 import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import InfoSidebar from "../Components/ReadChapterComponents/InfoSidebar";
 import Image from 'next/image';
 import BottomSettings from "../Components/ReadChapterComponents/BottomSettings";
 import TextToSpeech from "../Components/ReadChapterComponents/TextToSpeech";
-import OCROverlay from "../Components/ReadChapterComponents/OCROverlay"
+import OCROverlay from "../Components/ReadChapterComponents/OCROverlay";
 import LoadingSpinner from "../Components/LoadingSpinner"; // New loading spinner component
 import { useLocation, useParams } from 'react-router-dom';
+import Placeholder from "../Components/ReadChapterComponents/Placeholder";
+// Memoized components
+const MemoizedInfoSidebar = memo(InfoSidebar);
+const MemoizedBottomSettings = memo(BottomSettings);
+const MemoizedTextToSpeech = memo(TextToSpeech);
+const MemoizedOCROverlay = memo(OCROverlay);
+const MemoizedLoadingSpinner = memo(LoadingSpinner);
+
 export default function ReadChapter() {
   const { mangaId, chapterId } = useParams();
   const location = useLocation();
@@ -45,7 +53,6 @@ export default function ReadChapter() {
       return text;
     }
   };
-
 
   const { data: pages, isLoading, isError } = useQuery({
     queryKey: ['chapterPages', chapterId],
@@ -88,13 +95,6 @@ export default function ReadChapter() {
     setImageKey((prevKey) => prevKey + 1);
   };
 
-  // useEffect(()=>{
-  //   if(isItTextToSpeech)
-  //   pages.map((page)=>{
-  //     handleUpload(page,"speak" )
-  //   })
-  // },[setIsItTextToSpeech,isItTextToSpeech])
-
   const handleUpload = async (imageUrl, from) => {
     if (!imageUrl) return alert("No image found!");
 
@@ -134,10 +134,10 @@ export default function ReadChapter() {
       if (from === "translate") {
         handleTranslate(processedText).then((translated) => {
           setTranslatedText(translated);
+          setIsItTextToSpeech(false);
         });
-      }
-      else {
-        setIsItTextToSpeech(true)
+      } else {
+        setIsItTextToSpeech(true);
         setTranslatedText(processedText);
       }
       setShowMessage(true);
@@ -150,35 +150,41 @@ export default function ReadChapter() {
   };
 
   return (
-    pages && (
+    pages ? (
       <div className="flex flex-row w-full justify-between items-start h-full -mt-5 bg-[#070920] backdrop-blur-md text-white">
-        <InfoSidebar chapterInfo={chapterInfo} extraInfo={artist_author_info} isCollapsed={isCollapsed} mangaInfo={mangaInfo} setIsCollapsed={setIsCollapsed} />
+        <MemoizedInfoSidebar
+          chapterInfo={chapterInfo}
+          extraInfo={artist_author_info}
+          isCollapsed={isCollapsed}
+          mangaInfo={mangaInfo}
+          setIsCollapsed={setIsCollapsed}
+        />
         <div
           style={{
             scrollbarWidth: "thin",
             scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)",
           }}
-          className="flex flex-col h-[91.2vh] flex-1 w-full  overflow-y-scroll"
+          className="flex flex-col h-[91.2vh] flex-1 w-full overflow-y-scroll"
         >
           <div
             className={`flex flex-1 ${layout === "horizontal"
-              ? "flex-row space-x-4 overflow-hidden justify-center"
-              : "flex-col space-y-4 justify-center"
-              } items-center mt-2 my-1`}
+              ? "flex-row space-x-4 overflow-hidden justify-center mt-7 items-start"
+              : "flex-col space-y-4 mt-7 justify-end items-center"
+              }  my-1`}
           >
             {isLoading ? (
-              <LoadingSpinner />
+              <MemoizedLoadingSpinner />
             ) : (
               layout === "horizontal" ? pages.slice(currentIndex, currentIndex + panels).map((page, index) => (
                 <div key={index} className="relative h-[75vh] flex justify-center items-center">
-                  <div className={`relative w-[380px] h-[75vh] `}>
+                  <div className={`relative w-[380px] h-[75vh]`}>
                     <Image
                       key={imageKey}
                       src={page}
                       alt={`Page ${currentIndex + index + 1}`}
                       height={1680}
                       width={1680}
-                      className={`object-contain  rounded-lg w-full h-full shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"}`}
+                      className={`object-contain rounded-lg w-full h-full shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"}`}
                       priority={index === 0}
                       loading={index === 0 ? undefined : "lazy"}
                       onLoadingComplete={() => handleImageLoad(page)}
@@ -187,35 +193,62 @@ export default function ReadChapter() {
                       blurDataURL="/placeholder.jpg"
                     />
 
-                    {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim() !== "en" ? <OCROverlay fullOCRResult={fullOCRResult} /> : ""}
+                    {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim() !== "en" ? <MemoizedOCROverlay fullOCRResult={fullOCRResult} /> : ""}
                     {!imageCache.includes(page) && (
-                      <LoadingSpinner />
+                      <Placeholder />
                     )}
                   </div>
 
-                  <div className="fixed flex flex-col justify-end items-end bottom-28  right-3">
+                  <div className="fixed flex flex-col justify-end items-end bottom-28 right-3">
                     {!isLoadingOCR ? (<>
-                      <TextToSpeech page={page} handleUpload={handleUpload} text={textResult} />
+                      <MemoizedTextToSpeech page={page} handleUpload={handleUpload} text={isItTextToSpeech ? textResult : translatedText} />
                       {chapterInfo?.translatedLanguage?.trim() !== "en" && <button
-                          disabled={panels === 2}
-                          onClick={() => handleUpload(page, "translate")}
-                          className={`font-sans mt-3 before:bg-opacity-60  min-w-[182px] transition-colors flex gap-4 justify-start  items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page] ? "bg-orange-400 bg-opacity-60 shadow-[0px_0px_5px_rgba(0,0,0,1)] shadow-orange-500 ":"bg-[#1a063e]"} backdrop-blur-md  lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-4 py-2 ease-in-out overflow-hidden border rounded-full group`}
-                          type="submit"
-                        >
-                          <img
-                            src="/translate.svg"
-                            alt="translate"
-                            className="w-12  h-12  group-hover:border-2 group-hover:border-orange-500  transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2  transform group-hover:rotate-[360deg]"
-                          />
+                        disabled={panels === 2 || pageTranslations[page]}
+                        onClick={() => handleUpload(page, "translate")}
+                        className={`font-sans  disabled:cursor-not-allowed mt-3 before:bg-opacity-60 min-w-[182px] transition-colors flex gap-4 justify-start items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page] ? "shadow-[0px_0px_6px_rgba(0,0,0,1)] shadow-orange-500 bg-orange-400 bg-opacity-60 " : "bg-[#1a063e]"} backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-4 py-2 ease-in-out overflow-hidden border rounded-full group`}
+                        type="submit"
+                      >
+                        <img
+                          src="/translate.svg"
+                          alt="translate"
+                          className="w-12 h-12 group-hover:border-2 group-hover:border-orange-500 transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2 transform group-hover:rotate-[360deg]"
+                        />
+                        {pageTranslations[page] ? "Translated" : "Translate"}
+                      </button>}
 
+
+                      {/* <button
+                        disabled={panels === 2 || pageTranslations[page]}
+                        onClick={() => handleUpload(page, "translate")}
+                        className={`group py-4 px-2 before:bg-opacity-60 flex items-center justify-start min-w-[48px] h-16 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300 shadow-md 
+        bg-[#1a063e] hover:min-w-[182px] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 
+        ${pageTranslations[page] ? "shadow-[0px_0px_6px rgba(0,0,0,1)] shadow-orange-500 bg-orange-400 bg-opacity-60" : "bg-[#1a063e]"} 
+        backdrop-blur-md lg:font-semibold border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 
+        before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full  before:bg-[#FFFFFF] 
+        hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 ease-in-out`}
+                      >
+                        <div className="flex items-center justify-center w-12 transition-all duration-300  group-hover:w-16 group-hover:pr-6">
+                        <img 
+                          src="/translate.svg"
+                          alt="translate"
+                          className="w-12 h-12 group-hover:border-2 group-hover:border-orange-500 transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2 transform group-hover:rotate-[360deg]"
+                        />
+                        </div>
+                        <span
+                          className={`absolute font-sans font-bold left-20 text-lg tracking-tight text-gray-100 opacity-0 transform translate-x-4 transition-all duration-300 
+            group-hover:opacity-100 group-hover:text-black group-hover:translate-x-0 ${pageTranslations[page] ? "text-orange-300" : ""}`}
+                        >
                           {pageTranslations[page] ? "Translated" : "Translate"}
-                        </button>}
+                        </span>
+                      </button> */}
+
+
                     </>) : (
                       <div className="h-fit w-full flex justify-center items-center rounded-lg shadow-lg">
                         <div className="flex justify-center items-center w-full h-fit">
                           <div className="text-center flex flex-col justify-center items-center">
-                            <div className="spinner-border -mt-36 -ml-36  animate-spin h-8 w-8 border-t-4 border-indigo-500 rounded-full mb-4" />
-
+                            <div className="spinner-border -mt-36 -ml-36 w-12 h-12  rounded-full animate-spin
+                    border-8 border-solid border-purple-500 border-t-transparent shadow-md"></div>
                           </div>
                         </div>
                       </div>
@@ -224,15 +257,15 @@ export default function ReadChapter() {
                 </div>
               )) :
                 pages.map((page, index) => (
-                  <div key={index} className="relative h-[75vh] flex justify-center items-center">
-                    <div className={`relative w-[380px] h-auto`}>
+                  <div key={index} className="relative h-fit flex justify-center items-center">
+                    <div className={`relative w-auto h-auto`}>
                       <Image
                         key={imageKey}
                         src={page}
                         alt={`Page ${currentIndex + index + 1}`}
                         height={1680}
                         width={1680}
-                        className={`object-contain  rounded-lg w-full h-full shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"}`}
+                        className={`object-contain rounded-lg w-full h-full shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"}`}
                         priority={index === 0}
                         loading={index === 0 ? undefined : "lazy"}
                         onLoadingComplete={() => handleImageLoad(page)}
@@ -241,35 +274,32 @@ export default function ReadChapter() {
                         blurDataURL="/placeholder.jpg"
                       />
 
-                      {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim() !== "en" ? <OCROverlay fullOCRResult={fullOCRResult} /> : ""}
+                      {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim() !== "en" ? <MemoizedOCROverlay fullOCRResult={fullOCRResult} /> : ""}
                       {!imageCache.includes(page) && (
-                        <LoadingSpinner />
+                        <Placeholder />
                       )}
                     </div>
-
                     <div className="absolute flex flex-col justify-center items-center -right-96">
                       {!isLoadingOCR ? (<>
-                        <TextToSpeech page={page} handleUpload={handleUpload} text={textResult} />
+                        <MemoizedTextToSpeech page={page} handleUpload={handleUpload} text={isItTextToSpeech ? textResult : translatedText} />
                         {chapterInfo?.translatedLanguage?.trim() !== "en" && <button
-                          disabled={panels === 2}
+                          disabled={panels === 2 || pageTranslations[page]}
                           onClick={() => handleUpload(page, "translate")}
-                          className={`font-sans mt-3 before:bg-opacity-60  min-w-[182px] transition-colors flex gap-4 justify-start  items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page] ? "bg-orange-400 bg-opacity-60 shadow-[0px_0px_5px_rgba(0,0,0,1)] shadow-orange-500 ":"bg-[#070920]"} backdrop-blur-md  lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-4 py-2 ease-in-out overflow-hidden border-2 rounded-full group`}
+                          className={`font-sans disabled:opacity-0 mt-3 before:bg-opacity-60 min-w-[182px] transition-colors flex gap-4 justify-start items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page] ? "bg-orange-400 bg-opacity-60 shadow-[0_0_5px_rgba(0,0,0,1)] shadow-orange-500" : "bg-[#070920]"} backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-4 py-2 ease-in-out overflow-hidden border-2 rounded-full group`}
                           type="submit"
                         >
                           <img
                             src="/translate.svg"
                             alt="translate"
-                            className="w-12  h-12  group-hover:border-2 group-hover:border-orange-500  transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2  transform group-hover:rotate-[360deg]"
+                            className="w-12 h-12 group-hover:border-2 group-hover:border-orange-500 transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2 transform group-hover:rotate-[360deg]"
                           />
-
                           {pageTranslations[page] ? "Translated" : "Translate"}
                         </button>}
                       </>) : (
                         <div className="h-fit w-full flex justify-center items-center rounded-lg shadow-lg">
                           <div className="flex justify-center items-center w-full h-fit">
                             <div className="text-center flex flex-col justify-center items-center">
-                              <div className="spinner-border -mt-36 -ml-36  animate-spin h-8 w-8 border-t-4 border-indigo-500 rounded-full mb-4" />
-
+                              <div className="spinner-border -mt-36 -ml-36 animate-spin h-8 w-8 border-t-4 border-indigo-500 rounded-full mb-4" />
                             </div>
                           </div>
                         </div>
@@ -280,7 +310,17 @@ export default function ReadChapter() {
             )}
           </div>
 
-          <BottomSettings allAtOnce={allAtOnce} setAllAtOnce={setAllAtOnce} currentIndex={currentIndex} layout={layout} pages={pages} panels={panels} setCurrentIndex={setCurrentIndex} setLayout={setLayout} setPanels={setPanels} />
+          <MemoizedBottomSettings
+            allAtOnce={allAtOnce}
+            setAllAtOnce={setAllAtOnce}
+            currentIndex={currentIndex}
+            layout={layout}
+            pages={pages}
+            panels={panels}
+            setCurrentIndex={setCurrentIndex}
+            setLayout={setLayout}
+            setPanels={setPanels}
+          />
         </div>
 
         {showMessage && (
@@ -295,6 +335,8 @@ export default function ReadChapter() {
           </div>
         )}
       </div>
+    ) : (
+      <MemoizedLoadingSpinner text='Loading Chapter...' />
     )
   );
 }

@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import MangaCard from "../Components/MangaListComponents/MangaCard";
 import AsideComponent from "../Components/MangaListComponents/AsideComponent";
 import SliderComponent from "../Components/MangaListComponents/SliderComponent";
+import LoadingSpinner from "../Components/LoadingSpinner";
 const MemoizedMangaCard = React.memo(MangaCard);
 const MemoizedAsideComponent = React.memo(AsideComponent);
 const MemoizedSliderComponent = React.memo(SliderComponent);
@@ -248,12 +249,7 @@ export default function MangaList() {
   return (
     <div className="min-h-screen w-full  text-white">
       {isLoadingState ? (
-        <div className="flex justify-center items-center w-full h-screen">
-          <div className="text-center">
-            <div className="spinner-border animate-spin h-8 w-8 border-t-4 border-indigo-500 border-solid rounded-full mb-4" />
-            <p className="text-lg font-semibold">Loading Mangas...</p>
-          </div>
-        </div>
+        <LoadingSpinner text="Loading Mangas..."/>
       ) : (
         <>
           <div className=" w-full h-fit">

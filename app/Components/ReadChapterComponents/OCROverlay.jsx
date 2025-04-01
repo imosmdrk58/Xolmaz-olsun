@@ -80,47 +80,52 @@ const OCROverlay = ({ fullOCRResult }) => {
 
   return (
     <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-      {fullOCRResult &&
-        fullOCRResult.map((item, i) => {
-          const [[x1, y1], [x2], , [, y4]] = item.bbox;
-          const originalImageWidth = 1680;
-          const originalImageHeight = 1680;
+  {fullOCRResult &&
+    fullOCRResult.map((item, i) => {
+      // Extract bounding box coordinates
+      const [[x1, y1], [x2], , [, y4]] = item.bbox;
+      const originalImageWidth = 1680; // Original width of the image
+      const originalImageHeight = 1680; // Original height of the image
 
-          const imageAspectRatio = originalImageWidth / originalImageHeight;
-          const containerAspectRatio =
-            380 / (window.innerHeight * item.confidence);
+      // Get the rendered image container dimensions (assuming 380px width for vertical layout)
+      const containerWidth = 380; // Fixed width from your layout
+      const containerHeight = 570; // Estimated height for vertical layout (adjust based on actual height)
 
-          let renderedWidth, renderedHeight;
-          if (imageAspectRatio > containerAspectRatio) {
-            renderedWidth = 380;
-            renderedHeight = 380 / imageAspectRatio;
-          } else {
-            renderedHeight = window.innerHeight * item.confidence;
-            renderedWidth = renderedHeight * imageAspectRatio;
-          }
+      // Calculate scaling factors
+      const scaleX = containerWidth / originalImageWidth; // Scale factor for width
+      const scaleY = containerHeight / originalImageHeight; // Scale factor for height
 
-          const offsetX = (380 - renderedWidth) / 2;
-          const offsetY = (810 - renderedHeight) / 15;
-          const scaleX = renderedWidth / originalImageWidth;
-          const scaleY = (renderedHeight / originalImageHeight) * 1.4;
+      // Calculate the position of the text block
+      const scaledX = x1 * scaleX + 100; // X position scaled to container
+      const scaledY = y1 * scaleY - Math.abs(1200 + y4>1000?y4:y4/10)/10 -20
 
-          const scaledX = x1 * scaleX + offsetX;
-          const scaledY = y1 * scaleY + offsetY - 60;
-          
-          return (
-            <div
-              key={i}
-              className="absolute bg-white w-fit h-[10px] text-black font-bold text-[10px] flex justify-center items-center overflow-hidden rounded-sm p-0.5"
-              style={{
-                top: `${scaledY}px`,
-                left: `${scaledX}px`,
-              }}
-            >
-              {getDisplayText(item.text)}
-            </div>
-          );
-        })}
-    </div>
+      // Calculate the width and height of the text block
+      const textBlockWidth = (x2 - x1) * scaleX; // Width based on bbox difference
+      const textBlockHeight = (y4 - y1) * scaleY; // Height based on bbox difference
+
+      // Ensure the text block is visible and readable
+      const minFontSize = 12; // Minimum font size in pixels
+      const fontSize = Math.max(minFontSize, textBlockHeight * 0.8); // Scale font size with height
+
+      return (
+        <div
+          key={i}
+          className="absolute bg-white text-black font-extrabold flex justify-center items-center overflow-hidden rounded-sm p-1 shadow-md"
+          style={{
+            left: `${scaledX}px`,
+            top: `${scaledY + (i +5)*i/1.5 - (scaledY>515?60:0)}px`,
+            // height: `${textBlockHeight}px`,
+            fontSize: `${fontSize}px`, // Dynamic font size
+            lineHeight: `${textBlockHeight}px`, // Ensure text fits vertically
+            whiteSpace: 'nowrap', // Prevent text wrapping
+            textOverflow: 'ellipsis', // Handle overflow
+          }}
+        >
+          <div className=" relative z-20">{getDisplayText(item.text)}</div>
+        </div>
+      );
+    })}
+</div>
   );
 };
 
