@@ -7,7 +7,7 @@ const InfoSidebar = ({ isCollapsed, setIsCollapsed, mangaInfo, chapterInfo, extr
                 scrollbarWidth: "none",
                 scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)", // Purple scrollbar
             }}
-            className={`${isCollapsed ? "w-fit rounded-2xl h-fit flex justify-center items-center z-50 absolute top-1/2 left-4 shadow-[0_0_10px_rgba(0,0,0,1)] shadow-purple-500" : "w-80 h-[91vh] mt-1.5 py-6 px-5"}  bg-gray-900/50 backdrop-blur-md shadow-2xl flex flex-col overflow-y-auto border border-gray-700 transition-all duration-300 `}
+            className={`${isCollapsed ? "w-fit rounded-2xl h-fit flex justify-center items-center z-50 absolute top-1/2 left-4 shadow-[0_0_10px_rgba(0,0,0,1)] shadow-purple-500" : "w-80 h-[91vh] mt-1.5 py-6 px-5"} col-span-1 bg-gray-900/50 backdrop-blur-md shadow-2xl flex flex-col overflow-y-auto border border-gray-700 transition-all duration-300 `}
         >
             <div className='flex flex-row justify-start gap-4 items-center'>
                 <span
