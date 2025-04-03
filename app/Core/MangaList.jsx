@@ -10,7 +10,7 @@ const MemoizedMangaCard = React.memo(MangaCard);
 const MemoizedAsideComponent = React.memo(AsideComponent);
 const MemoizedSliderComponent = React.memo(SliderComponent);
 
-const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+const CACHE_DURATION = 60 * 60 * 1000; // 30 minutes
 
 // Helper functions for localStorage
 const getFromStorage = (key) => {
