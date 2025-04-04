@@ -18,7 +18,7 @@ const LayoutSelector = ({ layout, setLayout }) => {
                 type="button"
                 onClick={toggleDropdown}
                 className={`flex items-center transition-all justify-between gap-1 w-40 p-3 pr-1 text-gray-100 rounded-md bg-[#1a1a2e] shadow-md focus:outline-none  duration-200 
-                    ${isOpen ? ' border-b-4 border-purple-600 bg-opacity-20' : ' hover:bg-[#25253a] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] shadow-violet-500  bg-opacity-100'}`}
+                    ${isOpen ? ' border-b-4 border-purple-600 bg-opacity-20' : ' hover:bg-[#25253a] shadow-[0px_0px_8px_rgba(0,0,0,0.2)] shadow-violet-500  bg-opacity-100'}`}
             >
                 <span className="flex items-center gap-3">
                     <img src={layout === 'horizontal' ? "/horizontal.svg" : "/vertical.svg"} alt={layout} className="w-7 h-7 bg-purple-500 bg-opacity-30 p-1 rounded-lg " />

@@ -27,7 +27,7 @@ const BottomSettings = ({
 
   return (
 layout === "horizontal" ? (
-      <div className="relative w-auto bg-[#070920] bottom-0 left-0 right-0 flex items-center justify-between px-6 py-4 backdrop-blur-md shadow-xl border-t border-blue-950">
+      <div className="relative w-auto h-24 bg-[#070920] bottom-0 left-0 right-0 flex items-center justify-between px-6 py-4 backdrop-blur-md shadow-xl border-t border-blue-950">
         <div className="flex w-full items-center justify-between space-x-4">
           <div className="flex items-center space-x-2">
             <label className="text-sm text-gray-100 ml-3 font-semibold tracking-tight">Layout:</label>
@@ -90,37 +90,38 @@ layout === "horizontal" ? (
         </div>
       </div>
     ) : (
-      <div className=" w-[79%] fixed bottom-0 bg-[#070920] flex items-center justify-between px-6 py-4 backdrop-blur-md shadow-xl border-t border-blue-950">
-        <div className="flex w-full items-center justify-between space-x-4">
-          <div className="flex items-center space-x-2">
-            <label className="text-sm text-gray-100 ml-3 font-semibold tracking-tight">Layout:</label>
-            <LayoutSelector layout={layout} setLayout={setLayout} />
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setAllAtOnce(true)}
-              className={`p-2 text-white rounded-md bg-gray-700 shadow-md focus:outline-none ${allAtOnce
-                ? 'border-b-2 border-orange-500'
-                : 'hover:border-b-2 hover:border-orange-400'
-                }`}
-            >
-              All At Once
-            </button>
-
-            <button
-              onClick={() => setAllAtOnce(false)}
-              className={`p-2 text-white rounded-md bg-gray-700 shadow-md focus:outline-none ${!allAtOnce
-                ? 'border-b-2 border-orange-500'
-                : 'hover:border-b-2 hover:border-orange-400'
-                }`}
-            >
-              Page wise
-            </button>
-          </div>
+      <div className="w-[79%] h-24 fixed bottom-0 bg-[#070920] flex items-center justify-between px-6 py-4 backdrop-blur-md shadow-xl border-t border-blue-950">
+      <div className="flex w-full items-center justify-between space-x-4">
+        <div className="flex items-center space-x-2">
+          <label className="text-sm text-gray-100 ml-3 font-semibold tracking-tight">Layout:</label>
+          <LayoutSelector layout={layout} setLayout={setLayout} />
         </div>
-
+    
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => setAllAtOnce(true)}
+            className={`relative min-w-36 p-4 text-white rounded-md bg-gradient-to-b from-gray-700 to-gray-800 shadow-lg hover:shadow-xl focus:outline-none transition-all duration-300
+              ${allAtOnce
+                ? 'border-b-2 border-violet-500 before:absolute before:inset-0 before:bg-violet-600/30 before:rounded-md before:scale-100'
+                : 'hover:border-b-2 hover:border-violet-400 before:absolute before:inset-0 before:bg-violet-400/20 before:rounded-md before:scale-0 hover:before:scale-100'
+              } before:transition-transform before:duration-300`}
+          >
+            All pages
+          </button>
+    
+          <button
+            onClick={() => setAllAtOnce(false)}
+            className={`relative p-4 min-w-36 text-white rounded-md bg-gradient-to-b from-gray-700 to-gray-800 shadow-lg hover:shadow-xl focus:outline-none transition-all duration-300
+              ${!allAtOnce
+                ? 'border-b-2 border-violet-500 before:absolute before:inset-0 before:bg-violet-600/30 before:rounded-md before:scale-100'
+                : 'hover:border-b-2 hover:border-violet-400 before:absolute before:inset-0 before:bg-violet-400/20 before:rounded-md before:scale-0 hover:before:scale-100'
+              } before:transition-transform before:duration-300`}
+          >
+            Page wise
+          </button>
+        </div>
       </div>
+    </div>
     )
   );
 }

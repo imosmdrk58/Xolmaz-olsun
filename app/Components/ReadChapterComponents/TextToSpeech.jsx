@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 
 export default function TextToSpeech({ text, handleUpload, page, ready, layout = "horizontal" }) {
     const [isSpeaking, setIsSpeaking] = useState(false);
-
     const handleSpeak = useCallback(() => {
         if (!text.trim()) return alert("No text to speak");
 
@@ -34,9 +33,9 @@ export default function TextToSpeech({ text, handleUpload, page, ready, layout =
                     onClick={() => handleUpload(page, "speak")}
                     disabled={isSpeaking}
                     className={`group py-4  px-2 before:bg-opacity-60 flex items-center justify-start min-w-[48px] h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
-                  shadow-[0px_0px_10px_rgba(0,0,0,1)]  shadow-violet-500 bg-[#1a063e] bg-opacity-60  hover:min-w-[182px] hover:shadow-lg disabled:cursor-not-allowed 
+                  shadow-[0px_0px_10px_rgba(0,0,0,1)]  shadow-violet-500 bg-[#2f0a6e] border-2 border-violet-800 bg-opacity-60  hover:min-w-[182px] hover:shadow-lg disabled:cursor-not-allowed 
                    
-                  backdrop-blur-md lg:font-semibold border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 
+                  backdrop-blur-md lg:font-semibold before:absolute before:w-full before:transition-all before:duration-700 
                   before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] 
                   hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300  z-10 ease-in-out`}
                 >
@@ -62,7 +61,7 @@ export default function TextToSpeech({ text, handleUpload, page, ready, layout =
                         <img
                             src="/microphone.svg"
                             alt="microphone"
-                            className="w-12 h-12 group-hover:border-2 group-hover:border-violet-300 bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2 transition-transform transform group-hover:rotate-[360deg]"
+                            className="w-12 h-12 group-hover:border-2 group-hover:border-violet-500 bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2 transition-transform transform group-hover:rotate-[360deg]"
                         />
                         Read Aloud
                     </button>
@@ -74,11 +73,14 @@ export default function TextToSpeech({ text, handleUpload, page, ready, layout =
                         onClick={handleSpeak}
                         disabled={isSpeaking}
                         className={`group  py-4 px-2  before:bg-opacity-60 flex items-center justify-start min-w-[48px] h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
-                  shadow-[0px_0px_10px_rgba(0,0,0,1)] shadow-violet-500 bg-[#065c7e] bg-gradient-to-b from-black/70 via-[#065c7e] to-black/70  hover:min-w-[182px] hover:shadow-lg disabled:cursor-not-allowed 
-                   
+                   hover:brightness-100 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500  hover:min-w-[182px] hover:shadow-lg disabled:cursor-not-allowed 
+                   brightness-150
                   backdrop-blur-md lg:font-semibold border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 
                   before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] 
                   hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300  z-10 ease-in-out`}
+                  style={{
+                    background: "linear-gradient(#3b235a, #241432)",
+                  }}
                     >
                         <img
                             src="/microphone.svg"
@@ -96,7 +98,7 @@ export default function TextToSpeech({ text, handleUpload, page, ready, layout =
                             <button
                         onClick={handleSpeak}
                         disabled={isSpeaking}
-                        className="font-sans before:bg-opacity-60  min-w-[182px] transition-colors flex gap-4 justify-start  items-center mx-auto text-lg text-white  bg-[#1a063e] shadow-[0px_0px_10px_rgba(0,0,0,1)] shadow-violet-500 bg-opacity-60 backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-4 py-2 ease-in-out overflow-hidden border-2 rounded-full group"
+                        className="font-sans before:bg-opacity-60  min-w-[182px] transition-colors flex gap-4 justify-start  items-center mx-auto text-lg text-white  bg-[#1a063e] shadow-[0px_0px_16px_rgba(0,0,0,1)] shadow-violet-500 bg-opacity-60 backdrop-blur-md lg:font-semibold isolation-auto border-violet-300 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-4 py-2 ease-in-out overflow-hidden border-2 rounded-full group"
                         type="submit"
                     >
                         <img

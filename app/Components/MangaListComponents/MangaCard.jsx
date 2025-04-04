@@ -62,7 +62,7 @@ const MangaCard = ({ processedLatestMangas, handleMangaClicked }) => (
                                 </div>
 
                                 <div className="flex">
-                                    <span className={`${manga.contentRating.toUpperCase() == "SAFE" ? "pr-8" : "pr-2"} z-10 tracking-widest mt-[1px] mr-2  top-0 right-0  bg-gray-900     flex items-center justify-end  text-center border-2  absolute  py-[7px] min-w-36 text-[9px] font-semibold rounded-xl  text-white bg-opacity-70 backdrop-blur-lg ${ratingColors[manga.contentRating] || ratingColors.default}`}>
+                                    <span className={`${manga.contentRating.toUpperCase() == "SAFE" ? "pr-8" :manga.contentRating.toUpperCase() ==  "EROTICA"?"pr-5": "pr-2"} z-10 tracking-widest mt-[1px] mr-2  top-0 right-0  bg-gray-900     flex items-center justify-end  text-center border-2  absolute  py-[7px] min-w-36 text-[9px] font-semibold rounded-xl  text-white bg-opacity-70 backdrop-blur-lg ${ratingColors[manga.contentRating] || ratingColors.default}`}>
                                         {manga.contentRating.toUpperCase()}
                                     </span>
                                 </div>

@@ -381,7 +381,7 @@ console.log("Final lines:", lines.map(line => line.map(item => `${item.text} (y=
                       <Placeholder />
                     )}
                   </div>
-                  <div className="fixed flex flex-col justify-end items-end bottom-28 right-4">
+                  <div className="fixed flex flex-col justify-end items-end bottom-32 right-7">
                     {!isLoadingOCR ? (<>
                       {chapterInfo?.translatedLanguage?.trim() !== "en" && <button
                         disabled={panels === 2 || pageTranslations[page]}
@@ -441,7 +441,7 @@ console.log("Final lines:", lines.map(line => line.map(item => `${item.text} (y=
                         <Placeholder />
                       )}
                     </div>
-                    <div className="absolute top-1/2 transform space-y-4 -translate-y-1/2 flex flex-col justify-end items-end bottom-28 right-3">
+                    <div className="absolute top-52 transform space-y-4  flex flex-col justify-start items-end bottom-28 right-3">
                       {!isLoadingOCR ? (
                         <>
                           {chapterInfo?.translatedLanguage?.trim() !== "en" && <button
@@ -457,7 +457,7 @@ console.log("Final lines:", lines.map(line => line.map(item => `${item.text} (y=
                             />
                             {pageTranslations[page] ? "Translated" : "Translate"}
                           </button>}
-                          <MemoizedTextToSpeech page={page} handleUpload={handleUpload} ready={Boolean(pageTTS[page] ? isItTextToSpeech : pageTranslations[page])} text={((pageTTS[page] && isItTextToSpeech) || pageTranslations[page]) && sortAndJoinOCR(isItTextToSpeech ? fullOCRResult : fullOCRResult)} />
+                          <MemoizedTextToSpeech page={page} handleUpload={handleUpload} ready={Boolean(pageTTS[page] ? isItTextToSpeech : pageTranslations[page])} text={((pageTTS[page] && isItTextToSpeech) || pageTranslations[page]) && sortAndJoinOCR(isItTextToSpeech ? fullOCRResult : fullOCRResult)} layout={layout}/>
                         </>
                       ) : (
                         <div className="h-fit w-full flex justify-center items-center rounded-lg shadow-lg">
@@ -485,7 +485,7 @@ console.log("Final lines:", lines.map(line => line.map(item => `${item.text} (y=
             setPanels={setPanels}
           />
             {layout == "vertical" && <button
-              className="cursor-pointer fixed bottom-24 right-8 w-16 h-16 rounded-full border-4 border-violet-200 bg-black flex items-center justify-center duration-300 hover:rounded-[50px] hover:w-24 group/button overflow-hidden active:scale-90"
+              className="cursor-pointer fixed bottom-32 right-8 w-16 h-16 rounded-full border-4 border-violet-200 bg-black flex items-center justify-center duration-300 hover:rounded-[50px] hover:w-24 group/button overflow-hidden active:scale-90"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
               <svg
