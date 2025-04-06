@@ -1,168 +1,379 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import Image from "next/image";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import Flag from "react-world-flags";
-import { motion } from "framer-motion";
 
-const stagger = 0.2;
-const variants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1 },
-};
 const langToCountry = { ja: "JP", ms: "MY", ko: "KR", en: "US", zh: "CN" };
 
-const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
-    const [visibleMangas, setVisibleMangas] = useState([]);
-    const [hoveredIndex, setHoveredIndex] = useState(null);
-    const autoPlayRef = useRef(null);
-    useEffect(() => {
-        setVisibleMangas(processedRandomMangas.slice(0, 5));
-        autoPlayRef.current = setInterval(handleNext, 5000);
-        return () => clearInterval(autoPlayRef.current);
-    }, [processedRandomMangas]);
-
-    const handleNext = () => {
-        setVisibleMangas((prev) => {
-            const nextIndex = (processedRandomMangas.indexOf(prev[4]) + 1) % processedRandomMangas.length;
-            return [...prev.slice(1), processedRandomMangas[nextIndex]];
-        });
-    };
-
-    const handlePrev = () => {
-        setVisibleMangas((prev) => {
-            const prevIndex = (processedRandomMangas.indexOf(prev[0]) - 1 + processedRandomMangas.length) % processedRandomMangas.length;
-            return [processedRandomMangas[prevIndex], ...prev.slice(0, 4)];
-        });
-    };
-
-    return (
-        <div className="w-full overflow-hidden text-white font-sans px-10  pb-10 pt-7">
-            <div className=" flex mb-5  relative justify-center items-center w-full px-10 ">
-                <h1 className=" relative h-16 gap-5   flex z-10 px-8 justify-center items-center [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]  scale-[102%] backdrop-blur-3xl w-fit text-xl font-bold text-purple-200 tracking-wide uppercase   bg-[#2b045a]">
-                    <img
-                        src="/random.png"
-                        alt="random"
-                        className=" w-10 h-10 filter invert brightness-200 contrast-200"
-                    />
-                    Randomized Recomendation
-                    <img
-                        src="/random.png"
-                        alt="random"
-                        className=" w-10 h-10 rotate-180 filter invert brightness-200 contrast-200"
-                    />
-                </h1>
-                <div
-                    className="flex  justify-center items-center h-[70px] scale-x-[140%] absolute   w-96 antialiased px-12 overflow-visible  bg-[#7a1feab5] backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono  py-4 text-3xl font-bold text-purple-200 tracking-wide uppercase ">
-
-                </div>
-                {/* 2nd */}
-                <div
-                    className="flex -z-10 justify-center items-center h-14 scale-x-[160%] absolute   w-96 antialiased px-12 overflow-visible  bg-[#7a23e6b5]  backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono  py-4 text-3xl font-bold text-purple-200 tracking-wide uppercase ">
-
-                </div>
-                <div
-                    className="flex -z-10 justify-center items-center h-12 scale-x-[155%] absolute   w-96 antialiased px-12 overflow-visible  bg-[#2d055d]  backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono  py-4 text-3xl font-bold text-purple-200 tracking-wide uppercase ">
-
-                </div>
-                {/* 3rd */}
-                <div
-                    className="flex -z-10 justify-center items-center h-8  scale-x-[103%] absolute  w-[50%] antialiased px-12 overflow-visible  bg-[#e6e023b5]  backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono   text-3xl font-bold text-purple-200 tracking-wide uppercase ">
-                </div>
-                <div
-                    className="flex -z-10 justify-center items-center h-6   absolute  w-[50%] antialiased px-12 overflow-visible  bg-[#5b6106]  backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono   text-3xl font-bold text-purple-200 tracking-wide uppercase ">
-                </div>
-                {/* 4th */}
-                {/* <div
-                    className="flex -z-30 justify-center items-center h-4  scale-x-[103%] absolute w-[85%] antialiased px-12 overflow-visible  bg-[#e6e023b5]  backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono   text-3xl font-bold text-purple-200 tracking-wide uppercase ">
-                </div>
-                <div
-                    className="flex -z-30 justify-center items-center h-2  absolute w-[85%] antialiased px-12 overflow-visible  bg-[#5b6106] backdrop-blur-3xl  transition  [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)]   font-mono   text-3xl font-bold text-purple-200 tracking-wide uppercase ">
-                </div> */}
-            </div>
-
-            <section className="carousel flex justify-center w-full items-center relative gap-4">
-                <span
-                    onClick={() => handlePrev()}
-                    className={`relative cursor-pointer brightness-150 shadow-[0px_0px_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center items-center p-7 rounded-xl overflow-hidden
-                                      before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-500 before:content-[''] group-hover:before:opacity-100
-                                    `}
-                    style={{
-                        background: "linear-gradient(#3b235a, #24143f)",
-                    }}
-                >
-                    <Image className=" brightness-200" src="/previous.svg" alt="prev" width={20} height={20} />
-                </span>
-                <div className="list flex w-full  justify-between  gap-2 items-center overflow-hidden">
-                    {visibleMangas.map((manga, index) => (
-                        <motion.div
-                            key={manga.id}
-                            onClick={() => handleMangaClicked(manga)}
-                            className="relative"
-                            variants={variants}
-                            initial="hidden"
-                            animate="visible"
-                            transition={{ delay: index * 0.5 * stagger, ease: "easeInOut", duration: 0.5 }}
-                        >
-                            <div
-                                className=" absolute z-10 [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)] w-[250px] mt-[9px] antialiased   -ml-[3px] h-[355px] overflow-visible  bg-purple-950 hover:scale-105 transition "></div>
-                            <div
-                                key={index}
-                                className="relative my-4 z-20 [clip-path:polygon(0_0,0_0,3%_49%,0_100%,0_100%,49%_97%,100%_100%,100%_100%,97%_51%,100%_0,100%_0,49%_3%)] w-[245px] h-[340px]  bg-purple-900 hover:scale-105 transition  border-stones-500 border-opacity-70"
-                                onMouseEnter={() => setHoveredIndex(index)}
-                                onMouseLeave={() => setHoveredIndex(null)}
-                            >
-                                <Image className="w-full h-full object-cover" src={manga.coverImageUrl} alt={manga.title} width={220} height={340} loading="lazy" />
-                                {/* Title Always Visible */}
-                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-stone-950 via-stone-900 to-transparent p-4">
-                                    <h1 className=" w-full flex-nowrap flex flex-row font-bold items-start justify-center text-xs tracking-[2px] text-white">
-                                        <Flag code={langToCountry[manga.originalLanguage] || "UN"} className="w-6 shadow-lg shadow-black  mr-4" />
-                                        {manga.title.length > 40 ? `${manga.title.slice(0, 40)}...` : manga.title}
-                                    </h1>
-
-                                </div>
-
-                                {/* Description on Hover */}
-                                {hoveredIndex === index && (
-                                    <div className="absolute inset-0 flex flex-col justify-start p-4 bg-purple-950 bg-opacity-80 backdrop-blur-md rounded-lg shadow-lg transition-opacity duration-300">
-                                        <div className="absolute inset-x-0 top-0 bg-gradient-to-t from-transparent via-stone-900 to-stone-950 p-4">
-                                            <h1 className=" w-full mt-3 flex-nowrap flex flex-row font-extrabold items-start justify-center text-xs tracking-[2px]  text-white">
-                                                <Flag code={langToCountry[manga.originalLanguage] || "UN"} className="w-6 shadow-lg shadow-black  mr-4" />
-                                                {manga.title.length > 40 ? `${manga.title.slice(0, 25)}...` : manga.title}
-                                            </h1>
-                                        </div>
-                                        <p className="text-xs mt-14 text-gray-300 tracking-tight font-semibold line-clamp-[10] leading-relaxed">
-                                            {manga.description || "No description available."}
-                                        </p>
-                                        <div className="absolute flex justify-center items-center inset-x-0 bottom-0 bg-gradient-to-t from-stone-950 via-stone-900 to-transparent p-4">
-                                            <button
-                                                onClick={() => handleMangaClicked(manga)}
-                                                className="mt-3 flex  w-full items-center -ml-1 gap-3 justify-center   p-2 rounded-lg border-2 border-[#4d229e] bg-[#4d229e]/40 shadow-md text-white text-sm font-medium transition-all duration-300 hover:bg-[#4d229e]/60 hover:scale-[101%]"
-                                            >
-                                                <Image className="brightness-200 mt-0.5" src="/list.svg" alt="list" width={20} height={20} />
-                                                Read Now
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
-                <span
-                    onClick={() => handleNext()}
-                    className={`relative cursor-pointer brightness-150 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 flex justify-center items-center p-7 rounded-xl overflow-hidden
-                                      before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-500 before:content-[''] group-hover:before:opacity-100
-                                    `}
-                    style={{
-                        background: "linear-gradient(#3b235a, #24143f)",
-                    }}
-                >
-                    <Image className=" brightness-200" src="/next.svg" alt="next" width={20} height={20} />
-                </span>
-            </section>
+// Memoized thumbnail component to reduce unnecessary renders
+const MangaThumbnail = React.memo(({ 
+  manga, 
+  index, 
+  activeIndex, 
+  handleThumbnailClick 
+}) => {
+  return (
+    <div
+      className={`
+        relative cursor-pointer transition-all duration-300
+        ${index === activeIndex ? 'ring-2 ring-purple-600' : 'opacity-70 hover:opacity-100'}
+      `}
+      onClick={() => handleThumbnailClick(index)}
+    >
+      <div className="w-full aspect-[2/3] overflow-hidden">
+        <img
+          src={manga.coverImageUrl}
+          alt={manga.title}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+      </div>
+      
+      <div className="absolute bottom-0 left-0 right-0 p-3">
+        <div className="flex items-center mb-1">
+          <Flag
+            code={langToCountry[manga.originalLanguage] || "UN"}
+            className="w-3 h-3 mr-1"
+          />
+          <span className="text-purple-600 text-xs">
+            {langToCountry[manga.originalLanguage]}
+          </span>
         </div>
-    );
+        <h4 className="text-white text-sm font-medium truncate">
+          {manga.title}
+        </h4>
+      </div>
+      
+      {index === activeIndex && (
+        <div className="absolute top-2 right-2 w-4 h-4 bg-purple-600 rounded-full flex items-center justify-center">
+          <div className="w-2 h-2 bg-black rounded-full"></div>
+        </div>
+      )}
+    </div>
+  );
+});
+
+MangaThumbnail.displayName = "MangaThumbnail";
+
+const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) => {
+  const [mangas, setMangas] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const showcaseRef = useRef(null);
+  const timerRef = useRef(null);
+  const progressRef = useRef(null);
+  const autoplayDuration = 8000; // 8 seconds
+  
+  // Cache the current manga to reduce calculations
+  const activeManga = useMemo(() => 
+    mangas.length > 0 ? mangas[activeIndex] : null, 
+    [mangas, activeIndex]
+  );
+
+  // Initialize mangas once
+  useEffect(() => {
+    if (processedRandomMangas?.length > 0) {
+      setMangas(processedRandomMangas.slice(0, 8));
+    }
+  }, [processedRandomMangas]);
+
+  // Clear timer on component unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
+  // Memoize navigation handlers to prevent unnecessary re-renders
+  const handleNext = useCallback(() => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    clearTimeout(timerRef.current);
+    resetProgress();
+    
+    setActiveIndex((prev) => (prev + 1) % mangas.length);
+    
+    setTimeout(() => {
+      setIsTransitioning(false);
+      // Start a new timer for the next slide immediately after transition completes
+      startTimer();
+    }, 500);
+  }, [isTransitioning, mangas.length]);
+
+  const handlePrev = useCallback(() => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    clearTimeout(timerRef.current);
+    resetProgress();
+    
+    setActiveIndex((prev) => (prev - 1 + mangas.length) % mangas.length);
+    
+    setTimeout(() => {
+      setIsTransitioning(false);
+      // Start a new timer for the next slide immediately after transition completes
+      startTimer();
+    }, 500);
+  }, [isTransitioning, mangas.length]);
+
+  const handleThumbnailClick = useCallback((index) => {
+    if (isTransitioning || index === activeIndex) return;
+    setIsTransitioning(true);
+    clearTimeout(timerRef.current);
+    resetProgress();
+    
+    setActiveIndex(index);
+    
+    setTimeout(() => {
+      setIsTransitioning(false);
+      // Start a new timer for the next slide immediately after transition completes
+      startTimer();
+    }, 500);
+  }, [isTransitioning, activeIndex]);
+
+  // Separate the progress animation into its own function
+  const startProgressAnimation = useCallback(() => {
+    if (!progressRef.current) return;
+    
+    // Reset first
+    progressRef.current.style.transition = "none";
+    progressRef.current.style.width = "0%";
+    
+    // Force reflow to ensure the transition gets applied
+    void progressRef.current.offsetWidth;
+    
+    // Apply transition
+    progressRef.current.style.transition = `width ${autoplayDuration}ms linear`;
+    progressRef.current.style.width = "100%";
+  }, []);
+
+  // Start timer for auto-advancement
+  const startTimer = useCallback(() => {
+    startProgressAnimation();
+    
+    // Clear any existing timeout first
+    if (timerRef.current) clearTimeout(timerRef.current);
+    
+    // Set a new timeout for advancing to the next slide
+    timerRef.current = setTimeout(() => {
+      handleNext();
+    }, autoplayDuration);
+  }, [handleNext, startProgressAnimation]);
+
+  // Properly start the auto-play timer whenever the active index changes
+  useEffect(() => {
+    startTimer();
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [activeIndex, startTimer]);
+
+  const resetProgress = useCallback(() => {
+    if (!progressRef.current) return;
+    progressRef.current.style.transition = "none";
+    progressRef.current.style.width = "0%";
+  }, []);
+
+  if (mangas.length === 0 || !activeManga) return null;
+
+  return (
+    <div 
+      ref={showcaseRef}
+      className="relative w-full h-[89vh] overflow-hidden bg-black"
+    >
+      {/* Background noise texture - simplified with static positioning */}
+      <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20viewBox%3D%270%200%20200%20200%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cfilter%20id%3D%27noiseFilter%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.65%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23noiseFilter%29%27%2F%3E%3C%2Fsvg%3E')]" />
+
+      {/* Progress Timeline */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gray-800 z-50">
+        <div
+          ref={progressRef}
+          className="h-full bg-purple-600"
+        />
+      </div>
+
+      {/* Main Content Area */}
+      <div className="absolute inset-0 flex flex-col md:flex-row">
+        {/* Left Panel - Feature Display */}
+        <div className="relative w-full md:w-2/3 h-full overflow-hidden">
+          {/* Background Image - static with opacity */}
+          <div
+            className="absolute inset-0 bg-cover bg-center filter blur-md opacity-30 transition-opacity duration-500"
+            style={{
+              backgroundImage: `url(${activeManga?.coverImageUrl})`,
+            }}
+          />
+          
+          {/* Overlay Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />
+          
+          {/* Content Container */}
+          <div className="relative h-full z-20 flex items-center">
+            <div className="w-full max-w-2xl px-8 md:px-16 py-12">
+              {/* Language Tag */}
+              <div className="inline-flex items-center px-3 py-1 mb-6 rounded-full border border-purple-600/30 bg-black/30 backdrop-blur-sm">
+                <Flag
+                  code={langToCountry[activeManga?.originalLanguage] || "UN"}
+                  className="w-4 h-4 mr-2"
+                />
+                <span className="text-purple-600 text-xs uppercase tracking-widest">
+                  {langToCountry[activeManga?.originalLanguage] || "Unknown"}
+                </span>
+              </div>
+              
+              {/* Title */}
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white leading-tight transition-all duration-500">
+                <span className="block relative">
+                  <span className="relative z-10">{activeManga?.title.length > 40
+                  ? `${activeManga?.title.slice(0, 40)}...`
+                  : activeManga?.title}</span>
+                  <span className="absolute -bottom-3 left-0 h-3 w-24 bg-purple-600/50 z-0"></span>
+                </span>
+              </h1>
+              
+              {/* Description */}
+              <p className="text-gray-300 mb-8 max-w-xl transition-all duration-500">
+                {activeManga?.description.length > 180
+                  ? `${activeManga?.description.slice(0, 180)}...`
+                  : activeManga?.description}
+              </p>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-4">
+                <button
+                  onClick={() => handleMangaClicked(activeManga)}
+                  className="px-6 py-3 bg-purple-600 text-black font-medium rounded-sm hover:bg-purple-300 transition-colors"
+                >
+                  Read Now
+                </button>
+                <button className="px-6 py-3 bg-transparent border border-purple-600/50 text-purple-600 font-medium rounded-sm hover:bg-purple-600/10 transition-colors">
+                  Add to Collection
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Cover Image - simplified with standard transition */}
+          <div
+            className="absolute right-8 top-1/2 transform -translate-y-1/2 w-56 h-80 md:w-64 md:h-96 z-30 hidden md:block transition-all duration-500"
+            style={{
+              boxShadow: "0 30px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,0,0,0.3)",
+            }}
+          >
+            <img
+              src={activeManga?.coverImageUrl}
+              alt={activeManga?.title}
+              className="w-full h-full object-cover rounded-sm"
+            />
+            
+            {/* Cover light effect - static positioning */}
+            <div className="absolute inset-0 rounded-sm bg-gradient-to-tr from-transparent via-white to-transparent opacity-20" />
+          </div>
+        </div>
+        
+        {/* Right Panel - Navigation & Thumbnails */}
+        <div className="relative w-full md:w-1/3 h-full bg-black/80 backdrop-blur-sm flex flex-col">
+          {/* Navigation Controls */}
+          <div className="h-24 border-b py-3 border-white/10 flex items-center justify-between px-8">
+            <button
+              onClick={handlePrev}
+              className="flex items-center gap-2 text-white/70 hover:text-purple-600 transition-colors group"
+            >
+              <span className="w-8 h-8 flex items-center justify-center border border-white/30 rounded-full group-hover:border-purple-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </span>
+              <span className="hidden sm:block uppercase text-xs tracking-widest">Previous</span>
+            </button>
+            
+            <div className="text-center">
+              <span className="block text-white/50 text-sm">{activeIndex + 1} / {mangas.length}</span>
+              <span className="block text-white/30 text-xs">Swipe to navigate</span>
+            </div>
+            
+            <button
+              onClick={handleNext}
+              className="flex items-center gap-2 text-white/70 hover:text-purple-600 transition-colors group"
+            >
+              <span className="hidden sm:block uppercase text-xs tracking-widest">Next</span>
+              <span className="w-8 h-8 flex items-center justify-center border border-white/30 rounded-full group-hover:border-purple-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </span>
+            </button>
+          </div>
+          
+          {/* Thumbnails Grid */}
+          <div className="flex-grow p-6  overflow-y-auto"
+          style={{
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)", // Purple scrollbar
+        }}
+          >
+            <h3 className="text-white/50 uppercase text-xs tracking-widest mb-6">Discover More</h3>
+            
+            <div className="grid grid-cols-2 gap-4">
+              {mangas.map((manga, index) => (
+                <MangaThumbnail
+                  key={manga.id}
+                  manga={manga}
+                  index={index}
+                  activeIndex={activeIndex}
+                  handleThumbnailClick={handleThumbnailClick}
+                />
+              ))}
+            </div>
+          </div>
+          
+          {/* Footer Info */}
+        <div className="h-5 flex items-center justify-between px-8">
+</div>
+          {/* <div className="h-16 border-t border-white/10 flex items-center justify-between px-8">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center text-black font-bold">
+                <img src="/logo.svg" />
+              </div>
+              <span className="text-white/70 text-sm">AI Manga Reader</span>
+            </div>
+            
+            <div className="flex gap-3">
+              <button className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-purple-600 hover:text-black transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+              </button>
+              <button className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-purple-600 hover:text-black transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
+                </svg>
+              </button>
+            </div>
+          </div> */}
+        </div>
+      </div>
+      
+      {/* Navigation Side Indicators - simplified */}
+      <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-40 hidden md:block">
+        <button
+          onClick={handlePrev}
+          className="w-12 h-12 mb-3 bg-black/50 backdrop-blur-sm border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-purple-600 hover:text-black hover:border-purple-600 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+        
+        <div className="relative w-1 h-40 bg-white/20 rounded-full overflow-hidden">
+          <div 
+            className="absolute top-0 left-0 right-0 bg-purple-600 transition-all duration-300"
+            style={{ height: `${(activeIndex / (mangas.length - 1)) * 100}%` }}
+          ></div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default SliderComponent;
+export default React.memo(CinematicMangaShowcase);

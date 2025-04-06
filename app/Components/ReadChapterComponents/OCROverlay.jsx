@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 
 const OCROverlay = ({ fullOCRResult, translatedTexts, loading, ready,layout="vertical" }) => {
   
