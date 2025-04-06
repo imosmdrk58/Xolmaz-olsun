@@ -281,7 +281,7 @@ export default function MangaList() {
         <LoadingSpinner text="Loading Mangas..." />
       ) : (
         <>
-          <div className="w-full  h-fit">
+          <div className="w-full shadow-[5px_5px_50px_rgba(0,0,0,1)] shadow-black  h-fit">
             <SliderComponent 
               handleMangaClicked={handleMangaClicked} 
               processedRandomMangas={processedRandomMangas} 

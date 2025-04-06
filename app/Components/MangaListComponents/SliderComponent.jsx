@@ -14,12 +14,12 @@ const MangaThumbnail = React.memo(({
   return (
     <div
       className={`
-        relative cursor-pointer transition-all duration-300
+        relative cursor-pointer  transition-all duration-300
         ${index === activeIndex ? 'ring-2 ring-purple-600' : 'opacity-70 hover:opacity-100'}
       `}
       onClick={() => handleThumbnailClick(index)}
     >
-      <div className="w-full aspect-[2/3] overflow-hidden">
+      <div className="w-full aspect-[2/3]  overflow-hidden">
         <img
           src={manga.coverImageUrl}
           alt={manga.title}
@@ -179,7 +179,7 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
   return (
     <div 
       ref={showcaseRef}
-      className="relative w-full h-[89vh] overflow-hidden bg-black"
+      className="relative w-full h-[89vh] border-b-[16px] border-black/10 overflow-hidden bg-black/60"
     >
       {/* Background noise texture - simplified with static positioning */}
       <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20viewBox%3D%270%200%20200%20200%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cfilter%20id%3D%27noiseFilter%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.65%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23noiseFilter%29%27%2F%3E%3C%2Fsvg%3E')]" />
@@ -328,8 +328,8 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
           </div>
           
           {/* Footer Info */}
-        <div className="h-5 flex items-center justify-between px-8">
-</div>
+        {/* <div className="h-5 flex items-center justify-between px-8">
+</div> */}
           {/* <div className="h-16 border-t border-white/10 flex items-center justify-between px-8">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center text-black font-bold">
