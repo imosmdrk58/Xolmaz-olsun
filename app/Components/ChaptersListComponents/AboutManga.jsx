@@ -71,15 +71,15 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo,last }) => {
         <>
             {manga && <div className="md-content flex-grow">
                 <div className="layout-container flex flex-col justify-center items-start manga has-gradient px-4">
-                    <div className="absolute left-0 top-0 w-full block">
+                    <div className="absolute left-0  top-0 w-full block">
                         <div
-                            className="banner-image bg-cover w-full h-[350px]"
+                            className="banner-image  bg-cover w-full h-[280px]"
                             style={{
                                 backgroundImage:
                                     `url('${manga.coverImageUrl}')`,
                             }}
                         ></div>
-                        <div className="bg-black backdrop-blur-sm absolute left-0 top-0 h-[350px] bg-opacity-40 w-full z-10"></div>
+                        <div className="bg-black backdrop-blur-sm absolute left-0 top-0 h-[280px] bg-opacity-40 w-full z-10"></div>
                     </div>
 
 
@@ -207,7 +207,7 @@ const AboutManga = ({ manga, handleChapterClick,setExtraInfo,last }) => {
 
 
 
-                                <div className="sm:mx-2 flex flex-col" style={{ gridArea: "info" }}>
+                                <div className="sm:mx-2 mt-3 flex flex-col" style={{ gridArea: "info" }}>
                                     <div className="flex gap-2 flex-wrap items-center">
                                         <div className="space-y-2">
                                             <div className="flex flex-wrap items-center gap-2">

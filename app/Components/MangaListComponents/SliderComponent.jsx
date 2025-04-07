@@ -2,8 +2,28 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import Flag from "react-world-flags";
 
-const langToCountry = { ja: "JP", ms: "MY", ko: "KR", en: "US", zh: "CN" };
+const langToCountry = { 
+    ja: "JP",       // Japanese → Japan
+    ms: "MY",       // Malay → Malaysia
+    uk:"UA",
+    ko: "KR",       // Korean → South Korea
+    en: "US",       // English → United States
+    zh: "CN",       // Chinese (Simplified) → China
+    fr: "FR",       // French → France
+    "pt-br": "BR",  // Portuguese (Brazilian) → Brazil
+    id: "ID",       // Indonesian → Indonesia
+    vi: "VN",       // Vietnamese → Vietnam
+    "es-la": "MX",  // Spanish (Latin America) → Mexico
+    "zh-hk": "HK",  // Chinese (Traditional) → Hong Kong
+    it: "IT",       // Italian → Italy
+    tr: "TR",       // Turkish → Turkey
+    es: "ES"        // Spanish → Spain
+};
 
+const StableFlag = React.memo(({ code, className }) => (
+    <Flag code={code} className={className} />
+));
+StableFlag.displayName = 'StableFlag';
 // Memoized thumbnail component to reduce unnecessary renders
 const MangaThumbnail = React.memo(({ 
   manga, 
@@ -30,10 +50,7 @@ const MangaThumbnail = React.memo(({
       
       <div className="absolute bottom-0 left-0 right-0 p-3">
         <div className="flex items-center mb-1">
-          <Flag
-            code={langToCountry[manga.originalLanguage] || "UN"}
-            className="w-3 h-3 mr-1"
-          />
+        <StableFlag code={langToCountry[manga.originalLanguage] || "UN"} className="w-6 shadow-md shadow-black mr-2" />
           <span className="text-purple-600 text-xs">
             {langToCountry[manga.originalLanguage]}
           </span>
@@ -212,10 +229,7 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
             <div className="w-full max-w-2xl px-8 md:px-16 py-12">
               {/* Language Tag */}
               <div className="inline-flex items-center px-3 py-1 mb-6 rounded-full border border-purple-600/30 bg-black/30 backdrop-blur-sm">
-                <Flag
-                  code={langToCountry[activeManga?.originalLanguage] || "UN"}
-                  className="w-4 h-4 mr-2"
-                />
+              <StableFlag code={langToCountry[activeManga?.originalLanguage] || "UN"} className="w-6 shadow-md shadow-black mr-2" />
                 <span className="text-purple-600 text-xs uppercase tracking-widest">
                   {langToCountry[activeManga?.originalLanguage] || "Unknown"}
                 </span>

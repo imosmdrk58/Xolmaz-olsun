@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import MangaCard from "../Components/MangaListComponents/MangaCard";
@@ -55,9 +55,9 @@ const fetchMangaType = async (type, page) => {
 
 const fetchAllMangaTypes = async ({ queryKey }) => {
   const [_, page] = queryKey;
-  const cacheKey = `all_manga_types_${page}`;
-  const cachedData = getFromStorage(cacheKey);
-  if (cachedData) return cachedData;
+  // const cacheKey = `all_manga_types_${page}`;
+  // const cachedData = getFromStorage(cacheKey);
+  // if (cachedData) return cachedData;
 
   try {
     const [rating, favourite, latest, random] = await Promise.all([
@@ -74,7 +74,7 @@ const fetchAllMangaTypes = async ({ queryKey }) => {
       randomMangas: random
     };
 
-    saveToStorage(cacheKey, result);
+    // saveToStorage(cacheKey, result);
     return result;
   } catch (error) {
     console.error('Error fetching manga data:', error);
@@ -87,6 +87,7 @@ export default function MangaList() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDataProcessed, setIsDataProcessed] = useState(false);
+  const showcaseRef = useRef(null);
 
   const processMangaData = async (mangaList) => {
     const cacheKey = `processed_manga_${mangaList?.length || 0}_${page}`;
@@ -184,7 +185,7 @@ export default function MangaList() {
       })
     );
 
-    saveToStorage(cacheKey, result);
+    // saveToStorage(cacheKey, result);
     return result;
   };
 
@@ -260,10 +261,10 @@ export default function MangaList() {
     });
   };
 
-  const processedMangas = queryClient.getQueryData(["processedMangas"]) || [];
-  const processedFavouriteMangas = queryClient.getQueryData(["processedFavouriteMangas"]) || [];
-  const processedLatestMangas = queryClient.getQueryData(["processedLatestMangas"]) || [];
-  const processedRandomMangas = queryClient.getQueryData(["processedRandomMangas"]) || [];
+  const processedMangas = useMemo(() =>queryClient.getQueryData(["processedMangas"]) || []);
+  const processedFavouriteMangas = useMemo(() =>queryClient.getQueryData(["processedFavouriteMangas"]) || []);
+  const processedLatestMangas = useMemo(() =>queryClient.getQueryData(["processedLatestMangas"]) || []);
+  const processedRandomMangas = useMemo(() =>queryClient.getQueryData(["processedRandomMangas"]) || []);
 
   const isLoadingState = isLoading || !isDataProcessed || processedLatestMangas.length === 0;
 
@@ -276,7 +277,7 @@ export default function MangaList() {
   }
 
   return (
-    <div className="min-h-screen w-full text-white">
+    <div ref={showcaseRef} className="min-h-screen w-full text-white">
       {isLoadingState ? (
         <LoadingSpinner text="Loading Mangas..." />
       ) : (
