@@ -111,10 +111,10 @@ function AsideComponent({
                           </h3>
 
                           {/* Manga Rating */}
-                          <div className="flex items-center gap-1.6 text-gray-400">
+                          <div className="flex items-center gap-1.5 text-gray-400">
                             <img src="/star.svg" alt="star" className="w-3.2 h-3.2" />
                             <span className="text-sm">
-                              {manga?.rating?.rating?.average ?? '0'}
+                              {manga?.rating?.rating?.bayesian?.toFixed(2) ?? '0'}
                             </span>
                           </div>
                         </div>

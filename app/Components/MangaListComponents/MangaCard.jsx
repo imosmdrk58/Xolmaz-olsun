@@ -51,7 +51,7 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked }) => 
                         onClick={() => stableHandleMangaClicked(manga)}
                         className="manga-card cursor-pointer w-full min-h-[400px] flex justify-center items-start"
                     >
-                        <div className="w-[250px] overflow-hidden rounded-[10px] bg-[#0c0221] p-[5px] shadow-slate-800 shadow-md transition-transform duration-300 ease-out hover:scale-[102%] will-change-transform">
+                        <div className="w-[250px] overflow-hidden rounded-[10px] bg-[#0c0221] p-[5px] shadow-slate-600 shadow-[0_0_4px_rgba(0,0,0,1)] transition-transform duration-300 ease-out hover:scale-[102%] will-change-transform">
                             <div className="relative flex h-[250px] flex-col rounded-[15px] bg-gradient-to-tr from-[#049fbb] to-[#50f6ff]">
                                 <Image 
                                     src={manga.coverImageUrl || '/placeholder.jpg'} 
