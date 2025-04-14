@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const baseUrl = 'https://api.mangadex.org';
-  const limit = 100; // Fetch a large number of mangas to randomize
+  const limit = 20; // Fetch a large number of mangas to randomize
   let allManga: any[] = [];
 
   try {
@@ -12,7 +12,7 @@ export async function GET() {
     const response = await axios.get(`${baseUrl}/manga`, {
       params: {
         limit,
-        includes: ['id', 'title', 'cover_art'],
+        includes: ['id', 'title', 'cover_art','author', 'artist'],
         order: { updatedAt: 'desc' }, // Ensure we get recent mangas
       },
     });

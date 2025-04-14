@@ -16,7 +16,7 @@ export async function GET() {
         params: {
           limit,
           offset,
-          includes: ['id', 'title', 'cover_art'],
+          includes: ['id', 'title', 'cover_art','author', 'artist'],
           order: { updatedAt: 'desc'  }, 
         },
       });
@@ -52,8 +52,8 @@ export async function GET() {
     }
 
     return NextResponse.json({ 
-      data: uniqueManga,
-      total: uniqueManga.length,
+      data: uniqueManga.slice(0, 100),
+      total: 100,
       offset,
       limit: limit * maxBatches
     });

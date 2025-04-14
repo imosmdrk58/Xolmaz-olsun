@@ -13,7 +13,7 @@ const ratingColors = {
 const langToCountry = { 
     ja: "JP",       // Japanese → Japan
     ms: "MY",       // Malay → Malaysia
-    uk:"UA",
+    uk: "UA",       // Ukrainian → Ukraine
     ko: "KR",       // Korean → South Korea
     en: "US",       // English → United States
     zh: "CN",       // Chinese (Simplified) → China
@@ -25,14 +25,17 @@ const langToCountry = {
     "zh-hk": "HK",  // Chinese (Traditional) → Hong Kong
     it: "IT",       // Italian → Italy
     tr: "TR",       // Turkish → Turkey
-    es: "ES"        // Spanish → Spain
+    es: "ES",       // Spanish → Spain
+    ru: "RU",       // Russian → Russia
+    ro: "RO",       // Romanian → Romania
+    ar: "AE"        // Arabic → United Arab Emirates
 };
 
 
 const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked }) => {
-    const StableFlag = useCallback(({ code, className }) => (
+    const StableFlag = React.memo(({ code, className }) => (
         <Flag code={code} className={className} />
-    ),[]);
+    ));
     StableFlag.displayName = 'StableFlag';
     const stableHandleMangaClicked = useCallback(handleMangaClicked, []);
 
@@ -91,7 +94,7 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked }) => 
                                             <span>
                                                 {icon === "comment" ? (manga?.rating?.comments?.repliesCount > 1000 ? manga?.rating?.comments?.repliesCount.toString()[0] + "K" : manga?.rating?.comments?.repliesCount || 0) :
                                                  icon === "heart" ? (manga?.rating?.follows > 1000 ? manga?.rating?.follows?.toString()[0] + "K" : manga?.rating?.follows || 0) :
-                                                 manga?.rating?.rating?.average?.toFixed(2) || "N/A"}
+                                                 manga?.rating?.rating?.bayesian?.toFixed(2) || "N/A"}
                                             </span>
                                         </div>
                                     ))}

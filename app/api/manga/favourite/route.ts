@@ -4,8 +4,8 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const baseUrl = 'https://api.mangadex.org';
-  const limit = 50; // Limit for each API call
-  const maxBatches = 3; // Additional batches for add-ons
+  const limit = 20; // Limit for each API call
+  const maxBatches = 1; // Additional batches for add-ons
   let allManga: any[] = [];
   let offset = 0;
 
@@ -16,7 +16,7 @@ export async function GET() {
         params: {
           limit,
           offset,
-          includes: ['id', 'title', 'cover_art'],
+          includes: ['id', 'title', 'cover_art','author', 'artist'],
           order: { followedCount: 'desc' }, // Order by follower count
         },
       });
@@ -34,7 +34,7 @@ export async function GET() {
 
     // Remove duplicates (if any)
     const uniqueManga = Array.from(
-      new Map(allManga.slice(0, 20).map((manga: any) => [manga.id, manga])).values()
+      new Map(allManga.slice(0, 10).map((manga: any) => [manga.id, manga])).values()
     );
     
 

@@ -24,7 +24,7 @@ apiVersion.ts
 /app/Components/ChaptersListComponents/Temp.jsx
 # production
 /build
-
+ai-manga-reader\app\api\manga\getAuthor
 # misc
 .DS_Store
 *.pem

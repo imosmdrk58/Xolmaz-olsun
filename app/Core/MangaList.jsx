@@ -89,31 +89,60 @@ export default function MangaList() {
   const [isDataProcessed, setIsDataProcessed] = useState(false);
   const showcaseRef = useRef(null);
 
-  const processMangaData = async (mangaList) => {
-    const cacheKey = `processed_manga_${mangaList?.length || 0}_${page}`;
+  const processMangaData = async (mangaList, type) => {
+    if (!mangaList || mangaList.length === 0) return [];
+    
+    const cacheKey = `processed_${type}_${page}`;
     const cachedData = getFromStorage(cacheKey);
-    if (cachedData) return cachedData;
+    if (cachedData?.data) return cachedData.data;
+
+    // Batch fetch ratings
+    const mangaIds = mangaList.map(manga => manga.id);
+    let ratings = {};
+    const ratingsCacheKey = `manga_ratings_batch_${mangaIds.join('_')}`;
+    const cachedRatings = getFromStorage(ratingsCacheKey);
+    
+    if (cachedRatings?.data) {
+      ratings = cachedRatings.data;
+    } else {
+      try {
+        const response = await fetch(
+          'https://api.mangadex.org/statistics/manga?' + 
+          mangaIds.map(id => `manga[]=${id}`).join('&')
+        );
+        if (response.ok) {
+          const ratingData = await response.json();
+          ratings = ratingData.statistics || {};
+          saveToStorage(ratingsCacheKey, ratings);
+        }
+      } catch (err) {
+        console.error('Error fetching batch ratings:', err);
+      }
+    }
 
     const result = await Promise.all(
       mangaList.map(async (manga) => {
         const {
           id,
-          attributes: {
-            title,
-            links,
-            availableTranslatedLanguages,
-            latestUploadedChapter,
-            originalLanguage,
-            description,
-            altTitles,
-            contentRating,
-            status,
-            year,
-            updatedAt,
-            tags,
-          },
+          attributes,
           relationships,
+          type,
         } = manga;
+
+        const {
+          title,
+          links,
+          availableTranslatedLanguages,
+          latestUploadedChapter,
+          originalLanguage,
+          description,
+          altTitles,
+          contentRating,
+          status,
+          year,
+          updatedAt,
+          tags,
+        } = attributes;
 
         const grouped = relationships.reduce((acc, rel) => {
           if (!acc[rel.type]) acc[rel.type] = [];
@@ -127,24 +156,7 @@ export default function MangaList() {
         const artistName = grouped.artist;
         const creatorName = grouped.creator ?? "N/A";
         const MangaStoryType = grouped.manga ?? "N/A";
-        let rating = 0;
-
-        const ratingCacheKey = `manga_rating_${id}`;
-        const cachedRating = getFromStorage(ratingCacheKey);
-        if (cachedRating) {
-          rating = cachedRating;
-        } else {
-          try {
-            const ratingResponse = await fetch(`https://api.mangadex.org/statistics/manga/${id}`);
-            if (ratingResponse.ok) {
-              const ratingData = await ratingResponse.json();
-              rating = ratingData.statistics[id] || 0;
-              saveToStorage(ratingCacheKey, rating);
-            }
-          } catch (err) {
-            console.error(`Error fetching rating for manga ID ${id}:`, err);
-          }
-        }
+        const rating = ratings[id] || {};
 
         const groupedTags = tags?.reduce((acc, tag) => {
           const group = tag.attributes?.group || 'Unknown Group';
@@ -154,7 +166,7 @@ export default function MangaList() {
           return acc;
         }, {});
 
-        const groupedTagsArray = Object.keys(groupedTags).map((group) => ({
+        const groupedTagsArray = Object.keys(groupedTags || {}).map((group) => ({
           group,
           tags: groupedTags[group],
         }));
@@ -162,7 +174,7 @@ export default function MangaList() {
         return {
           id,
           title: title?.en || Object?.values(altTitles?.[0] || {})[0] || 'Untitled',
-          description: description?.en || 'No description available for this manga.',
+          description: description?.en || 'No description available.',
           altTitle: Object.values(altTitles?.[0] || { none: "N/A" })[0] || 'N/A',
           contentRating: contentRating || 'N/A',
           status: status || 'Unknown',
@@ -181,11 +193,11 @@ export default function MangaList() {
           availableTranslatedLanguages: availableTranslatedLanguages || [],
           latestUploadedChapter,
           originalLanguage,
+          type,
         };
       })
     );
-
-    // saveToStorage(cacheKey, result);
+    saveToStorage(cacheKey, result);
     return result;
   };
 
@@ -216,10 +228,10 @@ export default function MangaList() {
       };
 
       const [processedMangas, processedFavouriteMangas, processedLatestMangas, processedRandomMangas] = await Promise.all([
-        getFromStorage(cacheKeys.mangas) || processMangaData(mangas.data || []),
-        getFromStorage(cacheKeys.favourite) || processMangaData(favouriteMangas.data || []),
-        getFromStorage(cacheKeys.latest) || processMangaData(latestMangas.data || []),
-        getFromStorage(cacheKeys.random) || processMangaData(randomMangas.data || []),
+        getFromStorage(cacheKeys.mangas) || processMangaData(mangas.data || [],"rating"),
+        getFromStorage(cacheKeys.favourite) || processMangaData(favouriteMangas.data || [],"favourite"),
+        getFromStorage(cacheKeys.latest) || processMangaData(latestMangas.data || [],"latest"),
+        getFromStorage(cacheKeys.random) || processMangaData(randomMangas.data || [],"random"),
       ]);
 
       return { processedMangas, processedFavouriteMangas, processedLatestMangas, processedRandomMangas };
@@ -275,7 +287,7 @@ export default function MangaList() {
       </div>
     );
   }
-
+console.log(processedLatestMangas)
   return (
     <div ref={showcaseRef} className="min-h-screen w-full text-white">
       {isLoadingState ? (

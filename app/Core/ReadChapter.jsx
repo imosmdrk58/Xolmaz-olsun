@@ -21,8 +21,8 @@ const MemoizedLoadingSpinner = memo(LoadingSpinner);
 export default function ReadChapter() {
   const { mangaId, chapterId } = useParams();
   const location = useLocation();
-  const [textResult, setTextResult] = useState("");
-  const { chapterInfo, mangaInfo, artist_author_info } = location.state || {};
+  // const [textResult, setTextResult] = useState("");
+  const { chapterInfo, mangaInfo } = location.state || {};
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [layout, setLayout] = useState('horizontal');
   const [panels, setPanels] = useState(1);
@@ -31,7 +31,7 @@ export default function ReadChapter() {
   const [imageKey, setImageKey] = useState(0);
   const [showMessage, setShowMessage] = useState(false);
   const [fullOCRResult, setFullOCRResult] = useState("");
-  const [translatedText, setTranslatedText] = useState("");
+  // const [translatedText, setTranslatedText] = useState("");
   const [pageTranslations, setPageTranslations] = useState({});
   const [isLoadingOCR, setIsLoadingOCR] = useState(false); // Loading state for OCR
   const [isItTextToSpeech, setIsItTextToSpeech] = useState(false); // Loading state for OCR
@@ -87,16 +87,16 @@ export default function ReadChapter() {
       const currentPage = pages[currentIndex];
       if (pageTranslations[currentPage]) {
         setFullOCRResult(pageTranslations[currentPage].ocrResult);
-        setTranslatedText(pageTranslations[currentPage].textResult);
-        setTextResult(pageTranslations[currentPage].textResult);
+        // setTranslatedText(pageTranslations[currentPage].textResult);
+        // setTextResult(pageTranslations[currentPage].textResult);
         setShowMessage(true);
       } else if (!pageTranslations[currentPage] && pageTTS[currentPage]) {
         setFullOCRResult(pageTTS[currentPage].ocrResult);
-        setTextResult(pageTTS[currentPage].textResult);
+        // setTextResult(pageTTS[currentPage].textResult);
         setShowMessage(true);
       } else {
         setFullOCRResult("");
-        setTextResult("");
+        // setTextResult("");
         setShowMessage(false);
       }
     }
@@ -189,7 +189,7 @@ export default function ReadChapter() {
             textResult: translated
           }
         }));
-        setTranslatedText(translated);
+        // setTranslatedText(translated);
         setIsItTextToSpeech(false);
       } else {
         setPageTTS(prev => ({
@@ -200,9 +200,9 @@ export default function ReadChapter() {
           }
         }));
         setFullOCRResult(ocrResult);
-        setTextResult(processedText);
+        // setTextResult(processedText);
         setIsItTextToSpeech(true);
-        setTranslatedText(processedText);
+        // setTranslatedText(processedText);
       }
       setShowMessage(true);
     } catch (error) {
@@ -337,7 +337,6 @@ console.log("Final lines:", lines.map(line => line.map(item => `${item.text} (y=
       <div className="flex flex-row w-full justify-between items-start h-full -mt-5 bg-[#070920] backdrop-blur-md text-white">
         <MemoizedInfoSidebar
           chapterInfo={chapterInfo}
-          extraInfo={artist_author_info}
           isCollapsed={isCollapsed}
           mangaInfo={mangaInfo}
           setIsCollapsed={setIsCollapsed}

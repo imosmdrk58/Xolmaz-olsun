@@ -1,6 +1,7 @@
 import React from 'react'
 import Image from 'next/image';
-const InfoSidebar = ({ isCollapsed, setIsCollapsed, mangaInfo, chapterInfo, extraInfo }) => {
+const InfoSidebar = ({ isCollapsed, setIsCollapsed, mangaInfo, chapterInfo }) => {
+    console.log(mangaInfo,chapterInfo)
     return mangaInfo && (
         <div
             style={{
@@ -125,7 +126,7 @@ const InfoSidebar = ({ isCollapsed, setIsCollapsed, mangaInfo, chapterInfo, extr
                         <div className="flex justify-center w-full flex-col items-center">
                             <h4 className="font-semibold w-full flex flex-row gap-4 text-purple-400 mb-2"> <Image width={20} height={20} className='opacity-80' src='/author.svg' alt="author" />Authors:</h4>
                             <p className="text-sm text-gray-300 bg-[#0c0221] py-1 px-3 rounded-full w-fit">
-                                {extraInfo?.authorName || "N/A"}
+                            {mangaInfo?.authorName[0]?.attributes?.name || "N/A"}
                             </p>
                         </div>
                         {/* Artists */}
@@ -133,7 +134,7 @@ const InfoSidebar = ({ isCollapsed, setIsCollapsed, mangaInfo, chapterInfo, extr
                             <h4 className="font-semibold w-full flex flex-row gap-4 text-purple-400 mb-2">
                                 <Image width={20} height={20} className='opacity-80' src='/author.svg' alt="author" />Artists:</h4>
                             <p className="text-sm text-gray-300 bg-[#0c0221] py-1 px-3 rounded-full w-fit">
-                                {extraInfo?.artistName || "N/A"}
+                            {mangaInfo?.artistName[0]?.attributes?.name || "N/A"}
                             </p>
                         </div>
                     </div>
