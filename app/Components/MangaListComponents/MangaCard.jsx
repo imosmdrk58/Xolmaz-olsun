@@ -1,42 +1,11 @@
 'use client';
 import Image from "next/image";
 import React, { useCallback } from "react";
-import Flag from "react-world-flags";
-
-const ratingColors = {
-    safe: "bg-green-600 border-green-600",
-    suggestive: "bg-yellow-600 border-yellow-600",
-    erotica: "bg-red-600 border-red-600",
-    default: "bg-gray-600 border-gray-600",
-};
-
-const langToCountry = { 
-    ja: "JP",       // Japanese → Japan
-    ms: "MY",       // Malay → Malaysia
-    uk: "UA",       // Ukrainian → Ukraine
-    ko: "KR",       // Korean → South Korea
-    en: "US",       // English → United States
-    zh: "CN",       // Chinese (Simplified) → China
-    fr: "FR",       // French → France
-    "pt-br": "BR",  // Portuguese (Brazilian) → Brazil
-    id: "ID",       // Indonesian → Indonesia
-    vi: "VN",       // Vietnamese → Vietnam
-    "es-la": "MX",  // Spanish (Latin America) → Mexico
-    "zh-hk": "HK",  // Chinese (Traditional) → Hong Kong
-    it: "IT",       // Italian → Italy
-    tr: "TR",       // Turkish → Turkey
-    es: "ES",       // Spanish → Spain
-    ru: "RU",       // Russian → Russia
-    ro: "RO",       // Romanian → Romania
-    ar: "AE"        // Arabic → United Arab Emirates
-};
-
+import {getRatingColor} from "../../constants/Flags"
+import StableFlag from "../StableFlag"
 
 const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked }) => {
-    const StableFlag = React.memo(({ code, className }) => (
-        <Flag code={code} className={className} />
-    ));
-    StableFlag.displayName = 'StableFlag';
+    
     const stableHandleMangaClicked = useCallback(handleMangaClicked, []);
 
     return (
@@ -63,7 +32,7 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked }) => 
                                 />
                                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-gray-900 to-transparent p-4">
                                     <h1 className="flex flex-row font-bold items-start justify-center text-xs tracking-[2px] text-white">
-                                    <StableFlag code={langToCountry[manga.availableTranslatedLanguages[0]] || "UN"} className="w-6 shadow-md shadow-black mr-2" />
+                                    <StableFlag code={manga.availableTranslatedLanguages[0] || "UN"} className="w-6 shadow-md shadow-black mr-2" />
                                         {manga.title.length > 40 ? `${manga.title.slice(0, 40)}...` : manga.title}
                                     </h1>
                                 </div>
@@ -79,7 +48,7 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked }) => 
                                         </span>
                                     </div>
                                     <div className="flex">
-                                        <span className={`${manga.contentRating.toUpperCase() === "SAFE" ? "pr-8" : manga.contentRating.toUpperCase() === "EROTICA" ? "pr-5" : "pr-2"} z-10 tracking-widest mt-[1px] mr-2 top-0 right-0 bg-gray-900 flex items-center justify-end text-center border-2 absolute py-[7px] min-w-36 text-[9px] font-semibold rounded-xl text-white bg-opacity-70 backdrop-blur-lg ${ratingColors[manga.contentRating] || ratingColors.default}`}>
+                                        <span className={`${manga.contentRating.toUpperCase() === "SAFE" ? "pr-8" : manga.contentRating.toUpperCase() === "EROTICA" ? "pr-5" : "pr-2"} z-10 tracking-widest mt-[1px] mr-2 top-0 right-0 bg-gray-900 flex items-center justify-end text-center border-2 absolute py-[7px] min-w-36 text-[9px] font-semibold rounded-xl text-white bg-opacity-70 backdrop-blur-lg ${getRatingColor(manga.contentRating) || getRatingColor("default")}`}>
                                             {manga.contentRating.toUpperCase()}
                                         </span>
                                     </div>

@@ -1,7 +1,8 @@
 import Image from 'next/image';
-import React, { useCallback, useState, useMemo } from 'react';
-import Flag from "react-world-flags";
-
+import React, { useState, useMemo } from 'react';
+import StableFlag from '../StableFlag';
+import {langFullNames} from "../../constants/Flags"
+const MemoStableFlag = React.memo(StableFlag)
 const ChapterList = ({ chapters, handleChapterClick, manga }) => {
     const [activeChapter, setActiveChapter] = useState(null);
 
@@ -47,24 +48,9 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
         );
     }, [chapters]);
 
-    // Language configs
-    const langToCountry = useMemo(() => ({
-        ja: "JP", ms: "MY", uk: "UA", ko: "KR", en: "US", zh: "CN", fr: "FR",
-        "pt-br": "BR", id: "ID", vi: "VN", "es-la": "MX", "zh-hk": "HK",
-        it: "IT", tr: "TR", es: "ES", ru: "RU", ro: "RO", ar: "AE"
-    }), []);
 
-    const langFullNames = useMemo(() => ({
-        ja: "Japanese", ms: "Malay", uk: "Ukrainian", ko: "Korean", en: "English",
-        zh: "Chinese", fr: "French", "pt-br": "Portuguese", id: "Indonesian",
-        vi: "Vietnamese", "es-la": "Spanish (LATAM)", "zh-hk": "Chinese (HK)",
-        it: "Italian", tr: "Turkish", es: "Spanish", ru: "Russian", ro: "Romanian", ar: "Arabic"
-    }), []);
 
-    // Memoized Flag component for performance
-    const StableFlag = useCallback(({ code, className }) => (
-        <Flag code={code} className={className} />
-    ), []);
+
 
     const toggleChapter = (chapterNum) => {
         setActiveChapter(activeChapter === chapterNum ? null : chapterNum);
@@ -170,10 +156,10 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
                                             <div className="hidden md:flex items-center">
                                                 {groupedChapter.translations.slice(0, 3).map((translation, idx) => (
                                                     <div key={idx} className="-ml-1 first:ml-0">
-                                                        {langToCountry[translation.translatedLanguage] && (
+                                                        {translation.translatedLanguage && (
                                                             <div className="ring-2 ring-gray-800 rounded-full">
-                                                                <StableFlag
-                                                                    code={langToCountry[translation.translatedLanguage]}
+                                                                <MemoStableFlag
+                                                                    code={translation.translatedLanguage}
                                                                     className="h-6 w-6 rounded-full"
                                                                 />
                                                             </div>
@@ -213,10 +199,10 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
                                                     className="groupedChapter flex items-center justify-between rounded-lg p-3 bg-gray-800 hover:bg-gray-750 border border-gray-700 cursor-pointer transition-all duration-200 hover:border-purple-500"
                                                 >
                                                     <div className="flex items-center gap-3">
-                                                        {langToCountry[translation.translatedLanguage] && (
+                                                        {translation.translatedLanguage && (
                                                             <div className="rounded-lg bg-black bg-opacity-30 p-1">
-                                                                <StableFlag
-                                                                    code={langToCountry[translation.translatedLanguage]}
+                                                                <MemoStableFlag
+                                                                    code={translation.translatedLanguage}
                                                                     className="h-8 w-8 rounded shadow"
                                                                 />
                                                             </div>
@@ -272,4 +258,3 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
 };
 
 export default ChapterList;
-
