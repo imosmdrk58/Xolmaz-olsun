@@ -1,29 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-
+import {allAvailableLanguages} from "../../../../constants/Flags"
 const chaptersPerPage = 90;  // Adjust the number of chapters per request
 const totalChaptersToFetch = 500; // Total chapters you want to fetch
-const availableLanguages = [
-    "ja",
-    "ms", 
-    "uk",     
-    "ko",
-    "en",
-    "zh",
-    "fr",
-    "pt-br",
-    "id",
-    "vi",
-    "es-la",
-    "zh-hk",
-    "it",
-    "tr",
-    "es",
-    "ru",
-    "ro",
-    "ar",
-  ];
+
 
 export async function GET(req: Request, { params }: { params: { mangaId: string } }) {
     const { mangaId } = await params;
@@ -39,14 +20,15 @@ export async function GET(req: Request, { params }: { params: { mangaId: string 
             for (let i = 0; i < maxBatches; i++) {
                 const response = await axios.get(`https://api.mangadex.org/manga/${mangaId}/feed`, {
                     params: {
-                        translatedLanguage: availableLanguages,
+                        translatedLanguage: allAvailableLanguages,
+                        includes: ['manga', 'scanlation_group', 'user', 'cover_art', 'author', 'artist', 'tag'],
                         limit: chaptersPerPage,
                         offset: i * chaptersPerPage
                     }
                 });
 
                 const fetchedChapters = response.data.data;
-                console.log(`Fetched ${fetchedChapters.length} chapters for language ${availableLanguages}`);
+                console.log(`Fetched ${fetchedChapters.length} chapters for language ${allAvailableLanguages}`);
 
                 // Map the fetched data and format it
                 const chapters = fetchedChapters.map((chapter: any) => ({

@@ -7,7 +7,7 @@ const MemoStableFlag = React.memo(StableFlag)
 
 const AboutManga = ({ manga, handleChapterClick, last }) => {
   if (!manga) return null;
-  console.log(manga)
+
   const websiteNames = {
     al: "AniList",
     amz: "Amazon",
@@ -67,10 +67,10 @@ const AboutManga = ({ manga, handleChapterClick, last }) => {
           <div className='flex flex-col justify-between gap-24'>
             <div>
               <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white mb-2 leading-tight text-shadow-md break-words">
-                {manga.title.length < 30 ? manga.title : manga.title.slice(0, 30) + "..."}
+                {manga.title.length < 30 ? manga.title : manga.title.slice(0, 25) + "..."}
               </h1>
               <p className="ml-1 text-base mb-2 sm:text-xl text-gray-300 line-clamp-2 leading-tight">
-                {manga.altTitle.length < 30 ? manga.altTitle : manga.altTitle.slice(0, 30) + "..."}
+                {manga.altTitle.length < 30 ? manga.altTitle : manga.altTitle.slice(0, 25) + "..."}
               </p>
             </div>
             <p className="text-base sm:text-base text-white ">{manga?.authorName[0]?.attributes?.name || "N/A"}</p>
@@ -88,15 +88,15 @@ const AboutManga = ({ manga, handleChapterClick, last }) => {
               </button>
               <div className="col-span-5 flex items-center gap-5 ml-6">
                 <div className="flex items-center gap-2 text-base text-gray-300">
-                  <img src="/star.svg" alt="Rating" className="w-5 h-5 opacity-80" />
+                  <Image width={300} height={300} src="/star.svg" alt="Rating" className="w-5 h-5 opacity-80" />
                   <span className="font-semibold text-gray-200">{manga?.rating?.rating?.bayesian?.toFixed(3) || "N/A"}</span>
                 </div>
                 <div className="flex items-center gap-2 text-base text-gray-300">
-                  <img src="/comment.svg" alt="Comments" className="w-5 h-5 opacity-80" />
+                  <Image width={300} height={300} src="/comment.svg" alt="Comments" className="w-5 h-5 opacity-80" />
                   <span className="font-semibold text-gray-200">{manga?.rating?.comments?.repliesCount || 0}</span>
                 </div>
                 <div className="flex items-center gap-2 text-base text-gray-300">
-                  <img src="/heart.svg" alt="Likes" className="w-5 h-5 opacity-80" />
+                  <Image width={300} height={300} src="/heart.svg" alt="Likes" className="w-5 h-5 opacity-80" />
                   <span className="font-semibold text-gray-200">{manga?.rating?.follows || 0}</span>
                 </div>
               </div>
@@ -119,7 +119,6 @@ const AboutManga = ({ manga, handleChapterClick, last }) => {
                 </span>
               ))}
             </div>
-
             {/* Description */}
             <div className="bg-[#070920] mt-2 rounded-xl p-8 shadow-[1px_2px_3px_rgba(76,43,140,0.3)] shadow-purple-400">
               <h2 className="text-2xl font-semibold text-white mb-6">Description</h2>
@@ -314,15 +313,15 @@ export default AboutManga;
 //               </button>
 //               <div className="col-span-5 flex items-center gap-5 ml-6">
 //                 <div className="flex items-center gap-2 text-base text-gray-300">
-//                   <img src="/star.svg" alt="Rating" className="w-5 h-5 opacity-80" />
+//                   <Image width={300} height={300} src="/star.svg" alt="Rating" className="w-5 h-5 opacity-80" />
 //                   <span className="font-semibold text-gray-200">{manga?.rating?.rating?.bayesian?.toFixed(3) || "N/A"}</span>
 //                 </div>
 //                 <div className="flex items-center gap-2 text-base text-gray-300">
-//                   <img src="/comment.svg" alt="Comments" className="w-5 h-5 opacity-80" />
+//                   <Image width={300} height={300} src="/comment.svg" alt="Comments" className="w-5 h-5 opacity-80" />
 //                   <span className="font-semibold text-gray-200">{manga?.rating?.comments?.repliesCount || 0}</span>
 //                 </div>
 //                 <div className="flex items-center gap-2 text-base text-gray-300">
-//                   <img src="/heart.svg" alt="Likes" className="w-5 h-5 opacity-80" />
+//                   <Image width={300} height={300} src="/heart.svg" alt="Likes" className="w-5 h-5 opacity-80" />
 //                   <span className="font-semibold text-gray-200">{manga?.rating?.follows || 0}</span>
 //                 </div>
 //               </div>

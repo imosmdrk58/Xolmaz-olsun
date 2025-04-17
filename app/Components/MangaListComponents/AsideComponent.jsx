@@ -24,7 +24,7 @@ function AsideComponent({
             {/* Section Header */}
             <div className=" pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase ">
               <h1 className=" border-b-4 border-purple-900 flex flex-row w-fit gap-4 items-center  pb-2">
-                <img src="/trophy.svg" alt="Trophy" className="w-6 h-6" />
+                <Image width={300} height={300} src="/trophy.svg" alt="Trophy" className="w-6 h-6" />
                 <span>{selectedCategory === 'Top' ? "Top Manga" : selectedCategory === 'Favourite' ? "Favourite Manga" : "New Manga"}</span>
               </h1>
             </div>
@@ -93,7 +93,7 @@ function AsideComponent({
                           className="relative w-[48px] h-[48px] rounded-lg shadow-md transition-all duration-300 hover:scale-105"
                           title={manga?.title ?? 'Unavailable'}
                         >
-                          <img
+                          <Image width={300} height={300}
                             className="w-full min-w-12 h-full object-cover rounded-lg"
                             src={manga?.coverImageUrl}
                             alt={manga?.title ?? 'No title'}
@@ -112,7 +112,7 @@ function AsideComponent({
 
                           {/* Manga Rating */}
                           <div className="flex items-center gap-1.5 text-gray-400">
-                            <img src="/star.svg" alt="star" className="w-3.2 h-3.2" />
+                            <Image width={300} height={300} src="/star.svg" alt="star" className="w-4 h-4" />
                             <span className="text-sm">
                               {manga?.rating?.rating?.bayesian?.toFixed(2) ?? '0'}
                             </span>

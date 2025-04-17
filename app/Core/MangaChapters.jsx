@@ -1,14 +1,18 @@
 'use client';
 
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, Suspense, lazy } from 'react';
 import React from 'react';
-import AboutManga from '../Components/ChaptersListComponents/AboutManga';
-import ChapterList from '../Components/ChaptersListComponents/ChapterList';
 import LoadingSpinner from '../Components/LoadingSpinner';
 
-const MemoizedAboutManga = React.memo(AboutManga);
-const MemoizedChapterList = React.memo(ChapterList);
+// Lazy load components with React.lazy
+const AboutManga = React.memo(lazy(() =>
+  import('../Components/ChaptersListComponents/AboutManga')
+));
+const ChapterList = React.memo(lazy(() =>
+  import('../Components/ChaptersListComponents/ChapterList')
+));
+
 
 // Utility to check storage availability
 const getAvailableStorage = () => {
@@ -18,12 +22,13 @@ const getAvailableStorage = () => {
     localStorage.setItem(testKey, testValue);
     localStorage.removeItem(testKey);
     // Estimate available space (rough heuristic)
-    return navigator.storage?.estimate ? navigator.storage.estimate().then(({ quota, usage }) => quota - usage) : 5 * 1024 * 1024; // Assume 5MB if API unavailable
+    return navigator.storage?.estimate
+      ? navigator.storage.estimate().then(({ quota, usage }) => quota - usage)
+      : 5 * 1024 * 1024; // Assume 5MB if API unavailable
   } catch {
     return 0;
   }
 };
-
 
 export default function MangaChapters() {
   const { mangaId } = useParams();
@@ -56,7 +61,7 @@ export default function MangaChapters() {
 
         // Fetch chapters from API
         const res = await fetch(`/api/manga/${mangaId}/chapters`, {
-          headers: { 'Accept': 'application/json' },
+          headers: { Accept: 'application/json' },
         });
         if (!res.ok) throw new Error(`Failed to fetch chapters: ${res.statusText}`);
 
@@ -68,7 +73,6 @@ export default function MangaChapters() {
             const chapterB = parseFloat(b.chapter);
             return isNaN(chapterA) ? 1 : isNaN(chapterB) ? -1 : chapterA - chapterB;
           });
-
 
         // Check storage availability before saving
         const availableStorage = await getAvailableStorage();
@@ -98,17 +102,16 @@ export default function MangaChapters() {
   const handleChapterClick = useCallback(
     (id) => {
       navigate(`/manga/${mangaId}/chapter/${id.id}/read`, {
-        state: { chapterInfo: id, mangaInfo: manga},
+        state: { chapterInfo: id, mangaInfo: manga },
       });
     },
-    [navigate, mangaId]
+    [navigate, mangaId, manga]
   );
 
   if (loading) {
     return <LoadingSpinner text="Loading chapters..." />;
   }
 
-  console.log(chapters)
   if (error) {
     return (
       <div className="flex justify-center items-center w-full h-screen bg-[#070920] backdrop-blur-md text-white">
@@ -127,19 +130,21 @@ export default function MangaChapters() {
       </div>
     );
   }
-console.log(chapters)
+
   return (
     <div className="w-full min-h-screen bg-transparent text-white py-10 px-6 sm:px-12">
-      <MemoizedAboutManga
-        last={chapters[chapters.length - 1]}
-        manga={manga}
-        handleChapterClick={handleChapterClick}
-      />
-      <MemoizedChapterList
-        manga={manga}
-        chapters={chapters}
-        handleChapterClick={handleChapterClick}
-      />
+      <Suspense fallback={<LoadingSpinner text="Loading Manga Info..." />}>
+        <AboutManga
+          last={chapters[chapters.length - 1]}
+          manga={manga}
+          handleChapterClick={handleChapterClick}
+        />
+        <ChapterList
+          manga={manga}
+          chapters={chapters}
+          handleChapterClick={handleChapterClick}
+        />
+      </Suspense>
     </div>
   );
 }

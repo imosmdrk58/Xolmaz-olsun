@@ -1,8 +1,8 @@
 import Image from 'next/image';
-import React, { useState, useMemo } from 'react';
-import StableFlag from '../StableFlag';
+import React, { useState, useMemo,lazy } from 'react';
+
 import {langFullNames} from "../../constants/Flags"
-const MemoStableFlag = React.memo(StableFlag)
+const StableFlag = React.memo(lazy(() => import('../StableFlag')));
 const ChapterList = ({ chapters, handleChapterClick, manga }) => {
     const [activeChapter, setActiveChapter] = useState(null);
 
@@ -113,10 +113,10 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
                 {/* Chapters Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
                     {groupedChapters.map((groupedChapter) => (
-                        <div key={groupedChapter.chapter} className="groupedChapter cursor-pointer">
-                            <div className="bg-gray-800/50 rounded-lg p-1 px-3 border border-gray-700 
+                        <div key={groupedChapter.chapter} className="groupedChapter w-full cursor-pointer">
+                            <div className={` ${activeChapter==groupedChapter.chapter?"absolute w-[45%] z-40 bg-gray-900":"relative bg-gray-800/50"} rounded-lg p-1 px-3 border border-gray-700 
                 transition-all duration-200 hover:border-purple-500 hover:bg-gray-750 
-                relative overflow-hidden"
+                 overflow-hidden`}
                             >
                                 {/* Chapter Header */}
                                 <div
@@ -158,7 +158,7 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
                                                     <div key={idx} className="-ml-1 first:ml-0">
                                                         {translation.translatedLanguage && (
                                                             <div className="ring-2 ring-gray-800 rounded-full">
-                                                                <MemoStableFlag
+                                                                <StableFlag
                                                                     code={translation.translatedLanguage}
                                                                     className="h-6 w-6 rounded-full"
                                                                 />
@@ -201,7 +201,7 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
                                                     <div className="flex items-center gap-3">
                                                         {translation.translatedLanguage && (
                                                             <div className="rounded-lg bg-black bg-opacity-30 p-1">
-                                                                <MemoStableFlag
+                                                                <StableFlag
                                                                     code={translation.translatedLanguage}
                                                                     className="h-8 w-8 rounded shadow"
                                                                 />
