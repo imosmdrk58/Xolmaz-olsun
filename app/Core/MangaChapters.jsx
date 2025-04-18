@@ -102,11 +102,12 @@ export default function MangaChapters() {
   const handleChapterClick = useCallback(
     (id) => {
       navigate(`/manga/${mangaId}/chapter/${id.id}/read`, {
-        state: { chapterInfo: id, mangaInfo: manga },
+        state: { chapterInfo: id, mangaInfo: manga,chapters:chapters },
       });
     },
-    [navigate, mangaId, manga]
+    [chapters,manga,mangaId,navigate,setChapters]
   );
+  console.log(chapters)
 
   if (loading) {
     return <LoadingSpinner text="Loading chapters..." />;

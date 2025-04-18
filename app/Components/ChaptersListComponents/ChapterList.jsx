@@ -33,6 +33,7 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
 
             grouped[chapterNum].translations.push({
                 id: chapter.id,
+                chapter:chapterNum,
                 title: chapter.title,
                 pageCount: chapter.pageCount,
                 translatedLanguage: chapter.translatedLanguage,
