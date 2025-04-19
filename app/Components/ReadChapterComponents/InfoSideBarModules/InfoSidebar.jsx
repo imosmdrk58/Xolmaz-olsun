@@ -1,8 +1,9 @@
 import React, { useState, useCallback, useEffect, memo, useRef, useMemo } from 'react';
-import PageAndChapterNavigation from './InfoSideBarModules/PageAndChaptersNavigation';
-import CollapsedSideBarStrip from './InfoSideBarModules/CollapsedSideBarStrip';
-import { SvgIcon, ReadingIcon, MenuIcon, ArrowLeftIcon, BookIcon, ChevronDownIcon, CreatorsIcon, DescriptionIcon, HeartIcon, InfoIcon, LanguageIcon, LinkIcon, NextIcon, PageIcon, PrevIcon, TagIcon } from './InfoSideBarModules/SVGIcons';
-import DifferentMetaDataChapter from './InfoSideBarModules/DifferentMetaDataChapter';
+import PageAndChapterNavigation from './PageAndChaptersNavigation';
+import CollapsedSideBarStrip from './CollapsedSideBarStrip';
+import { SvgIcon, ReadingIcon, MenuIcon, ArrowLeftIcon, BookIcon, ChevronDownIcon, CreatorsIcon, DescriptionIcon, HeartIcon, InfoIcon, LanguageIcon, LinkIcon, NextIcon, PageIcon, PrevIcon, TagIcon } from './SVGIcons';
+import DifferentMetaDataChapter from './DifferentMetaDataChapter';
+import Image from 'next/image';
 
 // Memoize imported components
 const MemoPageAndChapterNavigation = memo(PageAndChapterNavigation);
@@ -11,7 +12,7 @@ const MemoDifferentMetaDataChapter = memo(DifferentMetaDataChapter);
 
 // Memoized CoverImage component
 const CoverImage = memo(({ src, alt, className }) => (
-  <img src={src} alt={alt} className={className} loading="lazy" />
+  <Image height={300} width={300} src={src} alt={alt} className={className} loading="lazy" />
 ));
 CoverImage.displayName = 'CoverImage';
 
@@ -33,9 +34,9 @@ const InfoSidebar = memo(({
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('desc');
   const [activeSection, setActiveSection] = useState('info');
-  const [collapsedSections, setCollapsedSections] = useState({});
+
   const dropdownRef = useRef(null);
-  console.log(allChapters)
+  // console.log(allChapters)
   // Persist favorite state
   useEffect(() => {
     localStorage.setItem(`favorite_${mangaInfo?.id}`, isFavorite);
@@ -64,17 +65,14 @@ const InfoSidebar = memo(({
 
   // Memoized event handlers
   const toggleFavorite = useCallback(() => setIsFavorite(prev => !prev), []);
-  const toggleSection = useCallback((section) => 
-    setCollapsedSections(prev => ({ ...prev, [section]: !prev[section] })), 
-    []
-  );
+
   const setActiveSectionMemo = useCallback((section) => setActiveSection(section), []);
 
   // Memoized sorted chapters
   const sortedChapters = useMemo(() => 
     [...allChapters].sort((a, b) => {
-      const aNum = parseFloat(a.title);
-      const bNum = parseFloat(b.title);
+      const aNum = parseFloat(a.chapter);
+      const bNum = parseFloat(b.chapter);
       return sortOrder === 'asc' ? aNum - bNum : bNum - aNum;
     }), [allChapters, sortOrder]
   );
@@ -96,12 +94,13 @@ const InfoSidebar = memo(({
   }, [onChapterChange]);
 
   const goToPrevChapter = useCallback(() => 
-    hasPrevChapter && goToChapter(allChapters[currentChapterIndex + 1]), 
-    [hasPrevChapter, currentChapterIndex, allChapters, goToChapter]
+    hasNextChapter && goToChapter(allChapters[currentChapterIndex - 1]), 
+  [hasNextChapter, currentChapterIndex, allChapters, goToChapter]
   );
   const goToNextChapter = useCallback(() => 
-    hasNextChapter && goToChapter(allChapters[currentChapterIndex - 1]), 
-    [hasNextChapter, currentChapterIndex, allChapters, goToChapter]
+    hasPrevChapter && goToChapter(allChapters[currentChapterIndex + 1]), 
+  [hasPrevChapter, currentChapterIndex, allChapters, goToChapter]
+
   );
   const goToFirstChapter = useCallback(() => 
     goToChapter(allChapters[allChapters.length - 1]), 
@@ -173,22 +172,22 @@ const InfoSidebar = memo(({
   }
 
   return (
-    <div className="relative left-0 top-0 h-[91.7vh] z-40 flex items-center">
-      <div className="h-[87.7vh] mt-4 w-[340px] bg-gray-900/95 backdrop-blur-lg rounded-r-2xl px-5 pt-3 pb-2 flex flex-col shadow-[0_0_20px_rgba(0,0,0,0.5)] border-r border-purple-500/20">
-        <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-purple-700/10 blur-2xl -z-10"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-yellow-500/10 blur-2xl -z-10"></div>
+    <div className="tracking-wider relative left-0 top-0 h-[91.7vh] z-40 flex items-center">
+      <div className="tracking-wider h-[87.7vh] mt-4 w-[340px] bg-gray-900/95 backdrop-blur-lg rounded-r-2xl px-5 pt-3 pb-2 flex flex-col shadow-[0_0_20px_rgba(0,0,0,0.5)] border-r border-purple-500/20">
+        <div className="tracking-wider absolute top-0 right-0 w-32 h-32 rounded-full bg-purple-700/10 blur-2xl -z-10"></div>
+        <div className="tracking-wider absolute bottom-0 left-0 w-32 h-32 rounded-full bg-yellow-500/10 blur-2xl -z-10"></div>
 
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center">
+        <div className="tracking-wider flex items-center justify-between mb-2">
+          <div className="tracking-wider flex items-center">
             <button
               onClick={() => setIsCollapsed(true)}
-              className="w-9 h-9 rounded-lg bg-gray-800/50 border border-purple-700/20 flex items-center justify-center text-gray-200 transition-all duration-300 group"
+              className="tracking-wider w-9 h-9 rounded-lg bg-gray-800/50 border border-purple-700/20 flex items-center justify-center text-gray-200 transition-all duration-300 group"
               aria-label="Collapse sidebar"
             >
-              <ArrowLeftIcon className="w-4 h-4" />
-              <span className="absolute hidden group-hover:block bg-gray-900/90 text-white text-xs py-1 px-2 rounded-md left-12 top-7">Collapse</span>
+              <ArrowLeftIcon className="tracking-wider w-4 h-4" />
+              <span className="tracking-wider absolute hidden group-hover:block bg-gray-900/90 text-white text-xs py-1 px-2 rounded-md left-12 top-7">Collapse</span>
             </button>
-            <h1 className="ml-8 text-base font-bold tracking-wider uppercase bg-gradient-to-r from-purple-300 to-yellow-200 bg-clip-text text-transparent">
+            <h1 className="tracking-wider ml-8 text-base font-bold  uppercase bg-gradient-to-r from-purple-300 to-yellow-200 bg-clip-text text-transparent">
               Manga Explorer
             </h1>
           </div>
@@ -198,23 +197,23 @@ const InfoSidebar = memo(({
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >
             <HeartIcon filled={isFavorite} className={`w-5 h-5 ${isFavorite ? 'animate-pulse' : ''}`} />
-            <span className="absolute hidden group-hover:block bg-gray-900/90 text-white text-xs py-1 px-2 rounded-md right-12 top-7">{isFavorite ? 'Unfavorite' : 'Favorite'}</span>
+            <span className="tracking-wider absolute hidden group-hover:block bg-gray-900/90 text-white text-xs py-1 px-2 rounded-md right-12 top-7">{isFavorite ? 'Unfavorite' : 'Favorite'}</span>
           </button>
         </div>
 
-        <div className="bg-gray-800/50 rounded-xl border border-purple-700/20 mb-2">
-          <div className="flex p-3 items-center">
-            <div className="w-16 h-24 rounded-lg overflow-hidden border-2 border-purple-700/20 shadow-md">
+        <div className="tracking-wider bg-gray-800/50 rounded-xl border border-purple-700/20 mb-2">
+          <div className="tracking-wider flex p-3 items-center">
+            <div className="tracking-wider w-16 h-24 rounded-lg overflow-hidden border-2 border-purple-700/20 shadow-md">
               <CoverImage {...coverImageProps} />
             </div>
-            <div className="ml-3 flex-1">
-              <h2 className="text-base font-bold text-white line-clamp-1">{mangaInfo.title}</h2>
-              <div className="flex items-center mt-1.5 gap-1.5 flex-wrap">
-                <span className={`px-1.5 py-0.5 text-xs rounded-md font-medium ${mangaInfo.status === 'ongoing' ? 'bg-green-900/30 text-green-400 border border-green-700/20' : mangaInfo.status === 'completed' ? 'bg-blue-900/30 text-blue-400 border border-blue-700/20' : 'bg-gray-800/50 text-gray-400 border border-gray-700/20'}`}>
+            <div className="tracking-wider ml-3 flex-1">
+              <h2 className="tracking-wider text-base font-bold text-white line-clamp-1">{mangaInfo.title}</h2>
+              <div className="tracking-wider flex items-center mt-1.5 gap-1.5 flex-wrap">
+                <span className={`px-1.5 py-0.5 text-xs rounded-md font-medium ${mangaInfo.status === 'ongoing' ? 'bg-green-900/30 text-green-400 border border-green-700/20' : mangaInfo.status === 'completed' ? 'bg-blue-900/30 text-blue-400 border border-blue-700/20' :mangaInfo.status === 'hiatus' ? 'bg-gray-800/50 text-orange-400 border border-orange-700/20':mangaInfo.status === 'cancelled'?"bg-gray-800/50 text-red-400 border border-red-700/20" :'bg-gray-800/50 text-gray-400 border border-gray-700/20'}`}>
                   {mangaInfo.status.toUpperCase()}
                 </span>
-                <span className="px-1.5 py-0.5 text-xs bg-purple-900/30 text-purple-400 rounded-md font-medium border border-purple-700/20">{mangaInfo.year}</span>
-                <span className="px-1.5 py-0.5 text-xs bg-yellow-900/20 text-yellow-300 rounded-md font-medium border border-yellow-700/20">{mangaInfo.contentRating}</span>
+                <span className="tracking-wider px-1.5 py-0.5 text-xs bg-purple-900/30 text-purple-400 rounded-md font-medium border border-purple-700/20">{mangaInfo.year}</span>
+                <span className="tracking-wider px-1.5 py-0.5 text-xs bg-yellow-900/20 text-yellow-300 rounded-md font-medium border capitalize border-yellow-700/20">{mangaInfo.contentRating}</span>
               </div>
             </div>
           </div>
@@ -246,8 +245,6 @@ const InfoSidebar = memo(({
         <MemoDifferentMetaDataChapter
           activeSection={activeSection}
           setActiveSection={setActiveSectionMemo}
-          collapsedSections={collapsedSections}
-          toggleSection={toggleSection}
           mangaInfo={mangaInfo}
           allChapters={allChapters}
           {...iconProps}

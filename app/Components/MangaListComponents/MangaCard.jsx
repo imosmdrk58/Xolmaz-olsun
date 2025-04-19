@@ -10,7 +10,6 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadM
 
     const stableHandleMangaClicked = useCallback(handleMangaClicked, []);
     const MemoMangas = useMemo(()=>{
-console.log("rerender")
         return processedLatestMangas
     })
     return (
