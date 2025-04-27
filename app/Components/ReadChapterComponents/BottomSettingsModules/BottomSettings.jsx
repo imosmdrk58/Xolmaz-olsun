@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react';
+import React, { useCallback } from 'react';
 import Image from 'next/image';
 import LayoutSelector from "./LayoutSelector";
 import QualitySelector from "./QualitySelector"
@@ -17,10 +17,11 @@ const BottomSettings = ({
 }) => {
   const handlePrev = useCallback(() => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? Math.max(0, pages.length - panels) : prevIndex - panels
+      panels==2?prevIndex === 0 ||prevIndex === 1:prevIndex === 0 ? Math.max(0, pages.length - panels) : prevIndex - panels
     );
   }, [setCurrentIndex, panels, pages]);
 
+  console.log(currentIndex)
   const handleNext = useCallback(() => {
     setCurrentIndex((prevIndex) =>
       prevIndex + panels >= pages.length ? 0 : prevIndex + panels

@@ -23,7 +23,7 @@ const SliderComponent = React.memo(
   lazy(() => import('../Components/MangaListComponents/SliderComponent'))
 );
 
-const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+const CACHE_DURATION = 120 * 60 * 1000; // 1 hour
 
 // Helper functions outside component
 const getFromStorage = (key) => {

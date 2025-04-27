@@ -60,8 +60,13 @@ const InfoSidebar = memo(({
     allChapters.findIndex(ch => ch.id === chapterInfo.id), 
     [allChapters, chapterInfo.id]
   );
-  const hasPrevChapter = useMemo(() => currentChapterIndex < allChapters.length - 1);
-  const hasNextChapter = useMemo(() => currentChapterIndex > 0);
+  const hasPrevChapter = useMemo(() => currentChapterIndex > 0);
+  const hasNextChapter = useMemo(() => currentChapterIndex < allChapters.length - 1);
+console.log(hasNextChapter)
+console.log(hasPrevChapter)
+console.log(currentChapterIndex);
+console.log(allChapters.length - 1);
+
 
   // Memoized event handlers
   const toggleFavorite = useCallback(() => setIsFavorite(prev => !prev), []);
@@ -94,14 +99,16 @@ const InfoSidebar = memo(({
   }, [onChapterChange]);
 
   const goToPrevChapter = useCallback(() => 
-    hasNextChapter && goToChapter(allChapters[currentChapterIndex - 1]), 
-  [hasNextChapter, currentChapterIndex, allChapters, goToChapter]
+    hasPrevChapter && goToChapter(allChapters[currentChapterIndex - 1]), 
+  [hasPrevChapter, currentChapterIndex, allChapters, goToChapter]
   );
   const goToNextChapter = useCallback(() => 
-    hasPrevChapter && goToChapter(allChapters[currentChapterIndex + 1]), 
-  [hasPrevChapter, currentChapterIndex, allChapters, goToChapter]
-
+    hasNextChapter && goToChapter(allChapters[currentChapterIndex + 1]), 
+  [hasNextChapter, currentChapterIndex, allChapters, goToChapter]
   );
+
+  console.log(allChapters.length)
+  console.log(currentChapterIndex)
   const goToFirstChapter = useCallback(() => 
     goToChapter(allChapters[allChapters.length - 1]), 
     [allChapters, goToChapter]
