@@ -145,6 +145,7 @@ export default function MangaList() {
           description,
           altTitles,
           contentRating,
+          publicationDemographic,
           status,
           year,
           updatedAt,
@@ -162,7 +163,6 @@ export default function MangaList() {
         const authorName = grouped.author;
         const artistName = grouped.artist;
         const creatorName = grouped.creator ?? 'N/A';
-        const MangaStoryType = grouped.manga ?? 'N/A';
         const rating = ratings[id] || {};
 
         const groupedTags = tags?.reduce((acc, tag) => {
@@ -196,7 +196,7 @@ export default function MangaList() {
           rating,
           links,
           creatorName,
-          MangaStoryType,
+          MangaStoryType:publicationDemographic,
           availableTranslatedLanguages: availableTranslatedLanguages || [],
           latestUploadedChapter,
           originalLanguage,
@@ -309,7 +309,7 @@ export default function MangaList() {
       </div>
     );
   }
-
+console.log(processedFavouriteMangas)
   return (
     <div ref={showcaseRef} className="min-h-screen w-full text-white">
       {isLoadingState ? (

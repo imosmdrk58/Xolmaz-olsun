@@ -7,12 +7,12 @@ import { lazy, Suspense, useEffect, useState, useMemo } from "react";
 import LoadingSpinner from './Components/LoadingSpinner';
 
 // Dynamically import components
-const Home = lazy(() => import("./page"));
+const Home = lazy(() => import("./Core/Home"));
 const MangaChapters = lazy(() => import("./Core/MangaChapters"));
 const MangaList = lazy(() => import("./Core/MangaList"));
 const ReadChapter = lazy(() => import("./Core/ReadChapter"));
 const NotFound = lazy(() => import("./Core/NotFound"));
-
+const SearchPage = lazy(() => import("./Core/SearchPage"));
 // NavbarWrapper component to conditionally render the navbar
 const NavbarWrapper: React.FC = () => {
   const location = useLocation();
@@ -62,10 +62,11 @@ export default function RootLayout() {
           <NavbarWrapper />
           <div className='mt-20'>
             <Routes>
-              <Route path="/" element={<div className='-mt-20'><Home /></div>} />
+              <Route path="/" element={<div className='-mt-20'><Home/></div>} />
               <Route path="/manga-list" element={<MangaList />} />
               <Route path="/manga/:mangaId/chapters" element={<MangaChapters />} />
               <Route path="/manga/:mangaId/chapter/:chapterId/read" element={<ReadChapter />} />
+              <Route path="/search" element={<SearchPage />} />
               <Route path="*" element={<NotFound />} /> {/* Handle 404 */}
             </Routes>
           </div>
