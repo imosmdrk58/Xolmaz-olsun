@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import React, { useState, useEffect, useCallback, useMemo, lazy } from "react";
 import { useNavigate } from "react-router-dom";
-import TopFavouriteMangas from "../util/FallBackMangas/TopFavouriteMangas";
+import TopFavouriteMangas from "../constants/TopFavouriteMangas";
 const LandingContent = React.memo(
   lazy(() => import('../Components/HomeComponents/LandingContent'))
 );

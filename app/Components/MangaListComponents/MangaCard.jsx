@@ -96,14 +96,14 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadM
                     </div>
                 ))}
             </div>
-            <div className="text-center mt-10">
+            {loadMoreMangas &&<div className="text-center mt-10">
                 <button
                     onClick={loadMoreMangas}
                     className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
                 >
                     Load More
                 </button>
-            </div>
+            </div>}
         </div>
     );
 });

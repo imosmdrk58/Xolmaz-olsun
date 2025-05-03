@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, memo, useRef, useMemo } from 'react';
 import PageAndChapterNavigation from './PageAndChaptersNavigation';
 import CollapsedSideBarStrip from './CollapsedSideBarStrip';
-import { SvgIcon, ReadingIcon, MenuIcon, ArrowLeftIcon, BookIcon, ChevronDownIcon, CreatorsIcon, DescriptionIcon, HeartIcon, InfoIcon, LanguageIcon, LinkIcon, NextIcon, PageIcon, PrevIcon, TagIcon } from './SVGIcons';
+import { SvgIcon, ReadingIcon, MenuIcon, ArrowLeftIcon, BookIcon, ChevronDownIcon, CreatorsIcon, DescriptionIcon, HeartIcon, InfoIcon, LanguageIcon, LinkIcon, NextIcon, PageIcon, PrevIcon, TagIcon } from '../../SVGIcons';
 import DifferentMetaDataChapter from './DifferentMetaDataChapter';
 import Image from 'next/image';
 
