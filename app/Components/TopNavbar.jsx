@@ -38,7 +38,7 @@ const TopNavbar = () => {
       <div className="hidden lg:block flex-grow max-w-2xl mx-4">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Image alt='search' width={300} height={300} src={"./search.svg"} className=' w-4 h-4 brightness-75' />
+            <Image alt='search' width={300} height={300} src={"./search.svg"} className=' w-4 h-4 brightness-200 opacity-60' />
           </div>
           <input
             type="text"

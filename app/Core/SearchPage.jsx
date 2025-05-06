@@ -6,7 +6,7 @@ import BottomPagination from "../Components/SearchPageComponents/BottomPaginatio
 import LoadingSpinner from '../Components/LoadingSpinner';
 import Image from 'next/image';
 // Main component
-const MangaSearch = () => {
+const SearchPage = () => {
   // State management
   const [searchResults, setSearchResults] = useState([]);
   const [filteredResults, setFilteredResults] = useState([]);
@@ -20,13 +20,13 @@ const MangaSearch = () => {
   const [activeFilters, setActiveFilters] = useState({
     rating: [],
     status: [],
-    language: '',
-    year: '',
+    language: [],
+    year: [],
     minScore: '',
-    demographic: '',
+    demographic: [],
     genres: []
   });
-  
+
 
   // Constants
   const ITEMS_PER_PAGE = 24;
@@ -45,7 +45,7 @@ const MangaSearch = () => {
     }
   }, []);
 
-  console.log(filteredResults)
+  // console.log(filteredResults)
   // Filter manga when filter state changes
   useEffect(() => {
     if (searchResults.length > 0) {
@@ -195,7 +195,7 @@ const MangaSearch = () => {
           rating,
           links,
           creatorName,
-          MangaStoryType:publicationDemographic,
+          MangaStoryType: publicationDemographic,
           availableTranslatedLanguages: availableTranslatedLanguages || [],
           latestUploadedChapter,
           originalLanguage,
@@ -206,48 +206,50 @@ const MangaSearch = () => {
     return result;
   };
 
+  console.log(filteredResults[0]);
+  
   // Apply filters to search results
   const applyFilters = useCallback(() => {
     let results = [...searchResults];
-  
+
     // Filter by content rating
     if (activeFilters.rating.length > 0) {
       results = results.filter(manga =>
         activeFilters.rating.includes(manga.contentRating)
       );
     }
-  
+
     // Filter by status
     if (activeFilters.status.length > 0) {
       results = results.filter(manga =>
         activeFilters.status.includes(manga.status)
       );
     }
-  
+
     // Filter by year
-    if (activeFilters.year) {
-      results = results.filter(
-        manga => manga.year && manga.year.toString() === activeFilters.year
+    if (activeFilters.year.length>0) {
+      results = results.filter(manga =>
+        activeFilters.year.includes(manga.year && manga.year.toString())
       );
     }
-  
+
     // Filter by genre (using flatTags)
     if (activeFilters.genres.length > 0) {
       results = results.filter(manga =>
         activeFilters.genres.every(genre => manga.flatTags.includes(genre))
       );
     }
-  
+
+
     // Filter by language (check originalLanguage or availableTranslatedLanguages)
-    if (activeFilters.language) {
-      results = results.filter(
-        manga =>
-          manga.originalLanguage === activeFilters.language ||
+    if (activeFilters.language.length > 0) {
+      results = results.filter(manga =>
+        activeFilters.language.every(lang=>manga.originalLanguage === lang ||
           (manga.availableTranslatedLanguages &&
-            manga.availableTranslatedLanguages.includes(activeFilters.language))
+            manga.availableTranslatedLanguages.includes(lang)))
       );
     }
-  
+
     // Filter by minimum score
     if (activeFilters.minScore) {
       const minScore = parseFloat(activeFilters.minScore);
@@ -255,18 +257,18 @@ const MangaSearch = () => {
         manga => (manga.rating?.rating?.bayesian || 0) >= minScore
       );
     }
-  
+
     // Filter by demographic (check tags with group 'demographic')
-    if (activeFilters.demographic) {
-      results = results.filter(manga => {
-        return manga.MangaStoryType!=null?(manga.MangaStoryType.toLowerCase() == activeFilters.demographic.toLowerCase()):false;
-      });
+    if (activeFilters.demographic.length > 0) {
+      results = results.filter(manga =>
+        activeFilters.demographic.every(demo=>demo=="none"?manga.MangaStoryType==null:manga.MangaStoryType==demo) || activeFilters.demographic.includes(manga.MangaStoryType==null?"none":manga.MangaStoryType)
+      );
     }
-  
+
     setFilteredResults(results);
     setCurrentPage(1);
   }, [activeFilters, searchResults]);
-  
+
 
   // Clear all filters
   const clearAllFilters = () => {
@@ -362,18 +364,18 @@ const MangaSearch = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen  bg-slate-950 text-slate-100">
 
       <main className="max-w-[90vw] mx-auto px-4 py-6">
         {/* Results header with controls */}
         <SearchTotalAndFilterOptions handleSearch={handleSearch} setActiveFilters={setActiveFilters} activeFilters={activeFilters} clearAllFilters={clearAllFilters} filteredResults={filteredResults} searchQuery={searchQuery} setViewMode={setViewMode} viewMode={viewMode} />
+        {/* Error state */}
 
         {/* Loading state */}
         {isLoading && (
-          <LoadingSpinner text='Loading Mangas...' />
+          <LoadingSpinner className="relative h-[59dvh]  z-50" text='Loading Mangas...' />
         )}
 
-        {/* Error state */}
         {!isLoading && error && (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-md w-full text-center">
@@ -421,8 +423,8 @@ const MangaSearch = () => {
         {!isLoading && !error && filteredResults.length > 0 && (
           <>
             <div className={viewMode === 'grid'
-              ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2'
-              : 'flex flex-col space-y-4'
+              ? 'grid grid-cols-2 relative z-10 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2'
+              : 'flex flex-col space-y-4 z-10'
             }>
               {paginatedItems.map(manga => (
                 <SearchMangaCardWith2ViewMode
@@ -450,4 +452,4 @@ const MangaSearch = () => {
 
 
 
-export default MangaSearch;
+export default SearchPage;

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import filterOptions from "../../constants/filterOptions"
-import Image from 'next/image';
-
+import React, { useState, useEffect } from 'react';
+import filterOptions from "../../constants/filterOptions";
+import FilterCustomDropDown from "./SearchTotalAndFilterOptionsModules/FilterCustomDropDown"
+import ThemeGenreTags from "./SearchTotalAndFilterOptionsModules/ThemeGenreTags"
 function SearchTotalAndFilterOptions({
   setActiveFilters,
   activeFilters,
@@ -14,11 +14,17 @@ function SearchTotalAndFilterOptions({
 }) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchText, setSearchText] = useState(searchQuery);
-  const [filterAnimation, setFilterAnimation] = useState('');
+  const [showTags, setShowTags] = useState(false);
+
+  // Sync searchText with searchQuery
+  useEffect(() => {
+    setSearchText(searchQuery);
+  }, [searchQuery]);
 
   // Check if any filters are active
   const hasActiveFilters = Object.values(activeFilters).some(
-    value => Array.isArray(value) ? value.length > 0 : value !== ''
+    value => (Array.isArray(value) && value.length > 0) ||
+      (typeof value === 'string' && value !== '')
   );
 
   // Toggle filter selection
@@ -26,8 +32,8 @@ function SearchTotalAndFilterOptions({
     setActiveFilters(prev => {
       const newFilters = { ...prev };
 
-      if (Array.isArray(newFilters[filterType])) {
-        if (newFilters[filterType].includes(value)) {
+      if (filterType === 'tags' || filterType === 'genres' || filterType === 'rating' || filterType === 'status' || filterType === 'publicationType' || filterType === "demographic" || filterType === "year" || filterType === "language") {
+        if (newFilters[filterType]?.includes(value)) {
           newFilters[filterType] = newFilters[filterType].filter(item => item !== value);
         } else {
           newFilters[filterType] = [...newFilters[filterType], value];
@@ -43,14 +49,9 @@ function SearchTotalAndFilterOptions({
   // Handle opening/closing filter panel with animation
   const toggleFilterPanel = () => {
     if (isFilterOpen) {
-      setFilterAnimation('animate-slideUp');
-      setTimeout(() => {
-        setIsFilterOpen(false);
-        setFilterAnimation('');
-      }, 300);
+      setIsFilterOpen(false);
     } else {
       setIsFilterOpen(true);
-      setFilterAnimation('animate-slideDown');
     }
   };
 
@@ -67,18 +68,28 @@ function SearchTotalAndFilterOptions({
     return count + (value ? 1 : 0);
   }, 0);
 
+
+  const sortOptions = filterOptions.sortOptions.map(sort => ({
+    label: sort.label,
+    value: sort.id
+  }));
+
+  // const hasChaptersOptions = filterOptions.hasChaptersOptions.map(option => ({
+  //   label: option.label,
+  //   value: option.id
+  // }));
+
   return (
-    <div className="bg-black bg-opacity-90 backdrop-blur-md rounded-2xl p-6 shadow-2xl border border-purple-900/30">
+    <div className="bg-black relative z-50 bg-opacity-90 backdrop-blur-md rounded-2xl p-6 shadow-2xl border border-purple-900/30">
       {/* Search Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
         <div className="flex-1 w-full">
           <form onSubmit={handleSearch} className="relative w-full">
             <input
               type="text"
-              defaultValue={searchQuery}
-              placeholder="Search manga..."
               value={searchText}
               onChange={handleSearchChange}
+              placeholder="Search manga..."
               className="w-full px-5 py-4 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-xl text-purple-50 placeholder-purple-300/50 focus:outline-none focus:ring-2 focus:ring-purple-600/70 focus:border-purple-600 transition-all duration-300 shadow-inner pl-12"
             />
             <button
@@ -98,7 +109,7 @@ function SearchTotalAndFilterOptions({
             </button>
           </form>
         </div>
-        
+
         <div className="flex items-center gap-4 self-end lg:self-auto">
           {/* Results count */}
           {searchQuery && (
@@ -111,7 +122,7 @@ function SearchTotalAndFilterOptions({
               </span>
             </div>
           )}
-          
+
           {/* Filter button */}
           <button
             onClick={toggleFilterPanel}
@@ -182,9 +193,9 @@ function SearchTotalAndFilterOptions({
 
       {/* Filters panel */}
       {isFilterOpen && (
-        <div 
-          id="filter-panel" 
-          className={`bg-black/80 backdrop-blur-md border border-purple-900/50 rounded-xl p-6 mb-8 ${filterAnimation} shadow-2xl`}
+        <div
+          id="filter-panel"
+          className={`bg-black/80 backdrop-blur-md border border-purple-900/50 rounded-xl p-6 mb-8 shadow-2xl`}
         >
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
@@ -193,7 +204,7 @@ function SearchTotalAndFilterOptions({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
               </div>
-              <h2 className="text-lg font-semibold text-purple-200">Refine Your Search</h2>
+              <h2 className="text-lg font-semibold text-purple-200">Advanced Search</h2>
             </div>
             {hasActiveFilters && (
               <button
@@ -207,97 +218,92 @@ function SearchTotalAndFilterOptions({
               </button>
             )}
           </div>
-
+          {console.log(activeFilters)}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Content Rating */}
+            <FilterCustomDropDown
+              title="Content Rating"
+              multiple={true}
+              options={filterOptions.ratings}
+              selectedValues={activeFilters.rating}
+              onSelectionChange={(value) => toggleFilter('rating', value)}
+              countLabel={"Any Rating"}
+            />
+
+            {/* Publication Status */}
+
+            <FilterCustomDropDown
+              multiple={true}
+              title="Publication Status"
+              options={filterOptions.statuses}
+              selectedValues={activeFilters.status}
+              onSelectionChange={(value) => toggleFilter('status', value)}
+              countLabel={"Any Status"}
+            />
+
+            {/* Original Language */}
+            <FilterCustomDropDown
+              title="Original Language"
+              multiple={true}
+              options={filterOptions.languages}
+              selectedValues={activeFilters.language}
+              onSelectionChange={(value) => toggleFilter('language', value)}
+              countLabel={"Any Language"}
+            />
+
+            {/* Tags - Spans 2 columns on larger screens */}
+             <ThemeGenreTags activeFilters={activeFilters} filterOptions={filterOptions} toggleFilter={toggleFilter} key={"ThemeGenreTags"} />
+           
+
+            {/* Publication Demographic */}
+
+            <FilterCustomDropDown
+              title="Publication Demographic"
+              options={filterOptions.demographics}
+              selectedValues={activeFilters.demographic}
+              onSelectionChange={(value) => toggleFilter('demographic', value)}
+              countLabel={"Any Demographic"}
+            />
+
+            {/* Publication Type */}
             <div className="filter-group">
               <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-                Content Rating
+                Publication Type
               </h3>
               <div className="flex flex-wrap gap-2">
-                {filterOptions.ratings.map(rating => (
+                {filterOptions.publicationTypes.map(type => (
                   <button
-                    key={rating.id}
-                    onClick={() => toggleFilter('rating', rating.id)}
+                    key={type.id}
+                    onClick={() => toggleFilter('publicationType', type.id)}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1.5 transition-all duration-300
-                        ${activeFilters.rating.includes(rating.id)
+                      ${activeFilters.publicationType?.includes(type.id)
                         ? 'bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-lg shadow-purple-700/30'
                         : 'bg-black/50 text-purple-200 hover:bg-purple-900/40 border border-purple-800/50'}`}
                   >
-                    <span className={`w-2 h-2 rounded-full ${rating.color}`}></span>
-                    {rating.label}
+                    <span className={`w-2 h-2 rounded-full ${type.color}`}></span>
+                    {type.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Status */}
-            <div className="filter-group">
+            {/* Created At */}
+            {/* <div className="filter-group">
               <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-                Status
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {filterOptions.statuses.map(status => (
-                  <button
-                    key={status.id}
-                    onClick={() => toggleFilter('status', status.id)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1.5 transition-all duration-300
-                        ${activeFilters.status.includes(status.id)
-                        ? 'bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-lg shadow-purple-700/30'
-                        : 'bg-black/50 text-purple-200 hover:bg-purple-900/40 border border-purple-800/50'}`}
-                  >
-                    <span className={`w-2 h-2 rounded-full ${status.color}`}></span>
-                    {status.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Language */}
-            <div className="filter-group">
-              <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-                Language
+                Created At
               </h3>
               <div className="relative">
                 <select
-                  value={activeFilters.language}
-                  onChange={(e) => toggleFilter('language', e.target.value)}
-                  className="w-full p-3 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-lg text-purple-200 appearance-none focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600/30 transition-all duration-300"
-                >
-                  <option value="">Any Language</option>
-                  {filterOptions.languages.map(lang => (
-                    <option key={lang.code} value={lang.code}>
-                      {lang.label}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-purple-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Publication Year */}
-            <div className="filter-group">
-              <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-                Publication Year
-              </h3>
-              <div className="relative">
-                <select
-                  value={activeFilters.year}
+                  value={activeFilters.year || ''}
                   onChange={(e) => toggleFilter('year', e.target.value)}
                   className="w-full p-3 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-lg text-purple-200 appearance-none focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600/30 transition-all duration-300"
                 >
                   <option value="">Any Year</option>
-                  {Array.from({ length: 30 }, (_, i) => 2025 - i).map(year => (
-                    <option key={year} value={year.toString()}>
-                      {year}
+                  {yearOptions.map(year => (
+                    <option key={year.value} value={year.value}>
+                      {year.label}
                     </option>
                   ))}
                 </select>
@@ -307,83 +313,101 @@ function SearchTotalAndFilterOptions({
                   </svg>
                 </div>
               </div>
-            </div>
+            </div> */}
 
-            {/* Minimum Rating */}
-            <div className="filter-group">
+            {/* Has Available Chapters */}
+            {/* <div className="filter-group">
               <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-                Minimum Rating
+                Has Available Chapters
               </h3>
-              <div className="relative">
-                <select
-                  value={activeFilters.minScore}
-                  onChange={(e) => toggleFilter('minScore', e.target.value)}
-                  className="w-full p-3 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-lg text-purple-200 appearance-none focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600/30 transition-all duration-300"
-                >
-                  <option value="">Any Rating</option>
-                  {Array.from({ length: 10 }, (_, i) => i + 1).map(score => (
-                    <option key={score} value={score}>
-                      {score}+ {score === 10 ? '⭐' : ''}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-purple-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Demographics */}
-            <div className="filter-group">
-              <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-                Demographic
-              </h3>
-              <div className="relative">
-                <select
-                  value={activeFilters.demographic}
-                  onChange={(e) => toggleFilter('demographic', e.target.value)}
-                  className="w-full p-3 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-lg text-purple-200 appearance-none focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600/30 transition-all duration-300"
-                >
-                  <option value="">Any Demographic</option>
-                  {filterOptions.demographics.map(demo => (
-                    <option key={demo.id} value={demo.id}>
-                      {demo.label}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-purple-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Genres - Spans 2 columns on larger screens */}
-            <div className="md:col-span-2 filter-group">
-              <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-                Genres
-              </h3>
-              <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                {filterOptions.genres.map(genre => (
+              <div className="flex gap-2">
+                {hasChaptersOptions.map(option => (
                   <button
-                    key={genre.id}
-                    onClick={() => toggleFilter('genres', genre.label)}
+                    key={option.value}
+                    onClick={() => toggleFilter('hasChapters', option.value)}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-300
-                        ${activeFilters.genres.includes(genre.label)
+                      ${activeFilters.hasChapters === option.value
                         ? 'bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-lg shadow-purple-700/30'
                         : 'bg-black/50 text-purple-200 hover:bg-purple-900/40 border border-purple-800/50'}`}
                   >
-                    {genre.label}
+                    {option.label}
                   </button>
                 ))}
               </div>
+            </div> */}
+
+            {/* Sort By */}
+            <div className="filter-group">
+              <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+                Sort By
+              </h3>
+              <div className="relative">
+                <select
+                  value={activeFilters.sortBy || ''}
+                  onChange={(e) => toggleFilter('sortBy', e.target.value)}
+                  className="w-full p-3 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-lg text-purple-200 appearance-none focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600/30 transition-all duration-300"
+                >
+                  <option value="">Relevance</option>
+                  {sortOptions.map(sort => (
+                    <option key={sort.value} value={sort.value}>
+                      {sort.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-purple-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
+
+            {/* Author/Artist */}
+            {/* <div className="filter-group">
+              <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+                Author/Artist
+              </h3>
+              <input
+                type="text"
+                value={activeFilters.author || ''}
+                onChange={(e) => toggleFilter('author', e.target.value)}
+                placeholder="Enter author/artist name..."
+                className="w-full p-3 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-lg text-purple-200 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600/30 transition-all duration-300"
+              />
+            </div> */}
+
+            {/* Group */}
+            {/* <div className="filter-group">
+              <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+                Group
+              </h3>
+              <input
+                type="text"
+                value={activeFilters.group || ''}
+                onChange={(e) => toggleFilter('group', e.target.value)}
+                placeholder="Enter group name..."
+                className="w-full p-3 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-lg text-purple-200 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600/30 transition-all duration-300"
+              />
+            </div> */}
+
+            {/* Uploader */}
+            {/* <div className="filter-group">
+              <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+                Uploader
+              </h3>
+              <input
+                type="text"
+                value={activeFilters.uploader || ''}
+                onChange={(e) => toggleFilter('uploader', e.target.value)}
+                placeholder="Enter uploader name..."
+                className="w-full p-3 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-lg text-purple-200 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600/30 transition-all duration-300"
+              />
+            </div> */}
           </div>
         </div>
       )}
@@ -393,7 +417,7 @@ function SearchTotalAndFilterOptions({
         <div className="flex flex-wrap gap-2 mb-6">
           {activeFilters.rating.length > 0 && (
             <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
-              <span className="text-purple-400">Rating:</span>
+              <span className="text-purple-400">Content Rating:</span>
               <div className="flex gap-1">
                 {activeFilters.rating.map(ratingId => {
                   const rating = filterOptions.ratings.find(r => r.id === ratingId);
@@ -404,8 +428,8 @@ function SearchTotalAndFilterOptions({
                   );
                 })}
               </div>
-              <button 
-                onClick={() => setActiveFilters({...activeFilters, rating: []})}
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, rating: [] })}
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
@@ -415,8 +439,7 @@ function SearchTotalAndFilterOptions({
               </button>
             </div>
           )}
-          
-          {/* Similar elements for other active filters */}
+
           {activeFilters.status.length > 0 && (
             <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
               <span className="text-purple-400">Status:</span>
@@ -430,8 +453,8 @@ function SearchTotalAndFilterOptions({
                   );
                 })}
               </div>
-              <button 
-                onClick={() => setActiveFilters({...activeFilters, status: []})}
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, status: [] })}
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
@@ -441,6 +464,204 @@ function SearchTotalAndFilterOptions({
               </button>
             </div>
           )}
+
+          {activeFilters.language && (
+            <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
+              <span className="text-purple-400">Language:</span>
+              <span className="text-purple-300 font-medium">
+                {filterOptions.languages.find(l => l.code === activeFilters.language)?.label}
+              </span>
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, language: '' })}
+                className="ml-1 text-purple-400 hover:text-white transition-colors"
+                aria-label="Remove filter"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {activeFilters.demographic && (
+            <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
+              <span className="text-purple-400">Demographic:</span>
+              <span className="text-purple-300 font-medium">
+                {filterOptions.demographics.find(d => d.id === activeFilters.demographic)?.label}
+              </span>
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, demographic: '' })}
+                className="ml-1 text-purple-400 hover:text-white transition-colors"
+                aria-label="Remove filter"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {activeFilters.publicationType.length > 0 && (
+            <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
+              <span className="text-purple-400">Publication Type:</span>
+              <div className="flex gap-1">
+                {activeFilters.publicationType.map(typeId => {
+                  const type = filterOptions.publicationTypes.find(t => t.id === typeId);
+                  return (
+                    <span key={typeId} className="text-purple-300 font-medium">
+                      {type?.label}
+                    </span>
+                  );
+                })}
+              </div>
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, publicationType: [] })}
+                className="ml-1 text-purple-400 hover:text-white transition-colors"
+                aria-label="Remove filter"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {activeFilters.year && (
+            <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
+              <span className="text-purple-400">Created At:</span>
+              <span className="text-purple-300 font-medium">{activeFilters.year}</span>
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, year: '' })}
+                className="ml-1 text-purple-400 hover:text-white transition-colors"
+                aria-label="Remove filter"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {activeFilters.hasChapters && (
+            <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
+              <span className="text-purple-400">Has Chapters:</span>
+              <span className="text-purple-300 font-medium">
+                {filterOptions.hasChaptersOptions.find(o => o.id === activeFilters.hasChapters)?.label}
+              </span>
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, hasChapters: '' })}
+                className="ml-1 text-purple-400 hover:text-white transition-colors"
+                aria-label="Remove filter"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {activeFilters.sortBy && (
+            <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
+              <span className="text-purple-400">Sort By:</span>
+              <span className="text-purple-300 font-medium">
+                {filterOptions.sortOptions.find(s => s.id === activeFilters.sortBy)?.label}
+              </span>
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, sortBy: '' })}
+                className="ml-1 text-purple-400 hover:text-white transition-colors"
+                aria-label="Remove filter"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {activeFilters.author && (
+            <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
+              <span className="text-purple-400">Author/Artist:</span>
+              <span className="text-purple-300 font-medium">{activeFilters.author}</span>
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, author: '' })}
+                className="ml-1 text-purple-400 hover:text-white transition-colors"
+                aria-label="Remove filter"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {activeFilters.group && (
+            <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
+              <span className="text-purple-400">Group:</span>
+              <span className="text-purple-300 font-medium">{activeFilters.group}</span>
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, group: '' })}
+                className="ml-1 text-purple-400 hover:text-white transition-colors"
+                aria-label="Remove filter"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {activeFilters.uploader && (
+            <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
+              <span className="text-purple-400">Uploader:</span>
+              <span className="text-purple-300 font-medium">{activeFilters.uploader}</span>
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, uploader: '' })}
+                className="ml-1 text-purple-400 hover:text-white transition-colors"
+                aria-label="Remove filter"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {activeFilters.genres.length > 0 && (
+            <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
+              <span className="text-purple-400">Genres:</span>
+              <div className="flex gap-1">
+                {activeFilters.genres.slice(0, 3).map(tag => (
+                  <span key={tag} className="text-purple-300 font-medium">
+                    {tag}
+                  </span>
+                ))}
+                {activeFilters.genres.length > 3 && (
+                  <span className="text-purple-300 font-medium">
+                    +{activeFilters.genres.length - 3} more
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={() => setActiveFilters({ ...activeFilters, genres: [] })}
+                className="ml-1 text-purple-400 hover:text-white transition-colors"
+                aria-label="Remove filter"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          <button
+            onClick={clearAllFilters}
+            className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm text-purple-400 hover:text-white transition-colors"
+          >
+            Clear All
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       )}
     </div>
