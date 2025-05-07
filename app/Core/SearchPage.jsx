@@ -275,17 +275,18 @@ const SearchPage = () => {
     setActiveFilters({
       rating: [],
       status: [],
-      year: '',
+      year: [],
       genres: [],
-      language: '',
+      language: [],
       minScore: '',
-      demographic: ''
+      demographic: []
     });
   };
 
   // Cache helpers
   const getFromCache = (key) => {
     try {
+      // localStorage.clear()
       const data = localStorage.getItem(key);
       return data ? JSON.parse(data) : null;
     } catch (error) {
@@ -423,8 +424,8 @@ const SearchPage = () => {
         {!isLoading && !error && filteredResults.length > 0 && (
           <>
             <div className={viewMode === 'grid'
-              ? 'grid grid-cols-2 relative z-10 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2'
-              : 'flex flex-col space-y-4 z-10'
+              ? 'grid grid-cols-2 relative z-10 mt-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2'
+              : 'flex flex-col space-y-2 z-10'
             }>
               {paginatedItems.map(manga => (
                 <SearchMangaCardWith2ViewMode

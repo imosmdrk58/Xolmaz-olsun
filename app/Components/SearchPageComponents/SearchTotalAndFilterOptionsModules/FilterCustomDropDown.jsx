@@ -35,8 +35,8 @@ function FilterCustomDropDown({
 
   return (
     <div className="filter-group">
-      <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
-        <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+      <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2 tracking-widest">
+        <span className="w-1.5 h-1.5  rounded-full bg-purple-500 animate-pulse"></span>
         {title}
       </h3>
 
@@ -47,7 +47,7 @@ function FilterCustomDropDown({
         >
           <div className="flex items-center justify-between">
 
-            <span className="text-sm line-clamp-1 ">{selectedCount == 0 ? countLabel : selectedValues.map((val, index) => <span key={index} className='mr-2 capitalize'>{countLabel == "Any Language" ? langFullNames[val] : val.charAt(0).toUpperCase() + val.slice(1)}</span>)}</span>
+            <span className="text-sm line-clamp-1 tracking-widest">{selectedCount == 0 ? countLabel : selectedValues.map((val, index) => <span key={index} className='mr-2 capitalize '>{countLabel == "Any Language" ? langFullNames[val] : val.charAt(0).toUpperCase() + val.slice(1)}</span>)}</span>
             <div className={`text-purple-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -64,7 +64,7 @@ function FilterCustomDropDown({
             }}
             className="absolute z-10 w-full mt-2 bg-black/90 backdrop-blur-md border border-purple-800/50 rounded-lg overflow-hidden shadow-xl shadow-purple-900/30 transition-all duration-300">
             <div className="flex items-center justify-between px-4 py-3 border-b border-purple-800/30">
-              <span className="text-sm text-purple-300">
+              <span className="text-sm text-purple-300 tracking-widest">
                 {`${selectedCount} Selected`}
               </span>
 
@@ -91,16 +91,13 @@ function FilterCustomDropDown({
                       : selectedValues === option.id
                     }
                     onChange={() => handleCheckboxChange(option.id)}
-                    className="h-4 w-4 rounded-full appearance-none transition-colors
-    checked:bg-purple-600  checked:border-purple-400
-    bg-gray-600 border-purple-900/90 border-2
-    focus:outline-none  "
+                    className="h-4 w-4 rounded-full appearance-none transition-colors checked:bg-purple-600  checked:border-yellow-400 bg-gray-600 border-yellow-400/90 border-2 focus:outline-none  "
                   />
 
-                  <span className="text-sm font-medium text-purple-200">{option.label}</span>
+                  <span className="text-sm font-medium text-purple-200 tracking-widest">{option.label}</span>
 
                   {option.count !== undefined && (
-                    <span className="text-xs text-purple-400 ml-auto">{option.count}</span>
+                    <span className="text-xs text-purple-400 ml-auto tracking-widest">{option.count}</span>
                   )}
                 </label>
               ))}

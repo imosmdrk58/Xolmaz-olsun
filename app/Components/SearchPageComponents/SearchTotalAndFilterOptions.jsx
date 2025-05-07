@@ -14,7 +14,6 @@ function SearchTotalAndFilterOptions({
 }) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchText, setSearchText] = useState(searchQuery);
-  const [showTags, setShowTags] = useState(false);
 
   // Sync searchText with searchQuery
   useEffect(() => {
@@ -176,7 +175,7 @@ function SearchTotalAndFilterOptions({
 
       {/* Search query display and results count (mobile) */}
       {searchQuery && (
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 ">
           <h1 className="text-xl sm:text-2xl font-bold">
             <span className="text-purple-500">Results for </span>
             <span className="text-white">"</span>

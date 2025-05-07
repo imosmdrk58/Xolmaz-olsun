@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import Image from 'next/image';
 
 const FilterSection = ({ title, items, activeFilters, toggleFilter, searchTerm }) => {
     // Filter items based on search term
@@ -23,14 +24,13 @@ const FilterSection = ({ title, items, activeFilters, toggleFilter, searchTerm }
                     <li
                         key={tag.id}
                         onClick={() => toggleFilter('genres', tag.label)}
-                        className={`transition-all cursor-pointer rounded-md px-1 border flex items-center gap-1 text-gray-300
+                        className={`transition-all  cursor-pointer rounded-md px-1 border flex items-center gap-1 text-gray-300
               ${activeFilters.genres?.includes(tag.label)
                                 ? 'border-solid border-purple-500 outline outline-1 outline-purple-500 bg-gray-700'
                                 : 'border-dashed border-gray-500 hover:bg-gray-700'
                             }`}
                         role="button"
                         aria-pressed={activeFilters.genres?.includes(tag.label)}
-                        tabIndex={0}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') {
                                 e.preventDefault();
@@ -76,7 +76,7 @@ function ThemeGenreTags({ filterOptions, toggleFilter, activeFilters }) {
                 >
                     <div className="flex items-center justify-between">
 
-                        <span className="text-sm  line-clamp-1 ">{activeFilters.genres.length > 0 ? activeFilters.genres.map((val, index) => <span key={index} className='mr-2 capitalize'>{val.charAt(0).toUpperCase() + val.slice(1)}</span>) : "Any Tag"}</span>
+                        <span className="text-sm  line-clamp-1 tracking-widest ">{activeFilters.genres.length > 0 ? activeFilters.genres.map((val, index) => <span key={index} className='mr-2 capitalize'>{val.charAt(0).toUpperCase() + val.slice(1)}</span>) : "Any Tag"}</span>
                         <div className={`text-purple-400 transition-transform duration-300 ${showTags ? 'rotate-180' : ''}`}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -96,26 +96,15 @@ function ThemeGenreTags({ filterOptions, toggleFilter, activeFilters }) {
                             <div className="relative">
                                 <input
                                     type="text"
-                                    className="block w-full my-1 bg-gray-700 outline-none outline-1 outline-transparent focus:outline-purple-500 transition-[outline-color] text-sm py-2 pl-8 rounded-md text-gray-200 placeholder-gray-400"
+                                    className="block w-full my-1 tracking-wide bg-gray-700 outline-none outline-1 outline-transparent focus:outline-purple-500 transition-[outline-color] text-sm py-2 pl-8 rounded-md text-gray-200 placeholder-gray-400"
                                     placeholder="Search tags"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     aria-label="Search tags"
                                 />
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="absolute left-3 top-[0.875rem] w-4 h-4 pointer-events-none text-gray-400"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m18 11l-6-6"
-                                    />
-                                </svg>
+                                <Image src={"./search.svg"} width={300} height={300} alt='search'
+                                    className="absolute left-3 top-[0.875rem] w-4 h-4 pointer-events-none text-gray-400 saturate-0 brightness-150"
+                                />
                             </div>
                             <button
                                 disabled={searchTerm.trim() == ""}
@@ -123,7 +112,7 @@ function ThemeGenreTags({ filterOptions, toggleFilter, activeFilters }) {
                                 className="my-auto disabled:opacity-45  rounded relative flex items-center px-3 overflow-hidden bg-red-600/80 hover:bg-red-500 text-white text-sm h-[2.2rem] min-h-[1.75rem] min-w-[1.75rem]"
                                 aria-label="Reset filters"
                             >
-                                <span className="flex relative items-center justify-center font-medium select-none w-full">
+                                <span className="flex tracking-wide relative items-center justify-center font-bold text-xs select-none w-full">
                                     Reset
                                 </span>
                             </button>
