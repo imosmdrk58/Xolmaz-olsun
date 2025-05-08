@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import filterOptions from "../../constants/filterOptions";
 import FilterCustomDropDown from "./SearchTotalAndFilterOptionsModules/FilterCustomDropDown"
 import ThemeGenreTags from "./SearchTotalAndFilterOptionsModules/ThemeGenreTags"
+import Image from 'next/image';
 function SearchTotalAndFilterOptions({
   setActiveFilters,
   activeFilters,
@@ -68,11 +69,13 @@ function SearchTotalAndFilterOptions({
   }, 0);
 
 
-  const sortOptions = filterOptions.sortOptions.map(sort => ({
-    label: sort.label,
-    value: sort.id
-  }));
-
+  const yearOptions = Array.from(
+    { length: 2025 - 1910 + 1 },
+    (_, index) => ({
+      id: String(1910 + index),
+      label: String(1910 + index),
+    })
+  );
   // const hasChaptersOptions = filterOptions.hasChaptersOptions.map(option => ({
   //   label: option.label,
   //   value: option.id
@@ -91,15 +94,12 @@ function SearchTotalAndFilterOptions({
               placeholder="Search manga..."
               className="w-full px-5 py-4 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-xl text-purple-50 placeholder-purple-300/50 focus:outline-none focus:ring-2 focus:ring-purple-600/70 focus:border-purple-600 transition-all duration-300 shadow-inner pl-12"
             />
-            <button
-              type="submit"
+            <div
               className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-purple-400"
               aria-label="Search"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
+             <Image alt='Search' src={"/search.svg"} width={300} height={ 300} className=' h-6 w-6 saturate-0 brightness-150'/>
+            </div>
             <button
               type="submit"
               className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-gradient-to-br from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 text-white px-4 py-2 rounded-lg transition duration-300 shadow-lg hover:shadow-purple-500/30"
@@ -217,7 +217,6 @@ function SearchTotalAndFilterOptions({
               </button>
             )}
           </div>
-          {console.log(activeFilters)}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Content Rating */}
             <FilterCustomDropDown
@@ -242,7 +241,7 @@ function SearchTotalAndFilterOptions({
 
             {/* Original Language */}
             <FilterCustomDropDown
-              title="Original Language"
+              title="Original/Translated Language"
               multiple={true}
               options={filterOptions.languages}
               selectedValues={activeFilters.language}
@@ -251,8 +250,8 @@ function SearchTotalAndFilterOptions({
             />
 
             {/* Tags - Spans 2 columns on larger screens */}
-             <ThemeGenreTags activeFilters={activeFilters} filterOptions={filterOptions} toggleFilter={toggleFilter} key={"ThemeGenreTags"} />
-           
+            <ThemeGenreTags activeFilters={activeFilters} filterOptions={filterOptions} toggleFilter={toggleFilter} key={"ThemeGenreTags"} />
+
 
             {/* Publication Demographic */}
 
@@ -265,29 +264,22 @@ function SearchTotalAndFilterOptions({
             />
 
             {/* Publication Type */}
-            <div className="filter-group">
-              <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-                Publication Type
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {filterOptions.publicationTypes.map(type => (
-                  <button
-                    key={type.id}
-                    onClick={() => toggleFilter('publicationType', type.id)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1.5 transition-all duration-300
-                      ${activeFilters.publicationType?.includes(type.id)
-                        ? 'bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-lg shadow-purple-700/30'
-                        : 'bg-black/50 text-purple-200 hover:bg-purple-900/40 border border-purple-800/50'}`}
-                  >
-                    <span className={`w-2 h-2 rounded-full ${type.color}`}></span>
-                    {type.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <FilterCustomDropDown
+              title="Publication Type"
+              options={filterOptions.publicationTypes}
+              selectedValues={activeFilters.publicationType}
+              onSelectionChange={(value) => toggleFilter('publicationType', value)}
+              countLabel={"Any publication Type"}
+            />
 
             {/* Created At */}
+            <FilterCustomDropDown
+              title="Publication Year"
+              options={yearOptions}
+              selectedValues={activeFilters.year}
+              onSelectionChange={(value) => toggleFilter('year', value)}
+              countLabel={"Any year"}
+            />
             {/* <div className="filter-group">
               <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
@@ -337,32 +329,15 @@ function SearchTotalAndFilterOptions({
             </div> */}
 
             {/* Sort By */}
-            <div className="filter-group">
-              <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-                Sort By
-              </h3>
-              <div className="relative">
-                <select
-                  value={activeFilters.sortBy || ''}
-                  onChange={(e) => toggleFilter('sortBy', e.target.value)}
-                  className="w-full p-3 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-lg text-purple-200 appearance-none focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600/30 transition-all duration-300"
-                >
-                  <option value="">Relevance</option>
-                  {sortOptions.map(sort => (
-                    <option key={sort.value} value={sort.value}>
-                      {sort.label}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-purple-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
 
+            <FilterCustomDropDown
+              title="Sort By"
+              multiple={false}
+              options={filterOptions.sortOptions}
+              selectedValues={activeFilters.sortBy}
+              onSelectionChange={(value) => toggleFilter('sortBy', value)}
+              countLabel={"Any"}
+            />
             {/* Author/Artist */}
             {/* <div className="filter-group">
               <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">

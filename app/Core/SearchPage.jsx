@@ -21,8 +21,9 @@ const SearchPage = () => {
     rating: [],
     status: [],
     language: [],
+    publicationType: [],
     year: [],
-    minScore: '',
+    sortBy: '',
     demographic: [],
     genres: []
   });
@@ -207,68 +208,132 @@ const SearchPage = () => {
   };
 
   console.log(filteredResults[0]);
-  
+
   // Apply filters to search results
   const applyFilters = useCallback(() => {
-    let results = [...searchResults];
+    let filteredResults = [...searchResults];
 
     // Filter by content rating
     if (activeFilters.rating.length > 0) {
-      results = results.filter(manga =>
+      filteredResults = filteredResults.filter(manga =>
         activeFilters.rating.includes(manga.contentRating)
       );
     }
 
     // Filter by status
     if (activeFilters.status.length > 0) {
-      results = results.filter(manga =>
+      filteredResults = filteredResults.filter(manga =>
         activeFilters.status.includes(manga.status)
       );
     }
 
     // Filter by year
-    if (activeFilters.year.length>0) {
-      results = results.filter(manga =>
-        activeFilters.year.includes(manga.year && manga.year.toString())
+    if (activeFilters.year.length > 0) {
+      filteredResults = filteredResults.filter(manga =>
+        activeFilters.year.includes(manga.year?.toString())
       );
     }
 
     // Filter by genre (using flatTags)
     if (activeFilters.genres.length > 0) {
-      results = results.filter(manga =>
+      filteredResults = filteredResults.filter(manga =>
         activeFilters.genres.every(genre => manga.flatTags.includes(genre))
       );
     }
 
-
     // Filter by language (check originalLanguage or availableTranslatedLanguages)
     if (activeFilters.language.length > 0) {
-      results = results.filter(manga =>
-        activeFilters.language.every(lang=>manga.originalLanguage === lang ||
+      filteredResults = filteredResults.filter(manga =>
+        activeFilters.language.every(lang =>
+          manga.originalLanguage === lang ||
           (manga.availableTranslatedLanguages &&
-            manga.availableTranslatedLanguages.includes(lang)))
+            manga.availableTranslatedLanguages.includes(lang))
+        )
       );
     }
 
-    // Filter by minimum score
-    if (activeFilters.minScore) {
-      const minScore = parseFloat(activeFilters.minScore);
-      results = results.filter(
-        manga => (manga.rating?.rating?.bayesian || 0) >= minScore
-      );
-    }
-
-    // Filter by demographic (check tags with group 'demographic')
+    // Filter by demographic (check MangaStoryType)
     if (activeFilters.demographic.length > 0) {
-      results = results.filter(manga =>
-        activeFilters.demographic.every(demo=>demo=="none"?manga.MangaStoryType==null:manga.MangaStoryType==demo) || activeFilters.demographic.includes(manga.MangaStoryType==null?"none":manga.MangaStoryType)
+      filteredResults = filteredResults.filter(manga =>
+        activeFilters.demographic.every(demo =>
+          demo === 'none'
+            ? manga.MangaStoryType == null
+            : manga.MangaStoryType === demo
+        ) ||
+        activeFilters.demographic.includes(
+          manga.MangaStoryType == null ? 'none' : manga.MangaStoryType
+        )
       );
     }
 
-    setFilteredResults(results);
+    // Filter by publication type
+    if (activeFilters.publicationType.length > 0) {
+      filteredResults = filteredResults.filter(manga =>
+        activeFilters.publicationType.some(demo => {
+          const flatTags = manga.flatTags || [];
+          const originalLanguage = manga.originalLanguage || '';
+          const normalizedTags = flatTags.map(tag => tag.toLowerCase());
+
+          switch (demo.toLowerCase()) {
+            case 'manga':
+              return (
+                originalLanguage === 'ja' &&
+                !normalizedTags.includes('long strip') &&
+                !normalizedTags.includes('web comic')
+              );
+            case 'manhwa':
+              return (
+                originalLanguage === 'ko' &&
+                (normalizedTags.includes('long strip') || normalizedTags.includes('web comic'))
+              );
+            case 'manhua':
+              return originalLanguage === 'zh' || originalLanguage === 'zh-hk';
+            case 'doujinshi':
+              return normalizedTags.includes('doujinshi');
+            default:
+              return true;
+          }
+        })
+      );
+    }
+
+
+    // Sort results based on activeFilters.sortBy
+    if (activeFilters.sortBy && activeFilters.sortBy !== '') {
+      filteredResults.sort((a, b) => {
+        switch (activeFilters.sortBy.trim()) {
+          case 'relevance':
+            // Sort by title as a proxy for relevance
+            return (a.title || '').localeCompare(b.title || '');
+          case 'latestUploadedChapter':
+            // Sort by updatedAt
+            return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+          case 'followedCount':
+            // Sort by rating.follows
+            const aFollows = a.rating?.follows || 0;
+            const bFollows = b.rating?.follows || 0;
+            return bFollows - aFollows;
+          case 'createdAt':
+            // Sort by updatedAt as fallback (createdAt not available)
+            return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+          case 'title':
+            // Sort by title
+            return (a.title || '').localeCompare(b.title || '');
+          case 'year':
+            // Sort by year
+            return (b.year || 0) - (a.year || 0);
+          case "minScore":
+           return  b.rating?.rating?.bayesian -a.rating?.rating?.bayesian  
+
+          default:
+            return 0;
+        }
+      });
+    }
+
+    setFilteredResults(filteredResults);
     setCurrentPage(1);
   }, [activeFilters, searchResults]);
-
 
   // Clear all filters
   const clearAllFilters = () => {
@@ -277,8 +342,9 @@ const SearchPage = () => {
       status: [],
       year: [],
       genres: [],
+      sortBy: '',
+      publicationType: [],
       language: [],
-      minScore: '',
       demographic: []
     });
   };

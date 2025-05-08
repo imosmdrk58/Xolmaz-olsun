@@ -47,7 +47,7 @@ function FilterCustomDropDown({
         >
           <div className="flex items-center justify-between">
 
-            <span className="text-sm line-clamp-1 tracking-widest">{selectedCount == 0 ? countLabel : selectedValues.map((val, index) => <span key={index} className='mr-2 capitalize '>{countLabel == "Any Language" ? langFullNames[val] : val.charAt(0).toUpperCase() + val.slice(1)}</span>)}</span>
+            <span className="text-sm line-clamp-1 tracking-widest">{selectedCount == 0 ? countLabel : multiple?selectedValues.map((val, index) => <span key={index} className='mr-2 capitalize '>{countLabel == "Any Language" ? langFullNames[val] : val.charAt(0).toUpperCase() + val.slice(1)}</span>):<span className='mr-2 capitalize '>{selectedValues}</span>}</span>
             <div className={`text-purple-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

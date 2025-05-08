@@ -132,17 +132,21 @@ const AboutManga = ({ manga, handleChapterClick, last }) => {
             <hr className="my-4 border-gray-700" />
 
             {/* Metadata */}
-            <div className="flex flex-wrap gap-8">
+            <div className="flex flex-wrap gap-10 gap-y-0">
               <div className="mb-4">
                 <h3 className="text-lg font-bold text-white mb-2">Author</h3>
-                <a href={`/author/${manga?.authorName[0]?.id}/${manga?.authorName[0]?.attributes?.name}`} className="px-4 tracking-wider font-bold py-2 bg-[#4c2b8c]/5 hover:bg-[#5c3b9c]/50 rounded-lg text-sm  text-white text-center transition-all duration-300 shadow-[0_0_5px_rgba(76,43,140,0.3)] shadow-purple-500">
-                  {manga?.authorName[0]?.attributes?.name || "N/A"}
+                <a className="flex flex-wrap gap-2" href={`/author/${manga?.authorName[0]?.id}/${manga?.authorName[0]?.attributes?.name}`} >
+                  <span className="px-4 tracking-wider font-bold py-2 bg-[#4c2b8c]/5 hover:bg-[#5c3b9c]/50 rounded-lg text-sm  text-white text-center transition-all duration-300 shadow-[0_0_5px_rgba(76,43,140,0.3)] shadow-purple-500">
+                    {manga?.authorName[0]?.attributes?.name || "N/A"}
+                  </span>
                 </a>
               </div>
               <div className="mb-4">
-                <h3 className="text-lg font-bold text-white mb-2">Artist</h3>
-                <a href={`/author/${manga?.artistName[0]?.id}/${manga?.artistName[0]?.attributes?.name}`} className="px-4 tracking-wider font-bold py-2 bg-[#4c2b8c]/5 hover:bg-[#5c3b9c]/50 rounded-lg text-sm  text-white text-center transition-all duration-300 shadow-[0_0_5px_rgba(76,43,140,0.3)] shadow-purple-500">
-                  {manga?.artistName[0]?.attributes?.name || "N/A"}
+                <h3 className="text-lg font-bold tracking-wider text-white mb-2 capitalize">Artist</h3>
+                <a className="flex flex-wrap gap-2" href={`/author/${manga?.artistName[0]?.id}/${manga?.artistName[0]?.attributes?.name}`}>
+                  <span className="px-4 tracking-wider font-bold py-2 bg-[#4c2b8c]/5 hover:bg-[#5c3b9c]/50 rounded-lg text-sm  text-white text-center transition-all duration-300 shadow-[0_0_5px_rgba(76,43,140,0.3)] shadow-purple-500"
+                  >{manga?.artistName[0]?.attributes?.name || "N/A"}
+                  </span>
                 </a>
               </div>
               {manga?.tags?.map(tagGroup => tagGroup?.tags?.length > 0 && (
@@ -159,10 +163,13 @@ const AboutManga = ({ manga, handleChapterClick, last }) => {
                 </div>
               ))}
               <div className="mb-4">
-                <h3 className="text-lg font-bold text-white mb-3">Demographic</h3>
-                <a href="/titles?demos=josei" className="px-4 tracking-wider font-bold py-2 bg-[#4c2b8c]/5 hover:bg-[#5c3b9c]/50 rounded-lg text-sm  text-white text-center transition-all duration-300 shadow-[0_0_5px_rgba(76,43,140,0.3)] shadow-purple-500"
+                <h3 className="text-lg font-bold text-white mb-2">Demographic</h3>
+                <a className="flex flex-wrap gap-2" href="/titles?demos=josei"
                 >
-                  {manga.MangaStoryType[0].related || manga.MangaStoryType}
+                  <span className="px-4 tracking-wider font-bold py-2 bg-[#4c2b8c]/5 hover:bg-[#5c3b9c]/50 rounded-lg text-sm  text-white text-center transition-all duration-300 shadow-[0_0_5px_rgba(76,43,140,0.3)] shadow-purple-500"
+                  >
+                    {manga?.MangaStoryType || "Not Available"}
+                  </span>
                 </a>
               </div>
             </div>

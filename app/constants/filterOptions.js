@@ -85,12 +85,9 @@ const filterOptions = {
     { id: 'none', label: 'None' },
   ],
   publicationTypes: [
-    { id: 'manga', label: 'Manga', color: 'bg-blue-500' },
-    { id: 'manhwa', label: 'Manhwa', color: 'bg-purple-500' },
-    { id: 'manhua', label: 'Manhua', color: 'bg-orange-500' },
-    { id: 'doujinshi', label: 'Doujinshi', color: 'bg-pink-500' },
-    { id: 'oneshot', label: 'One-shot', color: 'bg-teal-500' },
-    { id: 'oel', label: 'OEL', color: 'bg-gray-500' },
+    { id: 'manga', label: 'Manga' },
+    { id: 'manhwa', label: 'Manhwa'},
+    { id: 'manhua', label: 'Manhua' },
   ],
   formats: [
     { id: 'b9cb033c-5976-4d21-87e8-3652582520e5', label: '4-Koma' },
@@ -182,10 +179,11 @@ const filterOptions = {
   sortOptions: [
     { id: 'relevance', label: 'Relevance' },
     { id: 'latestUploadedChapter', label: 'Latest Upload' },
-    { id: 'followedCount', label: 'Follows' },
-    { id: 'createdAt', label: 'Created At' },
-    { id: 'title', label: 'Title' },
-    { id: 'year', label: 'Year' },
+    { id: 'followedCount', label: 'Total Follows' },
+    { id: 'createdAt', label: 'Creation Time' },
+    { id: 'title', label: 'Manga Title' },
+    { id: 'year', label: 'First Publish' },
+    { id: 'minScore', label: 'Manga Rating' },
   ],
   hasChaptersOptions: [
     { id: 'yes', label: 'Yes' },
