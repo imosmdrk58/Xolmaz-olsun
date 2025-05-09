@@ -1,5 +1,6 @@
 import React, { memo, lazy, useMemo } from "react";
 import Image from "next/image";
+import { Heart, MessageSquareText, Bookmark } from 'lucide-react';
 const StableFlag = memo(lazy(() => import("../../StableFlag")));
 
 const contentRatingStyles = {
@@ -83,7 +84,6 @@ const SearchMangaCard = ({
   return (
     <article
       className="relative group w-full tracking-wide flex justify-center cursor-pointer"
-      aria-label={`Open manga ${manga.title}`}
       onClick={handleMangaClicked}
       role="button"
     >
@@ -142,34 +142,27 @@ const SearchMangaCard = ({
           <div className="flex justify-between text-xs bg-slate-800/40 backdrop-blur-md p-2 rounded-lg">
             {[
               {
-                icon: "heart",
+                icon: Heart,
                 value: manga?.rating?.follows || 0,
                 label: "Follows",
-                color: "text-rose-400",
+                color: "text-rose-500 fill-rose-500/20",
               },
               {
-                icon: "comment",
+                icon: MessageSquareText,
                 value: manga?.rating?.comments?.repliesCount || 0,
                 label: "Comments",
-                color: "text-blue-400",
+                color: "text-sky-200/70 fill-blue-400/20",
               },
               {
-                icon: "bookmark",
+                icon: Bookmark,
                 value: manga?.rating?.bookmarks || 0,
                 label: "Bookmarks",
-                color: "text-purple-400",
+                color: "text-emerald-500 fill-emerald-400/20",
               },
-            ].map(({ icon, value, label, color }) => (
-              <div key={icon} className="flex flex-col items-center">
+            ].map(({ icon: Icon, value, label, color }) => (
+              <div key={label} className="flex flex-col items-center">
                 <div className="flex items-center gap-1">
-                  <Image
-                    width={14}
-                    height={14}
-                    src={`/${icon}.svg`}
-                    alt={icon}
-                    className={`w-4.5 h-4.5 ${color}`}
-                    priority={false}
-                  />
+                  <Icon className={`w-5 h-5 ${color} `} />
                   <span className={`${color} font-semibold`}>{formatCount(value)}</span>
                 </div>
                 <span className="text-[10px] text-gray-500">{label}</span>

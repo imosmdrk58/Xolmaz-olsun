@@ -1,7 +1,23 @@
 import React, { useState, useCallback, useEffect, memo, useRef, useMemo } from 'react';
 import PageAndChapterNavigation from './PageAndChaptersNavigation';
 import CollapsedSideBarStrip from './CollapsedSideBarStrip';
-import { SvgIcon, ReadingIcon, MenuIcon, ArrowLeftIcon, BookIcon, ChevronDownIcon, CreatorsIcon, DescriptionIcon, HeartIcon, InfoIcon, LanguageIcon, LinkIcon, NextIcon, PageIcon, PrevIcon, TagIcon } from '../../SVGIcons';
+import {
+  Heart,
+  Menu,
+  ArrowLeft,
+  BookOpen,
+  ChevronDown,
+  User,
+  FileText,
+  Info,
+  Globe,
+  Link,
+  ArrowRight,
+  File,
+  ArrowLeft as ArrowLeftIcon, // To avoid naming conflict if needed
+  Tag,
+  ChevronUpIcon,
+} from 'lucide-react';
 import DifferentMetaDataChapter from './DifferentMetaDataChapter';
 import Image from 'next/image';
 
@@ -120,22 +136,22 @@ console.log(allChapters.length - 1);
 
   // Memoized icon props to prevent re-renders
   const iconProps = useMemo(() => ({
-    ReadingIcon,
-    ChevronDownIcon,
-    NextIcon,
-    PageIcon,
-    PrevIcon,
-    SvgIcon,
-    HeartIcon,
-    MenuIcon,
-    BookIcon,
-    InfoIcon,
-    TagIcon,
-    LinkIcon,
-    DescriptionIcon,
-    CreatorsIcon,
-    LanguageIcon,
-    ArrowLeftIcon
+    ReadingIcon: File, // Assuming ReadingIcon corresponds to File icon
+    ChevronDownIcon: ChevronDown,
+    ChevronUpIcon:ChevronUpIcon,
+    NextIcon: ArrowRight,
+    PageIcon: File,
+    PrevIcon: ArrowLeft,
+    HeartIcon: Heart,
+    MenuIcon: Menu,
+    BookIcon: BookOpen,
+    InfoIcon: Info,
+    TagIcon: Tag,
+    LinkIcon: Link,
+    DescriptionIcon: FileText,
+    CreatorsIcon: User,
+    LanguageIcon: Globe,
+    ArrowLeftIcon: ArrowLeft,
   }), []);
 
   // Memoized cover image props
@@ -203,7 +219,7 @@ console.log(allChapters.length - 1);
             className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300 group ${isFavorite ? 'bg-red-900/30 text-red-400 border border-red-700/20' : 'bg-gray-800/50 text-gray-400 border border-gray-700/20 hover:bg-red-900/30 hover:text-red-400'}`}
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >
-            <HeartIcon filled={isFavorite} className={`w-5 h-5 ${isFavorite ? 'animate-pulse' : ''}`} />
+            <Heart className={`w-5 h-5 ${isFavorite ? 'animate-pulse fill-rose-500/40' : ''}`} />
             <span className="tracking-wider absolute hidden group-hover:block bg-gray-900/90 text-white text-xs py-1 px-2 rounded-md right-12 top-7">{isFavorite ? 'Unfavorite' : 'Favorite'}</span>
           </button>
         </div>

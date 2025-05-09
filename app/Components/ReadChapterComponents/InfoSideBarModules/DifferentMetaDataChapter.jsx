@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo,useState } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import { langFullNames } from '@/app/constants/Flags';
 const DifferentMetaDataChapter = memo(({
   activeSection,
@@ -20,9 +20,9 @@ const DifferentMetaDataChapter = memo(({
     completed: 'bg-blue-900/30 text-blue-400',
     default: 'bg-gray-800/50 text-gray-400'
   }), []);
-    const [collapsedSections, setCollapsedSections] = useState({description:true,creators:true,languages:true,publication:true});
-  const toggleSection = useCallback((section) => 
-    setCollapsedSections(prev => ({ ...prev, [section]: !prev[section] })), 
+  const [collapsedSections, setCollapsedSections] = useState({ description: true, creators: true, languages: true, publication: true });
+  const toggleSection = useCallback((section) =>
+    setCollapsedSections(prev => ({ ...prev, [section]: !prev[section] })),
     []
   );
   console.log(collapsedSections)
@@ -43,7 +43,7 @@ const DifferentMetaDataChapter = memo(({
             onClick={() => setActiveSection(section.id)}
             aria-label={`Show ${section.id} section`}
           >
-            <section.icon />
+            <section.icon className="h-5 w-5" />
             <span className="tracking-wider ml-2 capitalize">{section.id}</span>
           </button>
         ))}
@@ -86,13 +86,13 @@ const DifferentMetaDataChapter = memo(({
                   <div className="tracking-wider flex items-center">
                     <span className="tracking-wider text-xs font-medium text-gray-400 w-16">Author:</span>
                     <span className="tracking-wider text-sm text-white">
-                      {mangaInfo.authorName.map(author => author.attributes?.name).join(', ') || 'Unknown'}
+                      {(typeof (mangaInfo.authorName) == "string") == true ? mangaInfo.authorName : mangaInfo.authorName?.map(author => author.attributes?.name).join(', ') || 'Unknown'}
                     </span>
                   </div>
                   <div className="tracking-wider flex items-center">
                     <span className="tracking-wider text-xs font-medium text-gray-400 w-16">Artist:</span>
                     <span className="tracking-wider text-sm text-white">
-                      {mangaInfo.artistName.map(artist => artist.attributes?.name).join(', ') || 'Unknown'}
+                      {(typeof (mangaInfo.artistName) == "string") == true ? mangaInfo.artistName : mangaInfo.artistName?.map(author => author.attributes?.name).join(', ') || 'Unknown'}
                     </span>
                   </div>
                 </div>

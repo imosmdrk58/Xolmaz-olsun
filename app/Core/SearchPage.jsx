@@ -4,7 +4,7 @@ import SearchMangaCardWith2ViewMode from "../Components/SearchPageComponents/Sea
 import SearchTotalAndFilterOptions from "../Components/SearchPageComponents/SearchTotalAndFilterOptions"
 import BottomPagination from "../Components/SearchPageComponents/BottomPagination"
 import LoadingSpinner from '../Components/LoadingSpinner';
-import Image from 'next/image';
+import { AlertCircleIcon,RouteOff  } from "lucide-react";
 // Main component
 const SearchPage = () => {
   // State management
@@ -447,7 +447,7 @@ const SearchPage = () => {
           <div className="flex flex-col items-center justify-center py-16">
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-md w-full text-center">
               <div className="bg-slate-800/50 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                <Image alt='alert' src={"./AlertIcon.svg"} width={300} height={300} className=' w-6 h-6' />
+              <AlertCircleIcon className="h-6 w-6" />
               </div>
               <h2 className="text-xl font-semibold text-slate-200 mb-2">{error}</h2>
               <p className="text-slate-400 mb-5">
@@ -470,7 +470,7 @@ const SearchPage = () => {
           <div className="flex flex-col items-center justify-center py-16">
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-md w-full text-center">
               <div className="bg-slate-800/50 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                <Image alt='alert' src={"./FilterOffIcon.svg"} width={300} height={300} className=' w-8 h-8' />
+              <RouteOff className=' w-8 h-8' />
               </div>
               <h2 className="text-xl font-semibold text-slate-200 mb-2">No matches found</h2>
               <p className="text-slate-400 mb-5">

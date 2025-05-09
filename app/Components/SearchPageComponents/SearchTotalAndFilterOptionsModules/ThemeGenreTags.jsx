@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Image from 'next/image';
+import { Search } from 'lucide-react';
 
 const FilterSection = ({ title, items, activeFilters, toggleFilter, searchTerm }) => {
     // Filter items based on search term
@@ -102,9 +103,7 @@ function ThemeGenreTags({ filterOptions, toggleFilter, activeFilters }) {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     aria-label="Search tags"
                                 />
-                                <Image src={"./search.svg"} width={300} height={300} alt='search'
-                                    className="absolute left-3 top-[0.875rem] w-4 h-4 pointer-events-none text-gray-400 saturate-0 brightness-150"
-                                />
+                                <Search  className="absolute left-3 top-[0.875rem] w-4 h-4 pointer-events-none text-gray-100 " />
                             </div>
                             <button
                                 disabled={searchTerm.trim() == ""}

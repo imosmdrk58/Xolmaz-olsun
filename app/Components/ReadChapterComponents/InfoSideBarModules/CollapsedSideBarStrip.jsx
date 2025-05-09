@@ -1,6 +1,6 @@
 import { langFullNames } from '@/app/constants/Flags';
 import React, { memo } from 'react'
-function CollapsedSideBarStrip({ isFavorite, toggleFavorite, mangaInfo, HeartIcon, MenuIcon, setIsCollapsed, CoverImage, BookIcon, PageIcon, hasPrevChapter, goToNextChapter, hasNextChapter, sortOrder, goToPrevChapter, SvgIcon, goToChapter, filteredChapters, goToLastChapter, goToFirstChapter, setSortOrder, setSearchQuery, searchQuery, chapterInfo, dropdownRef, setChapterDropdownOpen, chapterDropdownOpen }) {
+function CollapsedSideBarStrip({ isFavorite, ChevronUpIcon, ChevronDownIcon, toggleFavorite, mangaInfo, HeartIcon, MenuIcon, setIsCollapsed, CoverImage, BookIcon, PageIcon, hasPrevChapter, goToNextChapter, hasNextChapter, sortOrder, goToPrevChapter, goToChapter, filteredChapters, goToLastChapter, goToFirstChapter, setSortOrder, setSearchQuery, searchQuery, chapterInfo, dropdownRef, setChapterDropdownOpen, chapterDropdownOpen }) {
     console.log(chapterInfo)
     const ChapterQuickSelect = memo(() => (
         <div className="tracking-wider relative w-12" ref={dropdownRef}>
@@ -35,9 +35,8 @@ function CollapsedSideBarStrip({ isFavorite, toggleFavorite, mangaInfo, HeartIco
                                 className="tracking-wider p-1 rounded-md bg-gray-800/50 hover:bg-purple-900/30 text-gray-200"
                                 aria-label={`Sort chapters ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
                             >
-                                <SvgIcon className={`w-4 h-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`}>
-                                    <polyline points="6 9 12 15 18 9" />
-                                </SvgIcon>
+                                <ChevronDownIcon className={`w-4 h-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
+
                             </button>
                         </div>
                         <div className="tracking-wider flex gap-1 mt-1">
@@ -67,7 +66,7 @@ function CollapsedSideBarStrip({ isFavorite, toggleFavorite, mangaInfo, HeartIco
                             >
                                 <div className="tracking-wider font-medium">Chapter. {chapter.chapter} ({langFullNames[chapter.translatedLanguage]}) </div>
                                 <div className="tracking-wider text-xs text-gray-400 flex items-center mt-0.5">
-                                    <PageIcon />
+                                    <PageIcon className="w-4 h-4" />
                                     <span className="tracking-wider ml-1">{chapter.pageCount} pages</span>
                                     <span className="tracking-wider mx-1">•</span>
                                     <span>{new Date(chapter.publishAt).toLocaleDateString()}</span>
@@ -121,9 +120,7 @@ function CollapsedSideBarStrip({ isFavorite, toggleFavorite, mangaInfo, HeartIco
                                 aria-label="Previous chapter"
                                 type="button"
                             >
-                                <SvgIcon className="tracking-wider w-5 h-5 rotate-90 mb-1" aria-hidden="true">
-                                    <polyline points="15 18 9 12 15 6" />
-                                </SvgIcon>
+                                <ChevronUpIcon className="tracking-wider w-6 h-6 mb-1" aria-hidden="true" />
                                 <span className="tracking-wider text-xs select-none">Prev</span>
                             </button>
                             <div className='flex text-[11px] my-2 flex-row space-x-1 justify-center items-center'>{chapterInfo.chapter} / {filteredChapters.length}</div>
@@ -137,9 +134,7 @@ function CollapsedSideBarStrip({ isFavorite, toggleFavorite, mangaInfo, HeartIco
                                 aria-label="Next chapter"
                                 type="button"
                             >
-                                <SvgIcon className="tracking-wider w-5 h-5 rotate-90 mb-1" aria-hidden="true">
-                                    <polyline points="9 18 15 12 9 6" />
-                                </SvgIcon>
+                                <ChevronDownIcon className="tracking-wider w-6 h-6 mb-1" aria-hidden="true" />
                                 <span className="tracking-wider text-xs select-none">Next</span>
                             </button>
                         </div>

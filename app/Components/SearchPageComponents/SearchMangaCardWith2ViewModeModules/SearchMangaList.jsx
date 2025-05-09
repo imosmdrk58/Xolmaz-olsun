@@ -1,5 +1,6 @@
 import React,{memo,lazy,useMemo} from 'react'
 import Image from 'next/image';
+import { Heart, MessageSquareText, Bookmark } from 'lucide-react';
 const StableFlag = memo(lazy(() => import("../../StableFlag")));
 function SearchMangaList({formatCount,manga,handleMangaClicked,StarRating,timeSinceUpdate}) {
   return (
@@ -72,31 +73,19 @@ function SearchMangaList({formatCount,manga,handleMangaClicked,StarRating,timeSi
 
                     <div className="relative flex items-center gap-4 bg-slate-900/60 backdrop-blur-md rounded-lg py-1.5 px-2.5 border border-slate-800/60">
                         <div className="flex items-center gap-1">
-                            <span className="text-rose-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-4.656z" clipRule="evenodd" />
-                                </svg>
-                            </span>
+                            <Heart className={`w-5 h-5 text-rose-500 fill-rose-500/20 `} />
                             <span className="text-xs font-medium text-slate-300">
                                 {manga.rating?.follows ? formatCount(manga.rating.follows) : "0"}
                             </span>
                         </div>
                         <div className="flex items-center gap-1">
-                            <span className="text-blue-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M18 10c0 3.866-4.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-4.123C2.493 12.767 2 11.434 2 10c0-4.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
-                                </svg>
-                            </span>
+                        <MessageSquareText className={`w-5 h-5 text-sky-500 fill-sky-500/20 `} />
                             <span className="text-xs font-medium text-slate-300">
                                 {manga.rating?.comments?.repliesCount ? formatCount(manga.rating.comments.repliesCount) : "0"}
                             </span>
                         </div>
                         <div className="flex items-center gap-1">
-                            <span className="text-violet-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-4-2.5L5 18V4z" />
-                                </svg>
-                            </span>
+                        <Bookmark className={`w-5 h-5 text-emerald-500 fill-emerald-500/20 `} />
                             <span className="text-xs font-medium text-slate-300">
                                 {manga.rating?.bookmarks ? formatCount(manga.rating.bookmarks) : "0"}
                             </span>
@@ -108,7 +97,7 @@ function SearchMangaList({formatCount,manga,handleMangaClicked,StarRating,timeSi
                     </span>
                     {/* Rating */}
                     {manga.rating?.rating?.bayesian > 0 && (
-                        <div className="bg-slate-800/70 backdrop-blur-sm rounded-lg p-1.5 px-2.5 flex items-center gap-1.5 shadow-inner">
+                        <div className="bg-slate-800/70 backdrop-blur-sm rounded-lg p-2 px-2.5  flex items-center gap-1.5 shadow-inner">
                             <span className="text-amber-400 font-bold text-base leading-none">
                                 {manga.rating.rating.bayesian.toFixed(1)}
                             </span>

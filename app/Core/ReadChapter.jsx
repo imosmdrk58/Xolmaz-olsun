@@ -12,7 +12,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Placeholder from "../Components/ReadChapterComponents/Placeholder";
 import sortAndJoinOCR from "../util/ReadChapterUtils/sortAndjoinOCR";
 import handleTranslate from "../util/ReadChapterUtils/handleTranslate";
-
+import { ArrowUp, Languages } from 'lucide-react'; // Add this import at the top with other imports
 // Memoized components
 const MemoizedInfoSidebar = memo(InfoSidebar);
 const MemoizedBottomSettings = memo(BottomSettings);
@@ -258,12 +258,12 @@ export default function ReadChapter() {
                           blurDataURL="/placeholder.jpg"
                         />
                         {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim() !== "en" ? (
-                            <MemoizedOCROverlay
-                              loading={overlayLoading}
-                              handleTranslate={memoizedHandleTranslate} // Use memoized version
-                              translatedTexts={translatedTexts}
-                              fullOCRResult={fullOCRResult}
-                            />
+                          <MemoizedOCROverlay
+                            loading={overlayLoading}
+                            handleTranslate={memoizedHandleTranslate} // Use memoized version
+                            translatedTexts={translatedTexts}
+                            fullOCRResult={fullOCRResult}
+                          />
                         ) : (
                           ""
                         )}
@@ -287,13 +287,7 @@ export default function ReadChapter() {
                                   before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] 
                                   hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 ease-in-out`}
                               >
-                                <Image
-                                  height={300}
-                                  width={300}
-                                  src="/translate.svg"
-                                  alt="translate"
-                                  className="tracking-wider w-16 h-16 bg-opacity-85 group-hover:border-2 group-hover:border-yellow-500 transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2 transform group-hover:rotate-[360deg]"
-                                />
+                                <Languages className="tracking-wider w-16 p-4 text-orange-400 h-16 bg-opacity-85 group-hover:border-2 group-hover:border-yellow-500 transition-all bg-gray-50 ease-in-out duration-300 rounded-full border border-gray-700  transform group-hover:rotate-[360deg]" />
                                 <span
                                   className={`absolute font-sans font-bold left-20 text-lg tracking-tight text-gray-100 opacity-0 transform translate-x-4 transition-all duration-300 
                                       group-hover:opacity-100 group-hover:text-black group-hover:translate-x-0 ${pageTranslations[page] ? "text-yellow-300" : ""
@@ -369,19 +363,13 @@ export default function ReadChapter() {
                                 disabled={panels === 2 || pageTranslations[page]}
                                 onClick={() => handleUpload(page, "translate")}
                                 className={`font-sans ${panels === 2 || pageTranslations[page] ? "hidden" : ""
-                                  } disabled:cursor-not-allowed mt-3 before:bg-opacity-60 min-w-[182px] transition-colors flex gap-4 justify-start items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page]
+                                  } disabled:cursor-not-allowed mt-3 before:bg-opacity-60 min-w-[189px] transition-colors flex gap-4 justify-start items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page]
                                     ? "shadow-[0px_0px_6px_rgba(0,0,0,1)] shadow-yellow-500 bg-yellow-400 bg-opacity-60 "
                                     : "bg-[#1a063e]"
-                                  } backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-4 py-2 ease-in-out overflow-hidden border-2 rounded-full group`}
+                                  } backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-3 py-2 ease-in-out overflow-hidden border-2 rounded-full group`}
                                 type="submit"
                               >
-                                <Image
-                                  height={300}
-                                  width={300}
-                                  src="/translate.svg"
-                                  alt="translate"
-                                  className="tracking-wider w-12 h-12 bg-opacity-85 group-hover:border-2 group-hover:border-yellow-500 transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2 transform group-hover:rotate-[360deg]"
-                                />
+                                <Languages className="tracking-wider w-12 h-12 bg-opacity-85 group-hover:border-2 group-hover:border-yellow-500 transition-all bg-gray-50 text-orange-400 ease-in-out duration-300 rounded-full border border-gray-700 p-3 transform group-hover:rotate-[360deg]" />
                                 {pageTranslations[page] ? "Translated" : "Translate"}
                               </button>
                             )}
@@ -430,12 +418,7 @@ export default function ReadChapter() {
                 className="tracking-wider cursor-pointer fixed bottom-32 right-8 w-16 h-16 rounded-full border-4 border-violet-200 bg-black flex items-center justify-center duration-300 hover:rounded-[50px] hover:w-24 group/button overflow-hidden active:scale-90"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               >
-                <svg
-                  className="tracking-wider w-3 fill-white delay-50 duration-200 group-hover/button:-translate-y-12"
-                  viewBox="0 0 384 512"
-                >
-                  <path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"></path>
-                </svg>
+                <ArrowUp className="tracking-wider w-3 fill-white delay-50 duration-200 group-hover/button:-translate-y-12" />
                 <span className="tracking-wider absolute text-white text-xs opacity-0 group-hover/button:opacity-100 transition-opacity duration-200">
                   Top
                 </span>

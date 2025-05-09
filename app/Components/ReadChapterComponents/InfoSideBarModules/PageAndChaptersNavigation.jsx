@@ -9,7 +9,7 @@ const PageNavigation = memo(({ currentIndex, chapterInfo, goToPrevPage, goToNext
       disabled={currentIndex < 1}
       aria-label="Previous page"
     >
-      <PrevIcon />
+      <PrevIcon className=" w-5 h-5" />
     </button>
     <div className="tracking-wider bg-gray-800/50 text-gray-200 px-2.5 py-1 rounded-md text-xs font-medium border border-purple-700/20">
       {currentIndex + 1} / {chapterInfo.pageCount}
@@ -20,7 +20,7 @@ const PageNavigation = memo(({ currentIndex, chapterInfo, goToPrevPage, goToNext
       disabled={currentIndex >= chapterInfo.pageCount}
       aria-label="Next page"
     >
-      <NextIcon />
+      <NextIcon className=" w-5 h-5" />
     </button>
   </div>
 ));
@@ -40,7 +40,6 @@ const PageAndChaptersNavigation = memo(({
   currentIndex,
   sortOrder,
   goToPrevChapter,
-  SvgIcon,
   ChevronDownIcon,
   goToChapter,
   filteredChapters,
@@ -68,8 +67,8 @@ const PageAndChaptersNavigation = memo(({
   }, [setCurrentIndex, panels, pages.length]);
 
   // Memoized dropdown toggle
-  const toggleDropdown = useCallback(() => 
-    setChapterDropdownOpen(prev => !prev), 
+  const toggleDropdown = useCallback(() =>
+    setChapterDropdownOpen(prev => !prev),
     [setChapterDropdownOpen]
   );
 
@@ -78,7 +77,7 @@ const PageAndChaptersNavigation = memo(({
       <div className="tracking-wider flex items-center justify-between mb-2">
         <div className="tracking-wider flex items-center text-xs text-purple-300 font-medium">
           <ReadingIcon />
-          <span className="tracking-wider ml-2">{chapterInfo.title.slice(0,15)}...</span>
+          <span className="tracking-wider ml-2">{chapterInfo.title.slice(0, 15)}...</span>
         </div>
         <PageNavigation
           currentIndex={currentIndex}
@@ -99,7 +98,7 @@ const PageAndChaptersNavigation = memo(({
           <span className="tracking-wider font-medium truncate">Chapter {chapterInfo.chapter}</span>
           <ChevronDownIcon />
         </button>
-        
+
         {chapterDropdownOpen && (
           <div
             style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)' }}
@@ -120,9 +119,7 @@ const PageAndChaptersNavigation = memo(({
                   className="tracking-wider p-1 rounded-md bg-gray-800/50 hover:bg-purple-900/30 text-gray-200"
                   aria-label={`Sort chapters ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
                 >
-                  <SvgIcon className={`w-4 h-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`}>
-                    <polyline points="6 9 12 15 18 9" />
-                  </SvgIcon>
+                  <ChevronDownIcon className={`w-4 h-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
                 </button>
               </div>
               <div className="tracking-wider flex gap-1 mt-1">
@@ -152,8 +149,7 @@ const PageAndChaptersNavigation = memo(({
                 >                {console.log(chapter)}
                   <div className="tracking-wider font-medium">Chapter. {chapter.chapter} ({langFullNames[chapter.translatedLanguage]})</div>
                   <div className="tracking-wider text-xs text-gray-400 flex items-center mt-0.5">
-                    <PageIcon />
-                    <span className="tracking-wider ml-1">{chapter.pageCount} pages</span>
+                    <PageIcon className="w-4 h-4" />                    <span className="tracking-wider ml-1">{chapter.pageCount} pages</span>
                     <span className="tracking-wider mx-1">•</span>
                     <span>{new Date(chapter.publishAt).toLocaleDateString()}</span>
                   </div>
@@ -167,20 +163,20 @@ const PageAndChaptersNavigation = memo(({
         <button
           onClick={goToPrevChapter}
           disabled={!hasPrevChapter}
-          className={`flex tracking-wider items-center justify-center py-2 rounded-lg ${hasPrevChapter ? 'bg-purple-900/30 text-white border border-purple-700/20 hover:bg-purple-800/40' : 'bg-gray-800/30 text-gray-500 border border-gray-700/20 cursor-not-allowed'}`}
+          className={`flex tracking-wider gap-3 items-center justify-center py-2 rounded-lg ${hasPrevChapter ? 'bg-purple-900/30 text-white border border-purple-700/20 hover:bg-purple-800/40' : 'bg-gray-800/30 text-gray-500 border border-gray-700/20 cursor-not-allowed'}`}
           aria-label="Previous chapter"
         >
-          <PrevIcon />
+          <PrevIcon className=" w-5 h-5" />
           <span className="tracking-wider ml-1 text-sm">Previous</span>
         </button>
         <button
           onClick={goToNextChapter}
           disabled={!hasNextChapter}
-          className={`flex items-center justify-center py-2 rounded-lg ${hasNextChapter ? 'bg-purple-900/30 text-white border border-purple-700/20 hover:bg-purple-800/40' : 'bg-gray-800/30 text-gray-500 border border-gray-700/20 cursor-not-allowed'}`}
+          className={`flex items-center gap-3 justify-center py-2 rounded-lg ${hasNextChapter ? 'bg-purple-900/30 text-white border border-purple-700/20 hover:bg-purple-800/40' : 'bg-gray-800/30 text-gray-500 border border-gray-700/20 cursor-not-allowed'}`}
           aria-label="Next chapter"
         >
           <span className="tracking-wider mr-1 text-sm">Next</span>
-          <NextIcon />
+          <NextIcon className=" w-5 h-5" />
         </button>
       </div>
       <div className="tracking-wider mt-3">
@@ -188,7 +184,7 @@ const PageAndChaptersNavigation = memo(({
         <div className="tracking-wider w-full bg-gray-800/50 rounded-full h-1.5">
           <div
             className="tracking-wider bg-purple-600 h-1.5 rounded-full transition-all duration-300"
-            style={{ width: `${((currentIndex+1) / chapterInfo.pageCount) * 100}%` }}
+            style={{ width: `${((currentIndex + 1) / chapterInfo.pageCount) * 100}%` }}
           ></div>
         </div>
       </div>

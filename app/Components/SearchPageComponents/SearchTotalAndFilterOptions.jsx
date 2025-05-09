@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import filterOptions from "../../constants/filterOptions";
-import FilterCustomDropDown from "./SearchTotalAndFilterOptionsModules/FilterCustomDropDown"
-import ThemeGenreTags from "./SearchTotalAndFilterOptionsModules/ThemeGenreTags"
-import Image from 'next/image';
+import FilterCustomDropDown from "./SearchTotalAndFilterOptionsModules/FilterCustomDropDown";
+import ThemeGenreTags from "./SearchTotalAndFilterOptionsModules/ThemeGenreTags";
+import { Search, Sliders, X, Grid, List, Filter, Trash2 } from 'lucide-react';
+
 function SearchTotalAndFilterOptions({
   setActiveFilters,
   activeFilters,
@@ -23,23 +24,35 @@ function SearchTotalAndFilterOptions({
 
   // Check if any filters are active
   const hasActiveFilters = Object.values(activeFilters).some(
-    value => (Array.isArray(value) && value.length > 0) ||
-      (typeof value === 'string' && value !== '')
+    value =>
+      (Array.isArray(value) && value.length > 0) ||
+      (typeof value === "string" && value !== "")
   );
 
   // Toggle filter selection
   const toggleFilter = (filterType, value) => {
-    setActiveFilters(prev => {
+    setActiveFilters((prev) => {
       const newFilters = { ...prev };
 
-      if (filterType === 'tags' || filterType === 'genres' || filterType === 'rating' || filterType === 'status' || filterType === 'publicationType' || filterType === "demographic" || filterType === "year" || filterType === "language") {
+      if (
+        filterType === "tags" ||
+        filterType === "genres" ||
+        filterType === "rating" ||
+        filterType === "status" ||
+        filterType === "publicationType" ||
+        filterType === "demographic" ||
+        filterType === "year" ||
+        filterType === "language"
+      ) {
         if (newFilters[filterType]?.includes(value)) {
-          newFilters[filterType] = newFilters[filterType].filter(item => item !== value);
+          newFilters[filterType] = newFilters[filterType].filter(
+            (item) => item !== value
+          );
         } else {
           newFilters[filterType] = [...newFilters[filterType], value];
         }
       } else {
-        newFilters[filterType] = value === newFilters[filterType] ? '' : value;
+        newFilters[filterType] = value === newFilters[filterType] ? "" : value;
       }
 
       return newFilters;
@@ -61,13 +74,15 @@ function SearchTotalAndFilterOptions({
   };
 
   // Count active filters
-  const activeFilterCount = Object.entries(activeFilters).reduce((count, [key, value]) => {
-    if (Array.isArray(value)) {
-      return count + value.length;
-    }
-    return count + (value ? 1 : 0);
-  }, 0);
-
+  const activeFilterCount = Object.entries(activeFilters).reduce(
+    (count, [key, value]) => {
+      if (Array.isArray(value)) {
+        return count + value.length;
+      }
+      return count + (value ? 1 : 0);
+    },
+    0
+  );
 
   const yearOptions = Array.from(
     { length: 2025 - 1910 + 1 },
@@ -98,7 +113,7 @@ function SearchTotalAndFilterOptions({
               className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-purple-400"
               aria-label="Search"
             >
-             <Image alt='Search' src={"/search.svg"} width={300} height={ 300} className=' h-6 w-6 saturate-0 brightness-150'/>
+              <Search className="h-6 w-6 saturate-0 brightness-150" />
             </div>
             <button
               type="submit"
@@ -117,7 +132,7 @@ function SearchTotalAndFilterOptions({
                 {filteredResults.length}
               </span>
               <span className="text-purple-200/70">
-                {filteredResults.length === 1 ? 'result' : 'results'}
+                {filteredResults.length === 1 ? "result" : "results"}
               </span>
             </div>
           )}
@@ -126,15 +141,15 @@ function SearchTotalAndFilterOptions({
           <button
             onClick={toggleFilterPanel}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-300
-              ${isFilterOpen
-                ? 'bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-xl shadow-purple-700/30'
-                : 'bg-black/60 hover:bg-black/80 text-purple-200 border border-purple-900/50 hover:border-purple-700/70'}`}
+              ${
+                isFilterOpen
+                  ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-xl shadow-purple-700/30"
+                  : "bg-black/60 hover:bg-black/80 text-purple-200 border border-purple-900/50 hover:border-purple-700/70"
+              }`}
             aria-expanded={isFilterOpen}
             aria-controls="filter-panel"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
+            <Filter className="h-5 w-5" />
             <span>Filters</span>
             {activeFilterCount > 0 && (
               <span className="flex items-center justify-center min-w-5 h-5 px-1.5 bg-purple-300 text-purple-900 text-xs font-bold rounded-full">
@@ -146,28 +161,28 @@ function SearchTotalAndFilterOptions({
           {/* View toggle */}
           <div className="flex bg-black/60 border border-purple-900/50 rounded-lg overflow-hidden shadow-lg">
             <button
-              onClick={() => setViewMode('grid')}
-              className={`p-2.5 transition-all duration-300 ${viewMode === 'grid'
-                ? 'bg-gradient-to-r from-purple-700 to-indigo-900 text-white'
-                : 'text-purple-300 hover:text-white hover:bg-purple-900/30'}`}
+              onClick={() => setViewMode("grid")}
+              className={`p-2.5 transition-all duration-300 ${
+                viewMode === "grid"
+                  ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
+                  : "text-purple-300 hover:text-white hover:bg-purple-900/30"
+              }`}
               aria-label="Grid view"
-              aria-pressed={viewMode === 'grid'}
+              aria-pressed={viewMode === "grid"}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
+              <Grid className="h-5 w-5" />
             </button>
             <button
-              onClick={() => setViewMode('list')}
-              className={`p-2.5 transition-all duration-300 ${viewMode === 'list'
-                ? 'bg-gradient-to-r from-purple-700 to-indigo-900 text-white'
-                : 'text-purple-300 hover:text-white hover:bg-purple-900/30'}`}
+              onClick={() => setViewMode("list")}
+              className={`p-2.5 transition-all duration-300 ${
+                viewMode === "list"
+                  ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
+                  : "text-purple-300 hover:text-white hover:bg-purple-900/30"
+              }`}
               aria-label="List view"
-              aria-pressed={viewMode === 'list'}
+              aria-pressed={viewMode === "list"}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <List className="h-5 w-5" />
             </button>
           </div>
         </div>
@@ -183,9 +198,10 @@ function SearchTotalAndFilterOptions({
             <span className="text-white">"</span>
           </h1>
           <p className="text-purple-300/70 lg:hidden">
-            {filteredResults.length > 0 && (
-              `${filteredResults.length} ${filteredResults.length === 1 ? 'result' : 'results'} found`
-            )}
+            {filteredResults.length > 0 &&
+              `${filteredResults.length} ${
+                filteredResults.length === 1 ? "result" : "results"
+              } found`}
           </p>
         </div>
       )}
@@ -199,20 +215,18 @@ function SearchTotalAndFilterOptions({
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
               <div className="bg-gradient-to-r from-purple-600 to-indigo-800 p-2 rounded-lg shadow-lg shadow-purple-700/20">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
+                <Sliders className="h-5 w-5 text-white" />
               </div>
-              <h2 className="text-lg font-semibold text-purple-200">Advanced Search</h2>
+              <h2 className="text-lg font-semibold text-purple-200">
+                Advanced Search
+              </h2>
             </div>
             {hasActiveFilters && (
               <button
                 onClick={clearAllFilters}
                 className="flex items-center gap-1 text-sm text-purple-400 hover:text-purple-300 transition-colors duration-300 group"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 group-hover:text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+                <Trash2 className="h-4 w-4 group-hover:text-purple-300" />
                 Clear All Filters
               </button>
             )}
@@ -224,7 +238,7 @@ function SearchTotalAndFilterOptions({
               multiple={true}
               options={filterOptions.ratings}
               selectedValues={activeFilters.rating}
-              onSelectionChange={(value) => toggleFilter('rating', value)}
+              onSelectionChange={(value) => toggleFilter("rating", value)}
               countLabel={"Any Rating"}
             />
 
@@ -235,7 +249,7 @@ function SearchTotalAndFilterOptions({
               title="Publication Status"
               options={filterOptions.statuses}
               selectedValues={activeFilters.status}
-              onSelectionChange={(value) => toggleFilter('status', value)}
+              onSelectionChange={(value) => toggleFilter("status", value)}
               countLabel={"Any Status"}
             />
 
@@ -245,13 +259,17 @@ function SearchTotalAndFilterOptions({
               multiple={true}
               options={filterOptions.languages}
               selectedValues={activeFilters.language}
-              onSelectionChange={(value) => toggleFilter('language', value)}
+              onSelectionChange={(value) => toggleFilter("language", value)}
               countLabel={"Any Language"}
             />
 
             {/* Tags - Spans 2 columns on larger screens */}
-            <ThemeGenreTags activeFilters={activeFilters} filterOptions={filterOptions} toggleFilter={toggleFilter} key={"ThemeGenreTags"} />
-
+            <ThemeGenreTags
+              activeFilters={activeFilters}
+              filterOptions={filterOptions}
+              toggleFilter={toggleFilter}
+              key={"ThemeGenreTags"}
+            />
 
             {/* Publication Demographic */}
 
@@ -259,7 +277,7 @@ function SearchTotalAndFilterOptions({
               title="Publication Demographic"
               options={filterOptions.demographics}
               selectedValues={activeFilters.demographic}
-              onSelectionChange={(value) => toggleFilter('demographic', value)}
+              onSelectionChange={(value) => toggleFilter("demographic", value)}
               countLabel={"Any Demographic"}
             />
 
@@ -268,7 +286,7 @@ function SearchTotalAndFilterOptions({
               title="Publication Type"
               options={filterOptions.publicationTypes}
               selectedValues={activeFilters.publicationType}
-              onSelectionChange={(value) => toggleFilter('publicationType', value)}
+              onSelectionChange={(value) => toggleFilter("publicationType", value)}
               countLabel={"Any publication Type"}
             />
 
@@ -277,7 +295,7 @@ function SearchTotalAndFilterOptions({
               title="Publication Year"
               options={yearOptions}
               selectedValues={activeFilters.year}
-              onSelectionChange={(value) => toggleFilter('year', value)}
+              onSelectionChange={(value) => toggleFilter("year", value)}
               countLabel={"Any year"}
             />
             {/* <div className="filter-group">
@@ -335,7 +353,7 @@ function SearchTotalAndFilterOptions({
               multiple={false}
               options={filterOptions.sortOptions}
               selectedValues={activeFilters.sortBy}
-              onSelectionChange={(value) => toggleFilter('sortBy', value)}
+              onSelectionChange={(value) => toggleFilter("sortBy", value)}
               countLabel={"Any"}
             />
             {/* Author/Artist */}
@@ -393,8 +411,10 @@ function SearchTotalAndFilterOptions({
             <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
               <span className="text-purple-400">Content Rating:</span>
               <div className="flex gap-1">
-                {activeFilters.rating.map(ratingId => {
-                  const rating = filterOptions.ratings.find(r => r.id === ratingId);
+                {activeFilters.rating.map((ratingId) => {
+                  const rating = filterOptions.ratings.find(
+                    (r) => r.id === ratingId
+                  );
                   return (
                     <span key={ratingId} className="text-purple-300 font-medium">
                       {rating?.label}
@@ -407,9 +427,7 @@ function SearchTotalAndFilterOptions({
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -418,8 +436,10 @@ function SearchTotalAndFilterOptions({
             <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
               <span className="text-purple-400">Status:</span>
               <div className="flex gap-1">
-                {activeFilters.status.map(statusId => {
-                  const status = filterOptions.statuses.find(s => s.id === statusId);
+                {activeFilters.status.map((statusId) => {
+                  const status = filterOptions.statuses.find(
+                    (s) => s.id === statusId
+                  );
                   return (
                     <span key={statusId} className="text-purple-300 font-medium">
                       {status?.label}
@@ -432,9 +452,7 @@ function SearchTotalAndFilterOptions({
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -443,16 +461,16 @@ function SearchTotalAndFilterOptions({
             <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
               <span className="text-purple-400">Language:</span>
               <span className="text-purple-300 font-medium">
-                {filterOptions.languages.find(l => l.code === activeFilters.language)?.label}
+                {filterOptions.languages.find(
+                  (l) => l.code === activeFilters.language
+                )?.label}
               </span>
               <button
-                onClick={() => setActiveFilters({ ...activeFilters, language: '' })}
+                onClick={() => setActiveFilters({ ...activeFilters, language: "" })}
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -461,16 +479,18 @@ function SearchTotalAndFilterOptions({
             <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
               <span className="text-purple-400">Demographic:</span>
               <span className="text-purple-300 font-medium">
-                {filterOptions.demographics.find(d => d.id === activeFilters.demographic)?.label}
+                {filterOptions.demographics.find(
+                  (d) => d.id === activeFilters.demographic
+                )?.label}
               </span>
               <button
-                onClick={() => setActiveFilters({ ...activeFilters, demographic: '' })}
+                onClick={() =>
+                  setActiveFilters({ ...activeFilters, demographic: "" })
+                }
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -479,8 +499,10 @@ function SearchTotalAndFilterOptions({
             <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
               <span className="text-purple-400">Publication Type:</span>
               <div className="flex gap-1">
-                {activeFilters.publicationType.map(typeId => {
-                  const type = filterOptions.publicationTypes.find(t => t.id === typeId);
+                {activeFilters.publicationType.map((typeId) => {
+                  const type = filterOptions.publicationTypes.find(
+                    (t) => t.id === typeId
+                  );
                   return (
                     <span key={typeId} className="text-purple-300 font-medium">
                       {type?.label}
@@ -489,13 +511,13 @@ function SearchTotalAndFilterOptions({
                 })}
               </div>
               <button
-                onClick={() => setActiveFilters({ ...activeFilters, publicationType: [] })}
+                onClick={() =>
+                  setActiveFilters({ ...activeFilters, publicationType: [] })
+                }
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -505,13 +527,11 @@ function SearchTotalAndFilterOptions({
               <span className="text-purple-400">Created At:</span>
               <span className="text-purple-300 font-medium">{activeFilters.year}</span>
               <button
-                onClick={() => setActiveFilters({ ...activeFilters, year: '' })}
+                onClick={() => setActiveFilters({ ...activeFilters, year: "" })}
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -520,16 +540,18 @@ function SearchTotalAndFilterOptions({
             <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
               <span className="text-purple-400">Has Chapters:</span>
               <span className="text-purple-300 font-medium">
-                {filterOptions.hasChaptersOptions.find(o => o.id === activeFilters.hasChapters)?.label}
+                {filterOptions.hasChaptersOptions.find(
+                  (o) => o.id === activeFilters.hasChapters
+                )?.label}
               </span>
               <button
-                onClick={() => setActiveFilters({ ...activeFilters, hasChapters: '' })}
+                onClick={() =>
+                  setActiveFilters({ ...activeFilters, hasChapters: "" })
+                }
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -538,16 +560,16 @@ function SearchTotalAndFilterOptions({
             <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
               <span className="text-purple-400">Sort By:</span>
               <span className="text-purple-300 font-medium">
-                {filterOptions.sortOptions.find(s => s.id === activeFilters.sortBy)?.label}
+                {filterOptions.sortOptions.find(
+                  (s) => s.id === activeFilters.sortBy
+                )?.label}
               </span>
               <button
-                onClick={() => setActiveFilters({ ...activeFilters, sortBy: '' })}
+                onClick={() => setActiveFilters({ ...activeFilters, sortBy: "" })}
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -557,13 +579,11 @@ function SearchTotalAndFilterOptions({
               <span className="text-purple-400">Author/Artist:</span>
               <span className="text-purple-300 font-medium">{activeFilters.author}</span>
               <button
-                onClick={() => setActiveFilters({ ...activeFilters, author: '' })}
+                onClick={() => setActiveFilters({ ...activeFilters, author: "" })}
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -573,13 +593,11 @@ function SearchTotalAndFilterOptions({
               <span className="text-purple-400">Group:</span>
               <span className="text-purple-300 font-medium">{activeFilters.group}</span>
               <button
-                onClick={() => setActiveFilters({ ...activeFilters, group: '' })}
+                onClick={() => setActiveFilters({ ...activeFilters, group: "" })}
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -589,13 +607,11 @@ function SearchTotalAndFilterOptions({
               <span className="text-purple-400">Uploader:</span>
               <span className="text-purple-300 font-medium">{activeFilters.uploader}</span>
               <button
-                onClick={() => setActiveFilters({ ...activeFilters, uploader: '' })}
+                onClick={() => setActiveFilters({ ...activeFilters, uploader: "" })}
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -604,7 +620,7 @@ function SearchTotalAndFilterOptions({
             <div className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm">
               <span className="text-purple-400">Genres:</span>
               <div className="flex gap-1">
-                {activeFilters.genres.slice(0, 3).map(tag => (
+                {activeFilters.genres.slice(0, 3).map((tag) => (
                   <span key={tag} className="text-purple-300 font-medium">
                     {tag}
                   </span>
@@ -620,9 +636,7 @@ function SearchTotalAndFilterOptions({
                 className="ml-1 text-purple-400 hover:text-white transition-colors"
                 aria-label="Remove filter"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -632,9 +646,7 @@ function SearchTotalAndFilterOptions({
             className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm text-purple-400 hover:text-white transition-colors"
           >
             Clear All
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="h-4 w-4" />
           </button>
         </div>
       )}

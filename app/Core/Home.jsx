@@ -6,6 +6,7 @@ import Image from "next/image";
 import React, { useState, useEffect, useCallback, useMemo, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import TopFavouriteMangas from "../constants/TopFavouriteMangas";
+import { MoveRight } from "lucide-react";
 const LandingContent = React.memo(
   lazy(() => import('../Components/HomeComponents/LandingContent'))
 );
@@ -352,28 +353,12 @@ const GOTOHomeButton = React.memo( ()=>( <div className="mt-16 flex justify-cent
       className="absolute bottom-0 left-0 w-full h-1 transition-all duration-150 ease-in-out brightness-150 group-hover:h-full"
     ></span>
     <span className="absolute right-0 pr-4 duration-200 ease-out group-hover:translate-x-12">
-      <svg
-        className="w-5 h-5 font-extrabold text-purple-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-      </svg>
+      <MoveRight className=" w-5 h-5 -mt-0.5"/>
     </span>
     <span className="absolute left-0 pl-2.5 -translate-x-12 group-hover:translate-x-0 ease-out duration-200">
-      <svg
-        className="w-5 h-5 font-extrabold text-purple-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-      </svg>
+    <MoveRight className=" w-5 h-5 -mt-0.5 group-hover:-mt-0"/>
     </span>
-    <span className="relative w-full text-left transition-colors duration-200 ease-in-out group-hover:text-white">
+    <span className="relative w-full transform -translate-y-1 group-hover:-translate-y-0  text-left transition-colors duration-200 ease-in-out group-hover:text-white">
       Go To Homepage
     </span>
   </Link>
