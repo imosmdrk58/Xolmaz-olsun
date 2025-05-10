@@ -1,15 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { Search } from "lucide-react";
 
 const TopNavbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
   return (
     <header className="fixed px-20 top-0  w-full  z-[9999] bg-gradient-to-b from-purple-900/30 to-gray-950/60 bg-opacity-90 backdrop-blur-md flex items-center justify-between h-20">
       {/* Left Section - Logo and Navigation */}

@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
-// import { debounce } from 'lodash';
-import SearchMangaCardWith2ViewMode from "../Components/SearchPageComponents/SearchMangaCardWith2ViewMode"
-import SearchTotalAndFilterOptions from "../Components/SearchPageComponents/SearchAndTotalFilterOptions"
-import BottomPagination from "../Components/SearchPageComponents/BottomPagination"
-import LoadingSpinner from '../Components/LoadingSpinner';
-import { AlertCircleIcon,RouteOff  } from "lucide-react";
+import React, { useEffect, useState, useCallback,memo, lazy } from 'react';
+const SearchMangaCardWith2ViewMode = memo(lazy(() => import('../Components/SearchPageComponents/SearchMangaCardWith2ViewMode')));
+const SearchTotalAndFilterOptions = memo(lazy(() => import('../Components/SearchPageComponents/SearchAndTotalFilterOptions')));
+const BottomPagination = memo(lazy(() => import('../Components/SearchPageComponents/BottomPagination')));
+const LoadingSpinner = memo(lazy(() => import('../Components/LoadingSpinner')));
+import { AlertCircleIcon, RouteOff } from "lucide-react";
 // Main component
 const SearchPage = () => {
   // State management
@@ -323,7 +322,7 @@ const SearchPage = () => {
             // Sort by year
             return (b.year || 0) - (a.year || 0);
           case "minScore":
-           return  b.rating?.rating?.bayesian -a.rating?.rating?.bayesian  
+            return b.rating?.rating?.bayesian - a.rating?.rating?.bayesian
 
           default:
             return 0;
@@ -447,7 +446,7 @@ const SearchPage = () => {
           <div className="flex flex-col items-center justify-center py-16">
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-md w-full text-center">
               <div className="bg-slate-800/50 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-              <AlertCircleIcon className="h-6 w-6" />
+                <AlertCircleIcon className="h-6 w-6" />
               </div>
               <h2 className="text-xl font-semibold text-slate-200 mb-2">{error}</h2>
               <p className="text-slate-400 mb-5">
@@ -470,7 +469,7 @@ const SearchPage = () => {
           <div className="flex flex-col items-center justify-center py-16">
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-md w-full text-center">
               <div className="bg-slate-800/50 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-              <RouteOff className=' w-8 h-8' />
+                <RouteOff className=' w-8 h-8' />
               </div>
               <h2 className="text-xl font-semibold text-slate-200 mb-2">No matches found</h2>
               <p className="text-slate-400 mb-5">

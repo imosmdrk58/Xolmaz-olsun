@@ -38,8 +38,8 @@ const QualitySelector = ({ quality, setQuality }) => {
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         className={`flex items-center justify-between w-36 px-3 py-4 text-xs font-medium text-gray-100 bg-gradient-to-b from-[#1a1a2e] to-[#141426] rounded-lg border border-violet-900/50 shadow-md focus:outline-none transition-all duration-300 hover:shadow-[0_0_12px_rgba(139,92,246,0.4)] ${isOpen
-            ? 'shadow-[0_0_15px_rgba(139,92,246,0.6)] bg-opacity-90'
-            : 'hover:bg-opacity-95'
+          ? 'shadow-[0_0_15px_rgba(139,92,246,0.6)] bg-opacity-90'
+          : 'hover:bg-opacity-95'
           }`}
       >
         <span className="flex items-center gap-2.5">
@@ -53,7 +53,7 @@ const QualitySelector = ({ quality, setQuality }) => {
           <span className="capitalize tracking-wider mb-0.5">{quality} Quality</span>
         </span>
         <ChevronDown className={`w-3 h-3 text-violet-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''
-            }`}/>
+          }`} />
       </button>
 
       {isOpen && (
@@ -88,8 +88,8 @@ const QualityOption = ({ icon, label, value, currentQuality, onSelect }) => {
   return (
     <li
       className={`flex items-center px-3 py-2 text-xs text-gray-100 cursor-pointer transition-all duration-200 ${isSelected
-          ? 'bg-violet-700/30 text-violet-300'
-          : 'hover:bg-violet-800/20 hover:text-violet-200'
+        ? 'bg-violet-700/30 text-violet-300'
+        : 'hover:bg-violet-800/20 hover:text-violet-200'
         }`}
       onClick={() => onSelect(value)}
       role="option"

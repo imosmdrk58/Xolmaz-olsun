@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { langFullNames } from "../../../constants/Flags"
-import {ChevronDown} from "lucide-react"
+import { ChevronDown } from "lucide-react"
 function FilterCustomDropDown({
   title,
   options = [],
@@ -48,9 +48,9 @@ function FilterCustomDropDown({
         >
           <div className="flex items-center justify-between">
 
-            <span className="text-sm line-clamp-1 tracking-widest">{selectedCount == 0 ? countLabel : multiple?selectedValues.map((val, index) => <span key={index} className='mr-2 capitalize '>{countLabel == "Any Language" ? langFullNames[val] : val.charAt(0).toUpperCase() + val.slice(1)}</span>):<span className='mr-2 capitalize '>{selectedValues}</span>}</span>
+            <span className="text-sm line-clamp-1 tracking-widest">{selectedCount == 0 ? countLabel : multiple ? selectedValues.map((val, index) => <span key={index} className='mr-2 capitalize '>{countLabel == "Any Language" ? langFullNames[val] : val.charAt(0).toUpperCase() + val.slice(1)}</span>) : <span className='mr-2 capitalize '>{selectedValues}</span>}</span>
             <div className={`text-purple-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-            <ChevronDown className={`w-5 h-5  `} />
+              <ChevronDown className={`w-5 h-5  `} />
             </div>
           </div>
         </div>

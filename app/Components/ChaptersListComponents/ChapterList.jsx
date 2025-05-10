@@ -1,9 +1,8 @@
 import React, { useState, useMemo, lazy } from 'react';
-import { Clock, Eye, ChevronDown, ChevronRight, List } from 'lucide-react';
-import StableFlag from '../StableFlag';
+import { Eye, ChevronDown, ChevronRight, List } from 'lucide-react';
 import { langFullNames } from '../../constants/Flags';
 
-const MemoStableFlag = React.memo(lazy(() => import('../StableFlag')));
+const StableFlag = React.memo(lazy(() => import('../StableFlag')));
 
 const ChapterList = ({ chapters, handleChapterClick, manga }) => {
   const [activeChapter, setActiveChapter] = useState(null);

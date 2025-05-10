@@ -137,10 +137,9 @@ function SearchTotalAndFilterOptions({
           <button
             onClick={toggleFilterPanel}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-300
-              ${
-                isFilterOpen
-                  ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-xl shadow-purple-700/30"
-                  : "bg-black/60 hover:bg-black/80 text-purple-200 border border-purple-900/50 hover:border-purple-700/70"
+              ${isFilterOpen
+                ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-xl shadow-purple-700/30"
+                : "bg-black/60 hover:bg-black/80 text-purple-200 border border-purple-900/50 hover:border-purple-700/70"
               }`}
             aria-expanded={isFilterOpen}
             aria-controls="filter-panel"
@@ -158,11 +157,10 @@ function SearchTotalAndFilterOptions({
           <div className="flex bg-black/60 border border-purple-900/50 rounded-lg overflow-hidden shadow-lg">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2.5 transition-all duration-300 ${
-                viewMode === "grid"
+              className={`p-2.5 transition-all duration-300 ${viewMode === "grid"
                   ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
                   : "text-purple-300 hover:text-white hover:bg-purple-900/30"
-              }`}
+                }`}
               aria-label="Grid view"
               aria-pressed={viewMode === "grid"}
             >
@@ -170,11 +168,10 @@ function SearchTotalAndFilterOptions({
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2.5 transition-all duration-300 ${
-                viewMode === "list"
+              className={`p-2.5 transition-all duration-300 ${viewMode === "list"
                   ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
                   : "text-purple-300 hover:text-white hover:bg-purple-900/30"
-              }`}
+                }`}
               aria-label="List view"
               aria-pressed={viewMode === "list"}
             >
@@ -195,8 +192,7 @@ function SearchTotalAndFilterOptions({
           </h1>
           <p className="text-purple-300/70 lg:hidden">
             {filteredResults.length > 0 &&
-              `${filteredResults.length} ${
-                filteredResults.length === 1 ? "result" : "results"
+              `${filteredResults.length} ${filteredResults.length === 1 ? "result" : "results"
               } found`}
           </p>
         </div>
@@ -294,7 +290,7 @@ function SearchTotalAndFilterOptions({
               onSelectionChange={(value) => toggleFilter("year", value)}
               countLabel={"Any year"}
             />
- 
+
             {/* Sort By */}
             <FilterCustomDropDown
               title="Sort By"

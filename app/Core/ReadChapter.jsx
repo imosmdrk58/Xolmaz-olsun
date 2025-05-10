@@ -1,24 +1,19 @@
 "use client";
 
 import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect, memo, useCallback } from 'react';
-import InfoSidebar from "../Components/ReadChapterComponents/InfoSideBarModules/InfoSidebar";
+import { useState, useEffect, memo, useCallback,lazy } from 'react';
 import Image from 'next/image';
-import BottomSettings from "../Components/ReadChapterComponents/BottomSettingsModules/BottomSettings";
-import TextToSpeech from "../Components/ReadChapterComponents/TextToSpeech";
-import OCROverlay from "../Components/ReadChapterComponents/OCROverlay";
-import LoadingSpinner from "../Components/LoadingSpinner";
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import Placeholder from "../Components/ReadChapterComponents/Placeholder";
-import sortAndJoinOCR from "../util/ReadChapterUtils/sortAndjoinOCR";
-import handleTranslate from "../util/ReadChapterUtils/handleTranslate";
-import { ArrowUp, Languages } from 'lucide-react'; // Add this import at the top with other imports
-// Memoized components
-const MemoizedInfoSidebar = memo(InfoSidebar);
-const MemoizedBottomSettings = memo(BottomSettings);
-const MemoizedTextToSpeech = memo(TextToSpeech);
-const MemoizedOCROverlay = memo(OCROverlay);
-const MemoizedLoadingSpinner = memo(LoadingSpinner);
+import sortAndJoinOCR from '../util/ReadChapterUtils/sortAndjoinOCR';
+import handleTranslate from '../util/ReadChapterUtils/handleTranslate';
+import { ArrowUp, Languages } from 'lucide-react';
+
+const InfoSidebar = memo(lazy(() => import('../Components/ReadChapterComponents/InfoSideBarModules/InfoSidebar')));
+const BottomSettings = memo(lazy(() => import('../Components/ReadChapterComponents/BottomSettingsModules/BottomSettings')));
+const TextToSpeech = memo(lazy(() => import('../Components/ReadChapterComponents/TextToSpeech')));
+const OCROverlay = memo(lazy(() => import('../Components/ReadChapterComponents/OCROverlay')));
+const LoadingSpinner = memo(lazy(() => import('../Components/LoadingSpinner')));
+const Placeholder = memo(lazy(() => import('../Components/ReadChapterComponents/Placeholder')));
 
 export default function ReadChapter() {
   const { mangaId, chapterId } = useParams();
@@ -47,11 +42,7 @@ export default function ReadChapter() {
     (text) => handleTranslate(text),
     []
   );
-
-  // // Memoize sortAndJoinOCR result to avoid recomputation
-  // const memoizedSortAndJoinOCR = useMemo(() => {
-  //   return sortAndJoinOCR(isItTextToSpeech ? fullOCRResult : fullOCRResult);
-  // }, [fullOCRResult, isItTextToSpeech]);
+  const momoizedSortAndJoinOCR = useCallback((fullOCRResult)=> sortAndJoinOCR(fullOCRResult))
 
   const { data: pages, isLoading, isError } = useQuery({
     queryKey: ['chapterPages', chapterId],
@@ -81,10 +72,10 @@ export default function ReadChapter() {
   );
   useEffect(() => {
     async function doFullTextOCR() {
-      setFinalResult(isItTextToSpeech ? sortAndJoinOCR(fullOCRResult) : await memoizedHandleTranslate(sortAndJoinOCR(fullOCRResult)));
+      setFinalResult(isItTextToSpeech ? momoizedSortAndJoinOCR(fullOCRResult) : await memoizedHandleTranslate(momoizedSortAndJoinOCR(fullOCRResult)));
     }
     doFullTextOCR()
-  }, [sortAndJoinOCR, isItTextToSpeech, memoizedHandleTranslate, fullOCRResult])
+  }, [momoizedSortAndJoinOCR, isItTextToSpeech, memoizedHandleTranslate, fullOCRResult])
 
   console.log(finalResult)
   useEffect(() => {
@@ -207,7 +198,7 @@ export default function ReadChapter() {
   return (
     pages && !isError ? (
       <div className="tracking-wider flex flex-row w-full justify-between items-start h-full -mt-5 bg-[#070920] backdrop-blur-md text-white">
-        <MemoizedInfoSidebar
+        <InfoSidebar
           panels={panels}
           pages={pages && (quality === "low" ? pages?.chapter?.dataSaver : pages?.chapter?.data)}
           setCurrentIndex={setCurrentIndex}
@@ -233,7 +224,7 @@ export default function ReadChapter() {
               } my-1`}
           >
             {isLoading ? (
-              <MemoizedLoadingSpinner />
+              <LoadingSpinner />
             ) : (
               layout === "horizontal"
                 ? pages != undefined &&
@@ -258,7 +249,7 @@ export default function ReadChapter() {
                           blurDataURL="/placeholder.jpg"
                         />
                         {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim() !== "en" ? (
-                          <MemoizedOCROverlay
+                          <OCROverlay
                             loading={overlayLoading}
                             handleTranslate={memoizedHandleTranslate} // Use memoized version
                             translatedTexts={translatedTexts}
@@ -297,7 +288,7 @@ export default function ReadChapter() {
                                 </span>
                               </button>
                             )}
-                            <MemoizedTextToSpeech
+                            <TextToSpeech
                               page={page}
                               handleUpload={handleUpload}
                               ready={Boolean(pageTTS[page] ? isItTextToSpeech : pageTranslations[page])}
@@ -343,7 +334,7 @@ export default function ReadChapter() {
                           blurDataURL="/placeholder.jpg"
                         />
                         {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim() !== "en" ? (
-                          <MemoizedOCROverlay
+                          <OCROverlay
                             loading={overlayLoading}
                             handleTranslate={memoizedHandleTranslate} // Use memoized version
                             ready={Boolean(pageTranslations[page]?.translatedocrResult)}
@@ -373,7 +364,7 @@ export default function ReadChapter() {
                                 {pageTranslations[page] ? "Translated" : "Translate"}
                               </button>
                             )}
-                            <MemoizedTextToSpeech
+                            <TextToSpeech
                               page={page}
                               handleUpload={handleUpload}
                               ready={Boolean(pageTTS[page] ? isItTextToSpeech : pageTranslations[page])}
@@ -400,7 +391,7 @@ export default function ReadChapter() {
             )}
           </div>
           <div>
-            <MemoizedBottomSettings
+            <BottomSettings
               allAtOnce={allAtOnce}
               quality={quality}
               setQuality={setQuality}
@@ -440,7 +431,7 @@ export default function ReadChapter() {
         )}
       </div>
     ) : (
-      <MemoizedLoadingSpinner text="Loading Chapter..." />
+      <LoadingSpinner text="Loading Chapter..." />
     )
   );
 }

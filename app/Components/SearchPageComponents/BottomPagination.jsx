@@ -39,11 +39,10 @@ const BottomPagination = ({ currentPage, totalPages, onPageChange }) => {
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`p-2 rounded-lg ${
-          currentPage === 1
+        className={`p-2 rounded-lg ${currentPage === 1
             ? 'text-slate-600 cursor-not-allowed'
             : 'text-slate-400 hover:text-white hover:bg-slate-800'
-        }`}
+          }`}
         aria-label="Previous page"
       >
         <ChevronLeft size={20} />
@@ -54,13 +53,12 @@ const BottomPagination = ({ currentPage, totalPages, onPageChange }) => {
           <button
             key={index}
             onClick={() => (typeof page === 'number' ? onPageChange(page) : null)}
-            className={`min-w-8 h-8 flex items-center justify-center rounded-md text-sm ${
-              page === currentPage
+            className={`min-w-8 h-8 flex items-center justify-center rounded-md text-sm ${page === currentPage
                 ? 'bg-purple-600 text-white font-medium'
                 : page === '...'
-                ? 'text-slate-500 cursor-default'
-                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-            }`}
+                  ? 'text-slate-500 cursor-default'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+              }`}
             disabled={page === '...'}
           >
             {page}
@@ -71,11 +69,10 @@ const BottomPagination = ({ currentPage, totalPages, onPageChange }) => {
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`p-2 rounded-lg ${
-          currentPage === totalPages
+        className={`p-2 rounded-lg ${currentPage === totalPages
             ? 'text-slate-600 cursor-not-allowed'
             : 'text-slate-400 hover:text-white hover:bg-slate-800'
-        }`}
+          }`}
         aria-label="Next page"
       >
         <ChevronRight size={20} />

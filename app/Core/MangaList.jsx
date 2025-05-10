@@ -11,13 +11,11 @@ import React, {
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LoadingSpinner from '../Components/LoadingSpinner';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import MangaCardPagination from "../Components/MangaListComponents/MangaCardPagination";
 // Lazy load components with React.lazy
-import MangaCard from '../Components/MangaListComponents/MangaCard';
-// const MangaCard = React.memo(
-//   lazy(() => import('../Components/MangaListComponents/MangaCard'))
-// );
+const MangaCard = React.memo(
+  lazy(() => import('../Components/MangaListComponents/MangaCard'))
+);
 const AsideComponent = React.memo(
   lazy(() => import('../Components/MangaListComponents/AsideComponent'))
 );

@@ -8,8 +8,6 @@ import {
   MessageSquareText,
   Heart,
   List,
-  ExternalLink,
-  Calendar,
   CheckCircle,
 } from "lucide-react";
 

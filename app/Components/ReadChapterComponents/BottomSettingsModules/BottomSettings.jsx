@@ -92,7 +92,7 @@ const BottomSettings = ({
             <QualitySelector quality={quality} setQuality={setQuality} />
           </div>
           <div className="flex items-center space-x-6">
-          <button
+            <button
               onClick={handlePrev}
               className={`flex items-center tracking-wider justify-center w-fit gap-4 px-6 py-3  text-xs font-medium text-gray-100 bg-gradient-to-b from-[#1a1a2e] to-[#141426] rounded-lg border border-violet-900/50 hover:shadow-purple-400 shadow-purple-400 focus:outline-none transition-all duration-300 shadow-[0_0_5px_rgba(139,92,246,0.9)] hover:shadow-[0_0_10px_rgba(139,92,246,0.4)]`}
             >
