@@ -363,7 +363,7 @@ export default function ReadChapter() {
                                 disabled={panels === 2 || pageTranslations[page]}
                                 onClick={() => handleUpload(page, "translate")}
                                 className={`font-sans ${panels === 2 || pageTranslations[page] ? "hidden" : ""
-                                  } disabled:cursor-not-allowed mt-3 before:bg-opacity-60 min-w-[189px] transition-colors flex gap-4 justify-start items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page]
+                                  } disabled:cursor-not-allowed mt-3 before:bg-opacity-60 min-w-[189px] transition-colors min-h-16 flex gap-4 justify-start items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page]
                                     ? "shadow-[0px_0px_6px_rgba(0,0,0,1)] shadow-yellow-500 bg-yellow-400 bg-opacity-60 "
                                     : "bg-[#1a063e]"
                                   } backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-3 py-2 ease-in-out overflow-hidden border-2 rounded-full group`}

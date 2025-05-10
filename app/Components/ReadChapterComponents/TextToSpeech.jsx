@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { AudioLines, Settings, Square } from "lucide-react";
 import { useCallback, useState, useEffect, memo } from "react";
 
 const TextToSpeech = memo(({ text, handleUpload, page, ready, layout = "horizontal" }) => {
@@ -67,7 +67,6 @@ const TextToSpeech = memo(({ text, handleUpload, page, ready, layout = "horizont
     setShowControls(prev => !prev);
   }, []);
 
-
   // Render the appropriate button based on ready state and speaking state
   const renderButton = () => {
     if (!ready) {
@@ -76,22 +75,17 @@ const TextToSpeech = memo(({ text, handleUpload, page, ready, layout = "horizont
           (<button
             onClick={() => handleUpload(page, "speak")}
             disabled={isSpeaking}
-            className={`group py-4  px-2 before:bg-opacity-60 flex items-center justify-start min-w-[48px] h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
-        shadow-[0px_0px_10px_rgba(0,0,0,1)]  shadow-violet-500 bg-[#2f0a6e] border-2 border-violet-800   hover:min-w-[182px] hover:shadow-lg disabled:cursor-not-allowed 
-         
+            className={`group py-4 px-2 before:bg-opacity-60 flex items-center justify-start min-w-[48px] h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
+        shadow-[0px_0px_10px_rgba(0,0,0,1)] shadow-violet-500 bg-[#2f0a6e] border-2 border-violet-800 hover:min-w-[189px] hover:shadow-lg disabled:cursor-not-allowed 
         backdrop-blur-md lg:font-semibold before:absolute before:w-full before:transition-all before:duration-700 
         before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] 
-        hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300  z-10 ease-in-out`}
+        hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 z-10 ease-in-out`}
           >
-            <Image
-              height={300}
-              width={300}
-              src="/microphone.svg"
-              alt="translate"
-              className="tracking-wider w-16 h-16  group-hover:border-2 group-hover:border-violet-500 transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-3 transform group-hover:rotate-[360deg]"
+            <AudioLines
+              className="tracking-wider w-16 h-16 group-hover:border-2 group-hover:border-violet-500 transition-all bg-gray-50 text-purple-800 ease-in-out duration-300 rounded-full border border-gray-700 p-3 transform group-hover:rotate-[360deg]"
             />
             <span
-              className={`absolute font-sans font-bold left-20 text-lg tracking-tight text-gray-100 opacity-0 transform translate-x-4 transition-all duration-300 
+              className={`absolute  font-sans font-bold left-20 text-lg tracking-tight text-gray-100 opacity-0 transform translate-x-4 transition-all duration-300 
           group-hover:opacity-100 group-hover:text-black group-hover:translate-x-0`}
             >
               Read&nbsp;Aloud
@@ -100,16 +94,12 @@ const TextToSpeech = memo(({ text, handleUpload, page, ready, layout = "horizont
             <button
               onClick={() => handleUpload(page, "speak")}
               disabled={isSpeaking}
-              className="tracking-wider font-sans before:bg-opacity-60  min-w-[182px] transition-colors flex gap-2 justify-start  items-center mx-auto shadow-xl text-lg text-white bg-[#1a063e] backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-4 py-2 ease-in-out overflow-hidden border-2 rounded-full group"
+              className="tracking-wider font-sans before:bg-opacity-60 min-w-[189px] transition-colors flex gap-2 justify-start items-center mx-auto shadow-xl text-lg text-white bg-[#1a063e] backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-3 py-2 ease-in-out overflow-hidden border-2 rounded-full group"
               type="submit"
             >
-              <Image
-                height={300}
-                width={300}
-                src="/microphone.svg"
-                alt="microphone"
-                className="tracking-wider w-12 h-12 group-hover:border-2 group-hover:border-violet-500 bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2 transition-transform transform group-hover:rotate-[360deg]"
-              />
+              <AudioLines
+              className="tracking-wider  w-12 h-12 group-hover:border-2 group-hover:border-violet-500 transition-all bg-gray-50 text-purple-800 ease-in-out duration-300 rounded-full border border-gray-700 p-3 transform group-hover:rotate-[360deg]"
+            />
               Read&nbsp;Aloud
             </button>)
       );
@@ -119,16 +109,12 @@ const TextToSpeech = memo(({ text, handleUpload, page, ready, layout = "horizont
       return (
         <button
           onClick={handleStop}
-          className={`group py-4 px-2 flex items-center justify-start min-w-[48px] h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
-  shadow-[0px_0px_6px_rgba(0,0,0,1)] shadow-red-500 bg-red-700 hover:shadow-lg disabled:cursor-not-allowed 
-  backdrop-blur-md lg:font-semibold border-gray-50  `}
+          className={`group  flex items-center justify-start min-w-[48px] h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
+  shadow-[0px_0px_6px_rgba(0,0,0,1)] shadow-red-500 ${layout=="vertical"?" h-auto p-2":" h-20 py-2 px-2"} bg-red-700 hover:shadow-lg disabled:cursor-not-allowed 
+  backdrop-blur-md lg:font-semibold border-gray-50`}
         >
-          <Image
-            height={300}
-            width={300}
-            src="/stop.svg"
-            alt="translate"
-            className="tracking-wider w-16  h-16 group-hover:border-4 border-red-500 group-hover:border-red-700 transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border  p-3 transform group-hover:rotate-[360deg]"
+          <Square
+            className={`tracking-wider fill-red-500 ${layout=="vertical"?" w-12 h-12":" w-16 h-16"} group-hover:border-4 border-red-500 group-hover:border-red-700 transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border p-3 transform group-hover:rotate-[360deg]`}
           />
         </button>
       );
@@ -139,51 +125,41 @@ const TextToSpeech = memo(({ text, handleUpload, page, ready, layout = "horizont
         {/* Settings button */}
         <button
           onClick={toggleControls}
-          className="tracking-wider bg-[#1a063e] my-auto p-2 rounded-full shadow-md hover:shadow-violet-500 transition-all duration-300 self-end mr-2"
+          className={`tracking-wider ${layout=="vertical"?"-ml-12":""} bg-[#1a063e] my-auto p-2 rounded-full shadow-md hover:shadow-violet-500 transition-all duration-300 self-end mr-2`}
           aria-label="Speech settings"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="tracking-wider h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+          <Settings className="tracking-wider h-6 w-6" />
         </button>
-        {layout !== "vertical" ? (<button
-          onClick={handleSpeak}
-          disabled={isSpeaking}
-          className={`group  py-4 px-2  before:bg-opacity-60 flex items-center justify-start min-w-[48px] h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
-                    hover:brightness-100 bg-purple-900 bg-opacity-50 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500  hover:min-w-[182px] hover:shadow-lg disabled:cursor-not-allowed 
+        {layout !== "vertical" ? (
+          <button
+            onClick={handleSpeak}
+            disabled={isSpeaking}
+            className={`group py-4 px-2 before:bg-opacity-60 flex items-center justify-start min-w-[48px] h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
+                    hover:brightness-100 bg-purple-900 bg-opacity-50 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 hover:min-w-[189px] hover:shadow-lg disabled:cursor-not-allowed 
                     brightness-150
                    backdrop-blur-md lg:font-semibold border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 
                    before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] 
-                   hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300  z-10 ease-in-out`}
-        >
-          <Image
-            height={300}
-            width={300}
-            src="/microphone.svg"
-            alt="translate"
-            className="tracking-wider w-16 h-16 group-hover:border-2 group-hover:border-violet-500 transition-all bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-3 transform group-hover:rotate-[360deg]"
-          />
-          <span
-            className={`absolute font-sans ml-3 font-bold left-20 text-lg tracking-tight text-gray-100 opacity-0 transform translate-x-4 transition-all duration-300 
-                     group-hover:opacity-100 group-hover:text-black group-hover:translate-x-0`}
+                   hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 z-10 ease-in-out`}
           >
-            Speak
-          </span>
-        </button>
+            <AudioLines
+              className="tracking-wider w-16 h-16 group-hover:border-2 group-hover:border-violet-500 transition-all bg-gray-50 text-purple-800 ease-in-out duration-300 rounded-full border border-gray-700 p-3 transform group-hover:rotate-[360deg]"
+            />
+            <span
+              className={`absolute font-sans ml-3 font-bold left-20 text-lg tracking-tight text-gray-100 opacity-0 transform translate-x-4 transition-all duration-300 
+                     group-hover:opacity-100 group-hover:text-black group-hover:translate-x-0`}
+            >
+              Speak
+            </span>
+          </button>
         ) : (
           <button
             onClick={handleSpeak}
             disabled={isSpeaking}
-            className="tracking-wider font-sans before:bg-opacity-60  min-w-[182px] transition-colors flex gap-4 justify-start  items-center mx-auto text-lg text-white  bg-[#1a063e] shadow-[0px_0px_16px_rgba(0,0,0,1)] shadow-violet-500 bg-opacity-60 backdrop-blur-md lg:font-semibold isolation-auto border-violet-300 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-4 py-2 ease-in-out overflow-hidden border-2 rounded-full group"
+            className="tracking-wider font-sans before:bg-opacity-60 min-w-[189px]  flex gap-4 justify-start items-center mx-auto text-lg text-white bg-[#1a063e] shadow-[0px_0px_16px_rgba(0,0,0,1)] shadow-violet-500 bg-opacity-60 backdrop-blur-md lg:font-semibold isolation-auto border-violet-300 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-3 py-2 ease-in-out overflow-hidden border-2 rounded-full group  group-hover:border-2 group-hover:border-violet-300  duration-300 transition-transform transform group-hover:rotate-[360deg]"
             type="submit"
           >
-            <Image
-              height={300}
-              width={300}
-              src="/microphone.svg"
-              alt="microphone"
-              className="tracking-wider w-12 h-12 bg-opacity-70 group-hover:border-2 group-hover:border-violet-300 bg-gray-50 text-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 p-2 transition-transform transform group-hover:rotate-[360deg]"
+            <AudioLines
+              className="tracking-wider  w-12 h-12 group-hover:border-2 group-hover:border-violet-500 transition-all bg-gray-50 text-purple-800 ease-in-out duration-300 rounded-full border border-gray-700 p-3 transform group-hover:rotate-[360deg]"
             />
             Speak
           </button>
@@ -233,7 +209,6 @@ const TextToSpeech = memo(({ text, handleUpload, page, ready, layout = "horizont
       </div>
     );
   };
-
   return (
     <div className="tracking-wider flex items-center gap-2">
       {renderButton()}

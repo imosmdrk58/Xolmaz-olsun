@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect, useRef, useMemo, useCallback,lazy } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback, lazy } from "react";
+import { ChevronLeft, ChevronRight } from 'lucide-react'; // Import lucide icons
 const StableFlag = React.memo(lazy(() => import('../StableFlag')));
 import Image from "next/image";
 // Memoized thumbnail component to reduce unnecessary renders
@@ -272,9 +273,7 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
               className="flex items-center gap-2 text-white/70 hover:text-purple-600 transition-colors group"
             >
               <span className="w-8 h-8 flex items-center justify-center border border-white/30 rounded-full group-hover:border-purple-600 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M15 18l-6-6 6-6" />
-                </svg>
+                <ChevronLeft size={18} />
               </span>
               <span className="hidden sm:block uppercase text-xs tracking-widest">Previous</span>
             </button>
@@ -290,9 +289,7 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
             >
               <span className="hidden sm:block uppercase text-xs tracking-widest">Next</span>
               <span className="w-8 h-8 flex items-center justify-center border border-white/30 rounded-full group-hover:border-purple-600 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 18l6-6-6-6" />
-                </svg>
+                <ChevronRight size={18} />
               </span>
             </button>
           </div>
@@ -318,31 +315,6 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
               ))}
             </div>
           </div>
-
-          {/* Footer Info */}
-          {/* <div className="h-5 flex items-center justify-between px-8">
-</div> */}
-          {/* <div className="h-16 border-t border-white/10 flex items-center justify-between px-8">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center text-black font-bold">
-                <Image width={300} height={300} src="/logo.svg" />
-              </div>
-              <span className="text-white/70 text-sm">AI Manga Reader</span>
-            </div>
-            
-            <div className="flex gap-3">
-              <button className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-purple-600 hover:text-black transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                </svg>
-              </button>
-              <button className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-purple-600 hover:text-black transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
-                </svg>
-              </button>
-            </div>
-          </div> */}
         </div>
       </div>
 
@@ -352,9 +324,7 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
           onClick={handlePrev}
           className="w-12 h-12 mb-3 bg-black/50 backdrop-blur-sm border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-purple-600 hover:text-black hover:border-purple-600 transition-colors"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
+          <ChevronLeft size={20} />
         </button>
 
         <div className="relative w-1 h-40 bg-white/20 rounded-full overflow-hidden">

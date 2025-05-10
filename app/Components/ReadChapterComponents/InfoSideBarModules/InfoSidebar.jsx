@@ -3,20 +3,7 @@ import PageAndChapterNavigation from './PageAndChaptersNavigation';
 import CollapsedSideBarStrip from './CollapsedSideBarStrip';
 import {
   Heart,
-  Menu,
-  ArrowLeft,
-  BookOpen,
-  ChevronDown,
-  User,
-  FileText,
-  Info,
-  Globe,
-  Link,
-  ArrowRight,
-  File,
-  ArrowLeft as ArrowLeftIcon, // To avoid naming conflict if needed
-  Tag,
-  ChevronUpIcon,
+  ArrowLeft as ArrowLeftIcon
 } from 'lucide-react';
 import DifferentMetaDataChapter from './DifferentMetaDataChapter';
 import Image from 'next/image';
@@ -49,7 +36,6 @@ const InfoSidebar = memo(({
   const [chapterDropdownOpen, setChapterDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('desc');
-  const [activeSection, setActiveSection] = useState('info');
 
   const dropdownRef = useRef(null);
   // console.log(allChapters)
@@ -78,16 +64,9 @@ const InfoSidebar = memo(({
   );
   const hasPrevChapter = useMemo(() => currentChapterIndex > 0);
   const hasNextChapter = useMemo(() => currentChapterIndex < allChapters.length - 1);
-console.log(hasNextChapter)
-console.log(hasPrevChapter)
-console.log(currentChapterIndex);
-console.log(allChapters.length - 1);
-
 
   // Memoized event handlers
   const toggleFavorite = useCallback(() => setIsFavorite(prev => !prev), []);
-
-  const setActiveSectionMemo = useCallback((section) => setActiveSection(section), []);
 
   // Memoized sorted chapters
   const sortedChapters = useMemo(() => 
@@ -134,25 +113,6 @@ console.log(allChapters.length - 1);
     [allChapters, goToChapter]
   );
 
-  // Memoized icon props to prevent re-renders
-  const iconProps = useMemo(() => ({
-    ReadingIcon: File, // Assuming ReadingIcon corresponds to File icon
-    ChevronDownIcon: ChevronDown,
-    ChevronUpIcon:ChevronUpIcon,
-    NextIcon: ArrowRight,
-    PageIcon: File,
-    PrevIcon: ArrowLeft,
-    HeartIcon: Heart,
-    MenuIcon: Menu,
-    BookIcon: BookOpen,
-    InfoIcon: Info,
-    TagIcon: Tag,
-    LinkIcon: Link,
-    DescriptionIcon: FileText,
-    CreatorsIcon: User,
-    LanguageIcon: Globe,
-    ArrowLeftIcon: ArrowLeft,
-  }), []);
 
   // Memoized cover image props
   const coverImageProps = useMemo(() => ({
@@ -189,7 +149,6 @@ console.log(allChapters.length - 1);
         setSearchQuery={setSearchQuery}
         setSortOrder={setSortOrder}
         sortOrder={sortOrder}
-        {...iconProps}
       />
     );
   }
@@ -261,16 +220,12 @@ console.log(allChapters.length - 1);
             setSearchQuery={setSearchQuery}
             setSortOrder={setSortOrder}
             sortOrder={sortOrder}
-            {...iconProps}
           />
         </div>
 
         <MemoDifferentMetaDataChapter
-          activeSection={activeSection}
-          setActiveSection={setActiveSectionMemo}
           mangaInfo={mangaInfo}
           allChapters={allChapters}
-          {...iconProps}
         />
       </div>
     </div>

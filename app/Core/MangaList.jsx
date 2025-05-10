@@ -11,11 +11,13 @@ import React, {
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LoadingSpinner from '../Components/LoadingSpinner';
-
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import MangaCardPagination from "../Components/MangaListComponents/MangaCardPagination";
 // Lazy load components with React.lazy
-const MangaCard = React.memo(
-  lazy(() => import('../Components/MangaListComponents/MangaCard'))
-);
+import MangaCard from '../Components/MangaListComponents/MangaCard';
+// const MangaCard = React.memo(
+//   lazy(() => import('../Components/MangaListComponents/MangaCard'))
+// );
 const AsideComponent = React.memo(
   lazy(() => import('../Components/MangaListComponents/AsideComponent'))
 );
@@ -196,7 +198,7 @@ export default function MangaList() {
           rating,
           links,
           creatorName,
-          MangaStoryType:publicationDemographic,
+          MangaStoryType: publicationDemographic,
           availableTranslatedLanguages: availableTranslatedLanguages || [],
           latestUploadedChapter,
           originalLanguage,
@@ -279,7 +281,7 @@ export default function MangaList() {
 
   const handleMangaClicked = useCallback((manga) => {
     navigate(`/manga/${manga.id}/chapters`, { state: { manga } });
-  },[]);
+  }, []);
 
   const loadMoreMangas = useCallback(() => {
     setPage((prevPage) => {
@@ -287,7 +289,7 @@ export default function MangaList() {
       setIsDataProcessed(false); // Reset processing state for new fetch
       return newPage;
     });
-  },[page]);
+  }, [page]);
 
   const processedMangas = useMemo(() => queryClient.getQueryData(['processedMangas']) || []);
   const processedFavouriteMangas = useMemo(
@@ -309,7 +311,24 @@ export default function MangaList() {
       </div>
     );
   }
-console.log(processedFavouriteMangas)
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
+
+  const totalPages = Math.ceil(processedLatestMangas.length / ITEMS_PER_PAGE);
+
+  const currentMangas = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return processedLatestMangas.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [processedLatestMangas, currentPage]);
+
+  const goToPage = useCallback((page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+    }, [totalPages]);
+
+  console.log(processedFavouriteMangas)
   return (
     <div ref={showcaseRef} className="min-h-screen w-full text-white">
       {isLoadingState ? (
@@ -324,8 +343,10 @@ console.log(processedFavouriteMangas)
             <div className="flex mt-10 bg-gradient-to-t from-transparent via-black/30 to-black/10 flex-row justify-between items-start">
               <MangaCard
                 handleMangaClicked={handleMangaClicked}
-                processedLatestMangas={processedLatestMangas}
+                processedLatestMangas={currentMangas}
                 loadMoreMangas={loadMoreMangas}
+                totalPages={totalPages}
+                currentPage={currentPage}
               />
 
               <AsideComponent
@@ -334,8 +355,15 @@ console.log(processedFavouriteMangas)
                 processedLatestMangas={processedLatestMangas}
                 processedFavouriteMangas={processedFavouriteMangas}
               />
-
             </div>
+            {/* Pagination Controls */}
+            <MangaCardPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={goToPage}
+              loadMoreMangas={loadMoreMangas}
+              onLoadMore={loadMoreMangas}
+            />
           </Suspense>
         </>
       )}

@@ -1,7 +1,7 @@
-import Image from 'next/image';
 import React, { useCallback, useState, useEffect, useRef } from 'react';
+import { LayoutPanelTop, LayoutPanelLeft, Check, ChevronDown } from 'lucide-react';
 
-const layoutSelector = ({ layout, setLayout }) => {
+const LayoutSelector = ({ layout, setLayout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -29,6 +29,9 @@ const layoutSelector = ({ layout, setLayout }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Icon component based on layout
+  const LayoutIcon = layout === 'horizontal' ? LayoutPanelTop : LayoutPanelLeft;
+
   return (
     <div className="relative font-sans" ref={dropdownRef}>
       <button
@@ -36,33 +39,25 @@ const layoutSelector = ({ layout, setLayout }) => {
         onClick={toggleDropdown}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        className={`flex items-center justify-between w-36 px-3 py-4 text-xs font-medium text-gray-100 bg-gradient-to-b from-[#1a1a2e] to-[#141426] rounded-lg border border-violet-900/50 shadow-md focus:outline-none transition-all duration-300 hover:shadow-[0_0_12px_rgba(139,92,246,0.4)] ${isOpen
-          ? 'shadow-[0_0_15px_rgba(139,92,246,0.6)] bg-opacity-90'
-          : 'hover:bg-opacity-95'
-          }`}
+        className={`flex items-center justify-between w-36 px-3 py-4 text-xs font-medium text-gray-100 bg-gradient-to-b from-[#1a1a2e] to-[#141426] rounded-lg border border-violet-900/50 shadow-md focus:outline-none transition-all duration-300 hover:shadow-[0_0_12px_rgba(139,92,246,0.4)] ${
+          isOpen
+            ? 'shadow-[0_0_15px_rgba(139,92,246,0.6)] bg-opacity-90'
+            : 'hover:bg-opacity-95'
+        }`}
       >
         <span className="flex items-center gap-2.5">
-          <Image
-            height={300}
-            width={300}
-            src={layout === 'horizontal' ? '/horizontal.svg' : '/vertical.svg'}
-            alt={layout}
-            className="w-5 h-5 tracking-wide text-white flex justify-center items-center rounded-md bg-violet-500/20"
+          <LayoutIcon
+            className="w-5 h-5 border border-white text-white rounded-md bg-violet-500/20 p-1"
+            aria-hidden="true"
           />
           <span className="capitalize tracking-wider mb-0.5">{layout}</span>
         </span>
-        <svg
-          className={`w-3 h-3 text-violet-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''
-            }`}
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-            clipRule="evenodd"
-          />
-        </svg>
+        <ChevronDown
+          className={`w-3 h-3 text-violet-400 transition-transform duration-300 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+          aria-hidden="true"
+        />
       </button>
 
       {isOpen && (
@@ -72,17 +67,17 @@ const layoutSelector = ({ layout, setLayout }) => {
           tabIndex={-1}
         >
           <LayoutOption
-            icon="/horizontal.svg"
+            Icon={LayoutPanelTop}
             label="horizontal"
             value="horizontal"
-            currentlayout={layout}
+            currentLayout={layout}
             onSelect={handleSelect}
           />
           <LayoutOption
-            icon="/vertical.svg"
+            Icon={LayoutPanelLeft}
             label="vertical"
             value="vertical"
-            currentlayout={layout}
+            currentLayout={layout}
             onSelect={handleSelect}
           />
         </ul>
@@ -91,42 +86,28 @@ const layoutSelector = ({ layout, setLayout }) => {
   );
 };
 
-const LayoutOption = ({ icon, label, value, currentlayout, onSelect }) => {
-  const isSelected = currentlayout === value;
+const LayoutOption = ({ Icon, label, value, currentLayout, onSelect }) => {
+  const isSelected = currentLayout === value;
 
   return (
     <li
-      className={`flex items-center px-3 py-2 text-xs text-gray-100 cursor-pointer transition-all duration-200 ${isSelected
-        ? 'bg-violet-700/30 text-violet-300'
-        : 'hover:bg-violet-800/20 hover:text-violet-200'
-        }`}
+      className={`flex items-center px-3 py-2 text-xs text-gray-100 cursor-pointer transition-all duration-200 ${
+        isSelected
+          ? 'bg-violet-700/30 text-violet-300'
+          : 'hover:bg-violet-800/20 hover:text-violet-200'
+      }`}
       onClick={() => onSelect(value)}
       role="option"
       aria-selected={isSelected}
     >
-      <Image
-        height={300}
-        width={300}
-        src={icon}
-        alt={label.toLowerCase()}
-        className="w-5 h-5 tracking-wide mr-2.5 text-white flex justify-center items-center rounded-md bg-violet-500/20"
+      <Icon
+        className="w-5 h-5 mr-2.5 border border-white text-white rounded-md bg-violet-500/20 p-1"
+        aria-hidden="true"
       />
       <span className="flex-1 capitalize tracking-wider">{label}</span>
-      {isSelected && (
-        <svg
-          className="w-3 h-3 text-violet-400"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-            clipRule="evenodd"
-          />
-        </svg>
-      )}
+      {isSelected && <Check className="w-3 h-3 text-violet-400" aria-hidden="true" />}
     </li>
   );
 };
 
-export default layoutSelector;
+export default LayoutSelector;

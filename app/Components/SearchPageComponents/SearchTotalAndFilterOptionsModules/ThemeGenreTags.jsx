@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import Image from 'next/image';
 import { Search } from 'lucide-react';
-
+import { ChevronDown} from "lucide-react"
 const FilterSection = ({ title, items, activeFilters, toggleFilter, searchTerm }) => {
     // Filter items based on search term
     const filteredItems = useMemo(() => {
@@ -79,9 +78,7 @@ function ThemeGenreTags({ filterOptions, toggleFilter, activeFilters }) {
 
                         <span className="text-sm  line-clamp-1 tracking-widest ">{activeFilters.genres.length > 0 ? activeFilters.genres.map((val, index) => <span key={index} className='mr-2 capitalize'>{val.charAt(0).toUpperCase() + val.slice(1)}</span>) : "Any Tag"}</span>
                         <div className={`text-purple-400 transition-transform duration-300 ${showTags ? 'rotate-180' : ''}`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
+                            <ChevronDown className="h-5 w-5"/>
                         </div>
                     </div>
                 </div>

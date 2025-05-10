@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 // import { debounce } from 'lodash';
 import SearchMangaCardWith2ViewMode from "../Components/SearchPageComponents/SearchMangaCardWith2ViewMode"
-import SearchTotalAndFilterOptions from "../Components/SearchPageComponents/SearchTotalAndFilterOptions"
+import SearchTotalAndFilterOptions from "../Components/SearchPageComponents/SearchAndTotalFilterOptions"
 import BottomPagination from "../Components/SearchPageComponents/BottomPagination"
 import LoadingSpinner from '../Components/LoadingSpinner';
 import { AlertCircleIcon,RouteOff  } from "lucide-react";
