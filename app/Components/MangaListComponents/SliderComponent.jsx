@@ -41,7 +41,7 @@ const MangaThumbnail = React.memo(({
 
       {index === activeIndex && (
         <div className="absolute top-2 right-2 w-4 h-4 bg-purple-600 rounded-full flex items-center justify-center">
-          <div className="w-2 h-2 bg-black rounded-full"></div>
+          <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
         </div>
       )}
     </div>

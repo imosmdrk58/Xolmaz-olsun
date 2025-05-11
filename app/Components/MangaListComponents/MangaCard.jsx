@@ -13,7 +13,7 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadM
 
     return (
         MemoMangas && (
-            <div className="w-full flex justify-center items-center flex-col">
+            <div className="w-full flex flex-col">
                 <div className="mx-20 pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase">
                     <h1 className="border-b-4 border-purple-900 w-fit pb-2">Latest Releases</h1>
                 </div>
@@ -24,13 +24,13 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadM
                             onClick={() => stableHandleMangaClicked(manga)}
                             className="manga-card cursor-pointer w-full min-h-[400px] flex justify-center items-start"
                         >
-                            <div className="w-[250px] overflow-hidden rounded-[10px] bg-[#0c0221] p-[5px] shadow-slate-600 shadow-[0_0_4px_rgba(0,0,0,1)] transition-transform duration-300 ease-out hover:scale-[102%] will-change-transform">
+                            <div className="w-[250px] overflow-hidden rounded-2xl bg-[#0c0221] p-[5px] shadow-slate-600 shadow-[0_0_4px_rgba(0,0,0,1)] transition-transform duration-300 ease-out hover:scale-[102%] will-change-transform">
                                 <div className="relative flex h-[250px] flex-col rounded-[15px] bg-gradient-to-tr from-[#049fbb] to-[#50f6ff]">
                                     <Image
                                         src={manga.coverImageUrl || '/placeholder.jpg'}
                                         alt={manga.title}
                                         fill
-                                        className="object-cover relative -mt-[1px] flex h-[250px] flex-col rounded-[7px] rounded-tl-[20px] bg-gradient-to-tr from-[#1f2020] to-[#000d0e]"
+                                        className="object-cover relative -mt-[1px] flex h-[250px] flex-col rounded-[11px] rounded-tl-[20px] bg-gradient-to-tr from-[#1f2020] to-[#000d0e]"
                                         placeholder="blur"
                                         blurDataURL="/placeholder.jpg"
                                     />
@@ -107,7 +107,7 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadM
                                                 </span>
                                             ))}
                                         </div>
-                                        <p className="text-xs w-full pr-6 relative z-30 flex justify-center items-center text-center bottom-1 text-gray-400 mt-4">
+                                        <p className="text-xs tracking-widest w-full pr-6 relative z-30 flex justify-center items-center text-center bottom-1 text-gray-400 mt-4">
                                             Last updated:{' '}
                                             {(() => {
                                                 const minutes = Math.floor((new Date() - new Date(manga.updatedAt)) / 60000);

@@ -1,11 +1,23 @@
 "use client";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import { Search } from "lucide-react";
 
 const TopNavbar = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = useCallback(
+    (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        window.location.href = `/search?query=${encodeURIComponent(searchQuery)}`;
+      }
+    },
+    [searchQuery]
+  );
+
   return (
-    <header className="fixed px-20 top-0  w-full  z-[9999] bg-gradient-to-b from-purple-900/30 to-gray-950/60 bg-opacity-90 backdrop-blur-md flex items-center justify-between h-20">
+    <header className="fixed px-20 top-0 w-full z-[9999] bg-gradient-to-b from-purple-900/30 to-gray-950/60 bg-opacity-90 backdrop-blur-md flex items-center justify-between h-20">
       {/* Left Section - Logo and Navigation */}
       <div className="flex items-center">
         <a href="/" className="flex items-center mr-6">
@@ -16,8 +28,8 @@ const TopNavbar = () => {
 
         {/* Navigation Links - Spotify style */}
         <div className="hidden md:flex space-x-7 text-gray-400">
-          <a href="#" className="font-bold text-white hover:text-white">Home</a>
-          <a href="#" className="font-medium hover:text-white">Search</a>
+          <a href="/manga-list" className="font-bold text-white hover:text-white">Home</a>
+          <a href="/search" className="font-medium hover:text-white">Search</a>
           <a href="#" className="font-medium hover:text-white">Library</a>
         </div>
       </div>
@@ -26,12 +38,15 @@ const TopNavbar = () => {
       <div className="hidden lg:block flex-grow max-w-2xl mx-4">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className=' w-4 h-4 brightness-200 opacity-60' />
+            <Search className='w-4 h-4 brightness-200 opacity-60' />
           </div>
           <input
             type="text"
             className="bg-gray-800 block w-full pl-10 pr-3 py-2 rounded-full text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
             placeholder="Search Manga"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearch}
           />
         </div>
       </div>
