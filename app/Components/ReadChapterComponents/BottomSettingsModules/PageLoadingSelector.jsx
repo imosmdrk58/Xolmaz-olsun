@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
-import { LayoutPanelTop, LayoutPanelLeft, Check, ChevronDown } from 'lucide-react';
+import { BookCopy, Book, Check, ChevronDown } from 'lucide-react';
 
-const LayoutSelector = ({ layout, setLayout }) => {
+const PageLoadingSelector = ({ allAtOnce, setAllAtOnce }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -11,10 +11,10 @@ const LayoutSelector = ({ layout, setLayout }) => {
 
   const handleSelect = useCallback(
     (value) => {
-      setLayout(value);
+      setAllAtOnce(value);
       setIsOpen(false);
     },
-    [setLayout]
+    [setAllAtOnce]
   );
 
   // Close dropdown when clicking outside
@@ -29,8 +29,8 @@ const LayoutSelector = ({ layout, setLayout }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Icon component based on layout
-  const LayoutIcon = layout === 'horizontal' ? LayoutPanelTop : LayoutPanelLeft;
+  // Icon component based on allAtOnce
+  const LayoutIcon = allAtOnce ? BookCopy : Book;
 
   return (
     <div className="relative font-sans" ref={dropdownRef}>
@@ -46,10 +46,10 @@ const LayoutSelector = ({ layout, setLayout }) => {
       >
         <span className="flex items-center gap-2.5">
           <LayoutIcon
-            className="w-5 h-5 font-extrabold border border-white text-white rounded-md bg-violet-500/20 p-0.5"
+            className="w-5 h-5 border border-white text-white rounded-md bg-violet-500/20 p-0.5"
             aria-hidden="true"
           />
-          <span className="capitalize tracking-wider mb-0.5">{layout}</span>
+          <span className="capitalize tracking-wider mb-0.5">{allAtOnce?"All At Once":"One By One"}</span>
         </span>
         <ChevronDown
           className={`w-3 h-3 text-violet-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''
@@ -64,18 +64,18 @@ const LayoutSelector = ({ layout, setLayout }) => {
           role="listbox"
           tabIndex={-1}
         >
-          <LayoutOption
-            Icon={LayoutPanelTop}
-            label="horizontal"
-            value="horizontal"
-            currentLayout={layout}
+          <PageLoadingOption
+            Icon={BookCopy}
+            label="All At Once"
+            value={true}
+            currentLayout={allAtOnce}
             onSelect={handleSelect}
           />
-          <LayoutOption
-            Icon={LayoutPanelLeft}
-            label="vertical"
-            value="vertical"
-            currentLayout={layout}
+          <PageLoadingOption
+            Icon={Book}
+            label="One By One"
+            value={false}
+            currentLayout={allAtOnce}
             onSelect={handleSelect}
           />
         </ul>
@@ -84,9 +84,8 @@ const LayoutSelector = ({ layout, setLayout }) => {
   );
 };
 
-const LayoutOption = ({ Icon, label, value, currentLayout, onSelect }) => {
+const PageLoadingOption = React.memo(({ Icon, label, value, currentLayout, onSelect }) => {
   const isSelected = currentLayout === value;
-
   return (
     <li
       className={`flex items-center px-3 py-2 text-xs text-gray-100 cursor-pointer transition-all duration-200 ${isSelected
@@ -98,13 +97,13 @@ const LayoutOption = ({ Icon, label, value, currentLayout, onSelect }) => {
       aria-selected={isSelected}
     >
       <Icon
-        className="w-5 h-5 font-extrabold mr-2.5 border border-white text-white rounded-md bg-violet-500/20 p-1"
+        className="w-5 h-5 mr-2.5 border border-white text-white rounded-md bg-violet-500/20 p-0.5"
         aria-hidden="true"
       />
       <span className="flex-1 capitalize tracking-wider">{label}</span>
       {isSelected && <Check className="w-3 h-3 text-violet-400" aria-hidden="true" />}
     </li>
   );
-};
+});
 
-export default LayoutSelector;
+export default PageLoadingSelector;

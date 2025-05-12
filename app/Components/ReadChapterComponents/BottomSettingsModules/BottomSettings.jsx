@@ -1,12 +1,19 @@
 import React, { useCallback } from 'react';
 import { ArrowBigLeftDash, ArrowBigRightDash, RectangleHorizontal, Columns } from 'lucide-react';
-import LayoutSelector from "./LayoutSelector";
-import QualitySelector from "./QualitySelector";
+import _LayoutSelector from "./LayoutSelector";
+import _QualitySelector from "./QualitySelector";
+import _PageLoadingSelector from "./PageLoadingSelector";
+
+// Memoized components
+const LayoutSelector = React.memo(_LayoutSelector);
+const QualitySelector = React.memo(_QualitySelector);
+const PageLoadingSelector = React.memo(_PageLoadingSelector);
 
 const BottomSettings = ({
   setLayout,
   setCurrentIndex,
   layout,
+  isCollapsed,
   currentIndex,
   panels,
   pages,
@@ -85,79 +92,12 @@ const BottomSettings = ({
         </div>
       </div>
     ) : (
-      <div className="w-[77.5%] h-24 fixed bottom-0 bg-[#070920] flex items-center justify-between px-6 py-4 backdrop-blur-md shadow-xl border-t border-blue-950">
+      <div className={` ${isCollapsed ? "w-[95.2%]" : "w-[77.7%]"} h-24 fixed bottom-0 bg-[#070920] flex items-center justify-between px-6 py-4 backdrop-blur-md shadow-xl border-t border-blue-950`}>
         <div className="flex w-full items-center justify-between space-x-4">
-          <div className="flex items-center space-x-2">
+          <div className="flex w-full justify-around items-center space-x-2">
             <LayoutSelector layout={layout} setLayout={setLayout} />
             <QualitySelector quality={quality} setQuality={setQuality} />
-          </div>
-          <div className="flex items-center space-x-6">
-            <button
-              onClick={handlePrev}
-              className={`flex items-center tracking-wider justify-center w-fit gap-4 px-6 py-3  text-xs font-medium text-gray-100 bg-gradient-to-b from-[#1a1a2e] to-[#141426] rounded-lg border border-violet-900/50 hover:shadow-purple-400 shadow-purple-400 focus:outline-none transition-all duration-300 shadow-[0_0_5px_rgba(139,92,246,0.9)] hover:shadow-[0_0_10px_rgba(139,92,246,0.4)]`}
-            >
-              <ArrowBigLeftDash className="w-7 h-7 text-white font-extrabold fill-white" />Prev
-            </button>
-
-            <span className="text-sm text-gray-300">
-              {currentIndex + 1}
-              {panels === 2 && "-" + Math.min(currentIndex + panels, pages.length)} / {pages.length}
-            </span>
-
-            <button
-              onClick={handleNext}
-              className={`flex items-center tracking-wider justify-center w-fit gap-4 px-6 py-3 text-xs font-medium text-gray-100 bg-gradient-to-b from-[#1a1a2e] to-[#141426] rounded-lg border border-violet-900/50 hover:shadow-purple-400 shadow-purple-400 focus:outline-none transition-all duration-300 shadow-[0_0_5px_rgba(139,92,246,0.9)] hover:shadow-[0_0_10px_rgba(139,92,246,0.4)]`}
-            >
-              Next
-              <ArrowBigRightDash className="w-7 h-7 text-white font-extrabold fill-white" />
-            </button>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setAllAtOnce(true)}
-              className={`relative min-w-36 p-4 text-white rounded-md bg-gradient-to-b from-gray-700 to-gray-800 shadow-lg hover:shadow-xl focus:outline-none transition-all duration-300
-              ${allAtOnce
-                  ? 'border-b-2 border-violet-500 before:absolute before:inset-0 before:bg-violet-600/30 before:rounded-md before:scale-100'
-                  : 'hover:border-b-2 hover:border-violet-400 before:absolute before:inset-0 before:bg-violet-400/20 before:rounded-md before:scale-0 hover:before:scale-100'
-                } before:transition-transform before:duration-300`}
-            >
-              All
-            </button>
-
-            <button
-              onClick={() => setAllAtOnce(false)}
-              className={`relative p-4 min-w-36 text-white rounded-md bg-gradient-to-b from-gray-700 to-gray-800 shadow-lg hover:shadow-xl focus:outline-none transition-all duration-300
-              ${!allAtOnce
-                  ? 'border-b-2 border-violet-500 before:absolute before:inset-0 before:bg-violet-600/30 before:rounded-md before:scale-100'
-                  : 'hover:border-b-2 hover:border-violet-400 before:absolute before:inset-0 before:bg-violet-400/20 before:rounded-md before:scale-0 hover:before:scale-100'
-                } before:transition-transform before:duration-300`}
-            >
-              By One
-            </button>
-          </div>
-          <div className="relative grid grid-cols-2 bg-[#1a1a2e] rounded-full py-2.5 px-2 shadow-lg shadow-black/50 select-none">
-            {/* Sliding indicator */}
-            <div
-              className={`absolute top-1 bottom-1 w-14 rounded-full bg-purple-400/30 border-2 border-purple-400 shadow-purple-500 transition-transform duration-300 ease-in-out ${panels === 1 ? "translate-x-2" : "translate-x-16"}`}
-            />
-            {/* Buttons */}
-            <button
-              onClick={() => setPanels(1)}
-              className={`relative col-span-1 z-10 flex items-center justify-center w-14 h-10 rounded-full text-sm font-semibold cursor-pointer transition-colors duration-300 ${panels === 1 ? "text-black" : "text-white hover:text-orange-400"}`}
-              aria-pressed={panels === 1}
-              aria-label="Single Panel"
-            >
-              <RectangleHorizontal className="w-5 h-5 text-white rotate-90" />
-            </button>
-            <button
-              onClick={() => setPanels(2)}
-              className={`relative z-10 col-span-1 flex items-center justify-center w-14 h-10 rounded-full text-sm font-semibold cursor-pointer transition-colors duration-300 ${panels === 2 ? "text-black" : "text-white hover:text-orange-400"}`}
-              aria-pressed={panels === 2}
-              aria-label="Double Panel"
-            >
-              <Columns className="w-5 h-5 text-white" />
-            </button>
+            <PageLoadingSelector allAtOnce={allAtOnce} setAllAtOnce={setAllAtOnce} />
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect, memo, useCallback,lazy } from 'react';
+import { useState, useEffect, memo, useCallback, lazy, useRef } from 'react';
 import Image from 'next/image';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import sortAndJoinOCR from '../util/ReadChapterUtils/sortAndjoinOCR';
@@ -37,12 +37,13 @@ export default function ReadChapter() {
   const [overlayLoading, setOverlayLoading] = useState(false);
   const [quality, setQuality] = useState("low");
   const [finalResult, setFinalResult] = useState();
+  const scrollContainerRef = useRef(null);
   // Memoize handleTranslate to ensure stable reference for props and callbacks
   const memoizedHandleTranslate = useCallback(
     (text) => handleTranslate(text),
     []
   );
-  const momoizedSortAndJoinOCR = useCallback((fullOCRResult)=> sortAndJoinOCR(fullOCRResult))
+  const momoizedSortAndJoinOCR = useCallback((fullOCRResult) => sortAndJoinOCR(fullOCRResult))
 
   const { data: pages, isLoading, isError } = useQuery({
     queryKey: ['chapterPages', chapterId],
@@ -101,6 +102,14 @@ export default function ReadChapter() {
   const handleImageError = useCallback(() => {
     setImageKey((prevKey) => prevKey + 1);
   }, []);
+
+  useEffect(() => {
+    if (mangaInfo.originalLanguage == "ko" || mangaInfo.originalLanguage == "zh" || mangaInfo.originalLanguage == "zh-hk" || mangaInfo.flatTags.includes("Long Strip") || mangaInfo.flatTags.includes("Web Comic")) {
+      setLayout("vertical")
+    }
+  }, [mangaId, chapters, mangaInfo, pages, chapterId])
+
+  console.log(mangaInfo);
 
   const translateAll = useCallback(async (fullOCRResult) => {
     if (!fullOCRResult || fullOCRResult.length === 0) return;
@@ -211,6 +220,7 @@ export default function ReadChapter() {
           setIsCollapsed={setIsCollapsed}
         />
         <div
+          ref={scrollContainerRef}
           style={{
             scrollbarWidth: "thin",
             scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)",
@@ -394,6 +404,7 @@ export default function ReadChapter() {
             <BottomSettings
               allAtOnce={allAtOnce}
               quality={quality}
+              isCollapsed={isCollapsed}
               setQuality={setQuality}
               setAllAtOnce={setAllAtOnce}
               currentIndex={currentIndex}
@@ -407,7 +418,11 @@ export default function ReadChapter() {
             {layout === "vertical" && (
               <button
                 className="tracking-wider cursor-pointer fixed bottom-32 right-8 w-16 h-16 rounded-full border-4 border-violet-200 bg-black flex items-center justify-center duration-300 hover:rounded-[50px] hover:w-24 group/button overflow-hidden active:scale-90"
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                onClick={() => {
+                  if (scrollContainerRef.current) {
+                    scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
               >
                 <ArrowUp className="tracking-wider w-3 fill-white delay-50 duration-200 group-hover/button:-translate-y-12" />
                 <span className="tracking-wider absolute text-white text-xs opacity-0 group-hover/button:opacity-100 transition-opacity duration-200">
