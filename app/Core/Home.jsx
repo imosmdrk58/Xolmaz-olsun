@@ -292,9 +292,9 @@ const processMangaData = useCallback(async (mangaList, type) => {
       className="bg-gray-900 text-gray-100 min-h-screen"
     >
       <div
-        className={`w-full ${isVisible ? "opacity-100" : "opacity-0"} transition-opacity flex justify-center items-center h-screen duration-300 bg-gradient-to-b from-purple-900/30 to-gray-900 pt-8 pb-12`}
+        className={`w-full  ${isVisible ? "opacity-100" : "opacity-0"} transition-opacity flex justify-center items-center h-screen duration-300 bg-gradient-to-b from-purple-900/30 to-gray-900 pt-8 pb-12`}
       >
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mt-52 md:mt-0 mx-auto px-4 py-6">
           {/* Logo */}
          <LOGO/>
 

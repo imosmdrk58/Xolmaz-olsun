@@ -60,13 +60,13 @@ export default function RootLayout() {
       <ClientOnlyRouter>
         <Router>
           <NavbarWrapper />
-          <div className='mt-20'>
+          <div className='mt-0 md:mt-20'>
             <Routes>
-              <Route path="/" element={<div className='-mt-20'><Home/></div>} />
-              <Route path="/manga-list" element={<MangaList />} />
-              <Route path="/manga/:mangaId/chapters" element={<MangaChapters />} />
-              <Route path="/manga/:mangaId/chapter/:chapterId/read" element={<ReadChapter />} />
-              <Route path="/search" element={<SearchPage />} />
+              <Route path="/" element={<div className=' md:-mt-20'><Home/></div>} />
+              <Route path="/manga-list" element={<div className='mt-20'><MangaList /></div>} />
+              <Route path="/manga/:mangaId/chapters" element={<div className='mt-20'><MangaChapters /></div>} />
+              <Route path="/manga/:mangaId/chapter/:chapterId/read" element={<div className='mt-20'><ReadChapter /></div>} />
+              <Route path="/search" element={<div className='mt-20'><SearchPage /></div>} />
               <Route path="*" element={<NotFound />} /> {/* Handle 404 */}
             </Routes>
           </div>

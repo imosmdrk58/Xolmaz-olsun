@@ -16,7 +16,7 @@ const LandingContent= () => {
     ];
   
     return (
-      <div className="bg-gray-900 min-h-screen text-gray-100">
+      <div className="bg-gray-900 mt-44 md:mt-0 min-h-screen text-gray-100">
         <main className="max-w-4xl mx-auto px-6 py-16 -mt-10">
           {/* Introduction */}
           <div className="bg-gray-800 rounded-xl p-8 mb-12 shadow-xl">
@@ -51,7 +51,7 @@ const LandingContent= () => {
               {`We're an ad-free platform offering thousands of manga titles across all genres. Our database is constantly growing, and we provide premium features at no cost `}
             </p>
             <h3 className="text-xl font-semibold mb-4 text-violet-400">Our Features</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
               {features.map((feature, index) => (
                 <div key={index} className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition duration-300">
                   <h4 className="font-medium text-violet-400 mb-1">{feature.title}</h4>

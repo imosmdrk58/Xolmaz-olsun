@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import filterOptions from "../../constants/filterOptions";
 import FilterCustomDropDown from "./SearchTotalAndFilterOptionsModules/FilterCustomDropDown";
 import ThemeGenreTags from "./SearchTotalAndFilterOptionsModules/ThemeGenreTags";
-import { Search, Sliders, X, Grid, List, Filter, Trash2 } from 'lucide-react';
+import { Search, Sliders, X, Grid, List, Filter, Trash2 } from "lucide-react";
 
 function SearchTotalAndFilterOptions({
   setActiveFilters,
@@ -17,32 +17,31 @@ function SearchTotalAndFilterOptions({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchText, setSearchText] = useState(searchQuery);
 
-  // Sync searchText with searchQuery
   useEffect(() => {
     setSearchText(searchQuery);
   }, [searchQuery]);
 
-  // Check if any filters are active
   const hasActiveFilters = Object.values(activeFilters).some(
-    value =>
+    (value) =>
       (Array.isArray(value) && value.length > 0) ||
       (typeof value === "string" && value !== "")
   );
 
-  // Toggle filter selection
   const toggleFilter = (filterType, value) => {
     setActiveFilters((prev) => {
       const newFilters = { ...prev };
 
       if (
-        filterType === "tags" ||
-        filterType === "genres" ||
-        filterType === "rating" ||
-        filterType === "status" ||
-        filterType === "publicationType" ||
-        filterType === "demographic" ||
-        filterType === "year" ||
-        filterType === "language"
+        [
+          "tags",
+          "genres",
+          "rating",
+          "status",
+          "publicationType",
+          "demographic",
+          "year",
+          "language",
+        ].includes(filterType)
       ) {
         if (newFilters[filterType]?.includes(value)) {
           newFilters[filterType] = newFilters[filterType].filter(
@@ -59,23 +58,16 @@ function SearchTotalAndFilterOptions({
     });
   };
 
-  // Handle opening/closing filter panel with animation
   const toggleFilterPanel = () => {
-    if (isFilterOpen) {
-      setIsFilterOpen(false);
-    } else {
-      setIsFilterOpen(true);
-    }
+    setIsFilterOpen((prev) => !prev);
   };
 
-  // Handle search input change
   const handleSearchChange = (e) => {
     setSearchText(e.target.value);
   };
 
-  // Count active filters
   const activeFilterCount = Object.entries(activeFilters).reduce(
-    (count, [key, value]) => {
+    (count, [, value]) => {
       if (Array.isArray(value)) {
         return count + value.length;
       }
@@ -93,7 +85,7 @@ function SearchTotalAndFilterOptions({
   );
 
   return (
-    <div className="bg-black relative z-50 bg-opacity-90 backdrop-blur-md rounded-2xl p-6 shadow-2xl border border-purple-900/30">
+    <div className=" w-full bg-black/10 relative z-50 bg-opacity-90 backdrop-blur-md rounded-2xl p-2 justify-center flex flex-col items-center md:block  md:p-8 shadow-2xl border border-purple-900/30">
       {/* Search Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
         <div className="flex-1 w-full">
@@ -120,7 +112,7 @@ function SearchTotalAndFilterOptions({
           </form>
         </div>
 
-        <div className="flex items-center gap-4 self-end lg:self-auto">
+        <div className="flex items-center gap-4 self-end lg:self-auto flex-wrap">
           {/* Results count */}
           {searchQuery && (
             <div className="hidden lg:flex items-center gap-2 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-purple-900/30">
@@ -136,10 +128,9 @@ function SearchTotalAndFilterOptions({
           {/* Filter button */}
           <button
             onClick={toggleFilterPanel}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-300
-              ${isFilterOpen
-                ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-xl shadow-purple-700/30"
-                : "bg-black/60 hover:bg-black/80 text-purple-200 border border-purple-900/50 hover:border-purple-700/70"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-300 ${isFilterOpen
+              ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-xl shadow-purple-700/30"
+              : "bg-black/60 hover:bg-black/80 text-purple-200 border border-purple-900/50 hover:border-purple-700/70"
               }`}
             aria-expanded={isFilterOpen}
             aria-controls="filter-panel"
@@ -158,8 +149,8 @@ function SearchTotalAndFilterOptions({
             <button
               onClick={() => setViewMode("grid")}
               className={`p-2.5 transition-all duration-300 ${viewMode === "grid"
-                  ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
-                  : "text-purple-300 hover:text-white hover:bg-purple-900/30"
+                ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
+                : "text-purple-300 hover:text-white hover:bg-purple-900/30"
                 }`}
               aria-label="Grid view"
               aria-pressed={viewMode === "grid"}
@@ -169,8 +160,8 @@ function SearchTotalAndFilterOptions({
             <button
               onClick={() => setViewMode("list")}
               className={`p-2.5 transition-all duration-300 ${viewMode === "list"
-                  ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
-                  : "text-purple-300 hover:text-white hover:bg-purple-900/30"
+                ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
+                : "text-purple-300 hover:text-white hover:bg-purple-900/30"
                 }`}
               aria-label="List view"
               aria-pressed={viewMode === "list"}
@@ -183,7 +174,7 @@ function SearchTotalAndFilterOptions({
 
       {/* Search query display and results count (mobile) */}
       {searchQuery && (
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 ">
+        <div className={`flex flex-col  ${isFilterOpen?"mb-4":"mb-0"}  md:flex-row justify-between items-start md:items-center gap-2 `}>
           <h1 className="text-xl sm:text-2xl font-bold">
             <span className="text-purple-500">Results for </span>
             <span className="text-white">"</span>
@@ -202,9 +193,9 @@ function SearchTotalAndFilterOptions({
       {isFilterOpen && (
         <div
           id="filter-panel"
-          className={`bg-black/80 backdrop-blur-md border border-purple-900/50 rounded-xl p-6 mb-8 shadow-2xl`}
+          className="bg-black/80 backdrop-blur-md border border-purple-900/50 rounded-xl p-6 shadow-2xl"
         >
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <div className="bg-gradient-to-r from-purple-600 to-indigo-800 p-2 rounded-lg shadow-lg shadow-purple-700/20">
                 <Sliders className="h-5 w-5 text-white" />
@@ -223,7 +214,7 @@ function SearchTotalAndFilterOptions({
               </button>
             )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-6">
             {/* Content Rating */}
             <FilterCustomDropDown
               title="Content Rating"
@@ -235,7 +226,6 @@ function SearchTotalAndFilterOptions({
             />
 
             {/* Publication Status */}
-
             <FilterCustomDropDown
               multiple={true}
               title="Publication Status"
@@ -255,18 +245,19 @@ function SearchTotalAndFilterOptions({
               countLabel={"Any Language"}
             />
 
-            {/* Tags - Spans 2 columns on larger screens */}
-            <ThemeGenreTags
-              activeFilters={activeFilters}
-              filterOptions={filterOptions}
-              toggleFilter={toggleFilter}
-              key={"ThemeGenreTags"}
+            {/* Publication Year */}
+            <FilterCustomDropDown
+              title="Original Publication Year"
+              options={yearOptions}
+              selectedValues={activeFilters.year}
+              onSelectionChange={(value) => toggleFilter("year", value)}
+              countLabel={"Any year"}
             />
 
-            {/* Publication Demographic */}
 
+            {/* Publication Demographic */}
             <FilterCustomDropDown
-              title="Publication Demographic"
+              title="Demographic"
               options={filterOptions.demographics}
               selectedValues={activeFilters.demographic}
               onSelectionChange={(value) => toggleFilter("demographic", value)}
@@ -279,16 +270,15 @@ function SearchTotalAndFilterOptions({
               options={filterOptions.publicationTypes}
               selectedValues={activeFilters.publicationType}
               onSelectionChange={(value) => toggleFilter("publicationType", value)}
-              countLabel={"Any publication Type"}
+              countLabel={"Any Publication Type"}
             />
 
-            {/* Created At */}
-            <FilterCustomDropDown
-              title="Publication Year"
-              options={yearOptions}
-              selectedValues={activeFilters.year}
-              onSelectionChange={(value) => toggleFilter("year", value)}
-              countLabel={"Any year"}
+            {/* Tags - Spans 2 columns on larger screens */}
+            <ThemeGenreTags
+              activeFilters={activeFilters}
+              filterOptions={filterOptions}
+              toggleFilter={toggleFilter}
+              key={"ThemeGenreTags"}
             />
 
             {/* Sort By */}

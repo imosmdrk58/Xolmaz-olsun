@@ -64,8 +64,8 @@ function ThemeGenreTags({ filterOptions, toggleFilter, activeFilters }) {
 
     return (
         <div className="filter-group">
-            <h3 className="font-medium text-purple-100 mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+            <h3 className="font-medium text-[14px] text-purple-100 mb-3 flex items-center gap-2 md:tracking-widest">
+                <span className="w-1.5 h-1.5  rounded-full bg-purple-500 animate-pulse"></span>
                 Tags Filter
             </h3>
 
@@ -76,7 +76,7 @@ function ThemeGenreTags({ filterOptions, toggleFilter, activeFilters }) {
                 >
                     <div className="flex items-center justify-between">
 
-                        <span className="text-sm  line-clamp-1 tracking-widest ">{activeFilters.genres.length > 0 ? activeFilters.genres.map((val, index) => <span key={index} className='mr-2 capitalize'>{val.charAt(0).toUpperCase() + val.slice(1)}</span>) : "Any Tag"}</span>
+                        <span className=" text-[12px] md:text-sm  line-clamp-1 md:tracking-widest ">{activeFilters.genres.length > 0 ? activeFilters.genres.map((val, index) => <span key={index} className='mr-2 capitalize'>{val.charAt(0).toUpperCase() + val.slice(1)}</span>) : "Any Tag"}</span>
                         <div className={`text-purple-400 transition-transform duration-300 ${showTags ? 'rotate-180' : ''}`}>
                             <ChevronDown className="h-5 w-5" />
                         </div>
