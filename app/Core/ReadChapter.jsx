@@ -1,48 +1,40 @@
 "use client";
 
 import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect, memo, useCallback, lazy, useRef } from 'react';
-import Image from 'next/image';
+import { useState, useEffect, memo, useCallback, lazy, useRef, useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import sortAndJoinOCR from '../util/ReadChapterUtils/sortAndjoinOCR';
 import handleTranslate from '../util/ReadChapterUtils/handleTranslate';
-import { ArrowUp, Languages } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 
 const InfoSidebar = memo(lazy(() => import('../Components/ReadChapterComponents/InfoSideBarModules/InfoSidebar')));
 const BottomSettings = memo(lazy(() => import('../Components/ReadChapterComponents/BottomSettingsModules/BottomSettings')));
-const TextToSpeech = memo(lazy(() => import('../Components/ReadChapterComponents/TextToSpeech')));
-const OCROverlay = memo(lazy(() => import('../Components/ReadChapterComponents/OCROverlay')));
 const LoadingSpinner = memo(lazy(() => import('../Components/LoadingSpinner')));
-const Placeholder = memo(lazy(() => import('../Components/ReadChapterComponents/Placeholder')));
 
+import _MiddleImageAndOptions from "../Components/ReadChapterComponents/MiddleImageAndOptions";
+const MiddleImageAndOptions = memo(_MiddleImageAndOptions);
 export default function ReadChapter() {
   const { mangaId, chapterId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { chapterInfo, mangaInfo, chapters } = location.state || {};
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [layout, setLayout] = useState('horizontal');
   const [panels, setPanels] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [imageCache, setImageCache] = useState([]);
-  const [imageKey, setImageKey] = useState(0);
   const [showMessage, setShowMessage] = useState(false);
   const [fullOCRResult, setFullOCRResult] = useState("");
   const [pageTranslations, setPageTranslations] = useState({});
-  const [isLoadingOCR, setIsLoadingOCR] = useState(false);
+
   const [isItTextToSpeech, setIsItTextToSpeech] = useState(false);
   const [allAtOnce, setAllAtOnce] = useState(false);
   const [pageTTS, setPageTTS] = useState({});
-  const [translatedTexts, setTranslatedTexts] = useState({});
-  const [overlayLoading, setOverlayLoading] = useState(false);
+
   const [quality, setQuality] = useState("low");
   const [finalResult, setFinalResult] = useState();
   const scrollContainerRef = useRef(null);
   // Memoize handleTranslate to ensure stable reference for props and callbacks
-  const memoizedHandleTranslate = useCallback(
-    (text) => handleTranslate(text),
-    []
-  );
+
   const momoizedSortAndJoinOCR = useCallback((fullOCRResult) => sortAndJoinOCR(fullOCRResult))
 
   const { data: pages, isLoading, isError } = useQuery({
@@ -63,6 +55,10 @@ export default function ReadChapter() {
     retry: 2,
   });
 
+  const memoizedHandleTranslate = useCallback(
+    (text) => handleTranslate(text),
+    []
+  );
   const handleChapterClick = useCallback(
     (id) => {
       navigate(`/manga/${mangaId}/chapter/${id.id}/read`, {
@@ -95,13 +91,6 @@ export default function ReadChapter() {
     }
   }, [currentIndex, pages, pageTranslations, pageTTS]);
 
-  const handleImageLoad = useCallback((url) => {
-    setImageCache((prevCache) => [...prevCache, url]);
-  }, []);
-
-  const handleImageError = useCallback(() => {
-    setImageKey((prevKey) => prevKey + 1);
-  }, []);
 
   useEffect(() => {
     if (mangaInfo.originalLanguage == "ko" || mangaInfo.originalLanguage == "zh" || mangaInfo.originalLanguage == "zh-hk" || mangaInfo.flatTags.includes("Long Strip") || mangaInfo.flatTags.includes("Web Comic")) {
@@ -111,99 +100,28 @@ export default function ReadChapter() {
 
   console.log(mangaInfo);
 
-  const translateAll = useCallback(async (fullOCRResult) => {
-    if (!fullOCRResult || fullOCRResult.length === 0) return;
 
-    const needsTranslation = fullOCRResult.some(
-      (item) => !translatedTexts[item.text] && item.text.trim() !== ""
-    );
 
-    if (!needsTranslation) return;
-
-    setOverlayLoading(true);
-    try {
-      const newTranslations = { ...translatedTexts };
-      const untranslatedItems = fullOCRResult.filter(
-        (item) => !translatedTexts[item.text] && item.text.trim() !== ""
-      );
-
-      const batchSize = 5;
-      for (let i = 0; i < untranslatedItems.length; i += batchSize) {
-        const batch = untranslatedItems.slice(i, i + batchSize);
-        const results = await Promise.all(
-          batch.map((item) => memoizedHandleTranslate(item.text))
-        );
-        batch.forEach((item, index) => {
-          newTranslations[item.text] = results[index];
-        });
-      }
-      setTranslatedTexts(newTranslations);
-      return newTranslations;
-    } catch (error) {
-      console.error("Error translating batch:", error);
-    } finally {
-      setOverlayLoading(false);
+  const currentChapterIndex = useMemo(() =>
+    chapters.findIndex(ch => ch.id === chapterInfo.id),
+    [chapters, chapterInfo.id]
+  );
+  const hasPrevChapter = useMemo(() => currentChapterIndex > 0);
+  const hasNextChapter = useMemo(() => currentChapterIndex < chapters.length - 1);
+  const goToChapter = useCallback((chapter) => {
+    if (chapter) {
+      handleChapterClick(chapter);
     }
-  }, [translatedTexts, memoizedHandleTranslate]);
+  }, [handleChapterClick]);
 
-  const handleUpload = useCallback(async (imageUrl, from) => {
-    if (!imageUrl) return alert("No image found!");
-
-    setIsLoadingOCR(true);
-    try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
-      const file = new File([blob], "image.jpg", { type: blob.type });
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const apiResponse = await fetch("/api/readTextAndReplace", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!apiResponse.ok) throw new Error("API request failed");
-
-      const result = await apiResponse.json();
-      console.log("OCR Result:", result);
-
-      const ocrResult = result.text.data;
-      const processedText = result.status === "error" ? "No Text Found" : result.text.data.map((item) => item.text).join(" ");
-
-      if (from === "translate") {
-        const translated = await memoizedHandleTranslate(processedText);
-        const translatedocrResult = await translateAll(ocrResult);
-
-        setPageTranslations((prev) => ({
-          ...prev,
-          [imageUrl]: {
-            ocrResult: ocrResult,
-            translatedocrResult: translatedocrResult,
-            textResult: translated,
-          },
-        }));
-        setIsItTextToSpeech(false);
-      } else {
-        setPageTTS((prev) => ({
-          ...prev,
-          [imageUrl]: {
-            ocrResult: ocrResult,
-            textResult: processedText,
-          },
-        }));
-        setFullOCRResult(ocrResult);
-        setIsItTextToSpeech(true);
-      }
-      setShowMessage(true);
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Something went wrong!");
-    } finally {
-      setIsLoadingOCR(false);
-    }
-  }, [memoizedHandleTranslate, translateAll]);
-
+  const goToPrevChapter = useCallback(() =>
+    hasPrevChapter && goToChapter(chapters[currentChapterIndex - 1]),
+    [hasPrevChapter, currentChapterIndex, chapters, goToChapter]
+  );
+  const goToNextChapter = useCallback(() =>
+    hasNextChapter && goToChapter(chapters[currentChapterIndex + 1]),
+    [hasNextChapter, currentChapterIndex, chapters, goToChapter]
+  );
   return (
     pages && !isError ? (
       <div className="tracking-wider flex flex-row w-full justify-between items-start h-full -mt-5 bg-[#070920] backdrop-blur-md text-white">
@@ -213,7 +131,15 @@ export default function ReadChapter() {
           setCurrentIndex={setCurrentIndex}
           currentIndex={currentIndex}
           allChapters={chapters}
+
+          currentChapterIndex={currentChapterIndex}
+          goToNextChapter={goToNextChapter}
+          goToPrevChapter={goToPrevChapter}
           onChapterChange={handleChapterClick}
+          hasNextChapter={hasNextChapter}
+          hasPrevChapter={hasPrevChapter}
+          goToChapter={goToChapter}
+
           chapterInfo={chapterInfo}
           isCollapsed={isCollapsed}
           mangaInfo={mangaInfo}
@@ -227,179 +153,32 @@ export default function ReadChapter() {
           }}
           className="tracking-wider flex flex-col h-[91.2vh] flex-1 w-full overflow-y-scroll"
         >
-          <div
-            className={`flex flex-1 ${layout === "horizontal"
-              ? "flex-row space-x-4 overflow-hidden justify-center mt-7 items-start"
-              : "flex-col space-y-4 mt-7 justify-end items-center"
-              } my-1`}
-          >
-            {isLoading ? (
-              <LoadingSpinner />
-            ) : (
-              layout === "horizontal"
-                ? pages != undefined &&
-                (quality === "low" ? pages?.chapter?.dataSaver : pages?.chapter?.data)
-                  .slice(Math.abs(currentIndex), Math.abs(currentIndex + panels))
-                  .map((page, index) => (
-                    <div key={index} className="tracking-wider relative h-[75vh] flex justify-center items-center">
-                      <div className={`relative  w-[380px] h-[75vh]`}>
-                        <Image
-                          key={imageKey}
-                          src={page}
-                          alt={`Page ${currentIndex + index + 1}`}
-                          height={1680}
-                          width={1680}
-                          className={`object-contain rounded-lg w-full h-full shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"
-                            }`}
-                          priority={index === 0}
-                          loading={index === 0 ? undefined : "eager"}
-                          onLoadingComplete={() => handleImageLoad(page)}
-                          onError={handleImageError}
-                          placeholder="blur"
-                          blurDataURL="/placeholder.jpg"
-                        />
-                        {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim() !== "en" ? (
-                          <OCROverlay
-                            loading={overlayLoading}
-                            handleTranslate={memoizedHandleTranslate} // Use memoized version
-                            translatedTexts={translatedTexts}
-                            fullOCRResult={fullOCRResult}
-                          />
-                        ) : (
-                          ""
-                        )}
-                        {!imageCache.includes(page) && <Placeholder />}
-                      </div>
-                      {panels != 2 && <div className="tracking-wider fixed flex flex-col justify-end items-end bottom-32 right-7">
-                        {!isLoadingOCR ? (
-                          <>
-                            {chapterInfo?.translatedLanguage?.trim() !== "en" && (
-                              <button
-                                disabled={panels === 2 || pageTranslations[page]}
-                                onClick={() => handleUpload(page, "translate")}
-                                className={`group py-4 ${panels === 2 || pageTranslations[page] ? "hidden" : ""
-                                  } px-2 mb-4 before:bg-opacity-60 flex items-center justify-start min-w-[48px] h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
-                                  shadow-[0px_0px_10px_rgba(0,0,0,1)] shadow-yellow-500 bg-[#1a063e] bg-opacity-60  hover:min-w-[182px] hover:shadow-lg disabled:cursor-not-allowed 
-                                  ${pageTranslations[page]
-                                    ? "shadow-[0px_0px_6px rgba(0,0,0,1)] shadow-yellow-500 bg-yellow-400 bg-opacity-60"
-                                    : "bg-[#1a063e]"
-                                  } 
-                                  backdrop-blur-md lg:font-semibold border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 
-                                  before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] 
-                                  hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 ease-in-out`}
-                              >
-                                <Languages className="tracking-wider w-16 p-4 text-orange-400 h-16 bg-opacity-85 group-hover:border-2 group-hover:border-yellow-500 transition-all bg-gray-50 ease-in-out duration-300 rounded-full border border-gray-700  transform group-hover:rotate-[360deg]" />
-                                <span
-                                  className={`absolute font-sans font-bold left-20 text-lg tracking-tight text-gray-100 opacity-0 transform translate-x-4 transition-all duration-300 
-                                      group-hover:opacity-100 group-hover:text-black group-hover:translate-x-0 ${pageTranslations[page] ? "text-yellow-300" : ""
-                                    }`}
-                                >
-                                  {pageTranslations[page] ? "Translated" : "Translate"}
-                                </span>
-                              </button>
-                            )}
-                            <TextToSpeech
-                              page={page}
-                              handleUpload={handleUpload}
-                              ready={Boolean(pageTTS[page] ? isItTextToSpeech : pageTranslations[page])}
-                              text={
-                                ((pageTTS[page] && isItTextToSpeech) || pageTranslations[page]) &&
-                                finalResult // Use memoized result
-                              }
-                            />
-                          </>
-                        ) : (
-                          <div className="tracking-wider h-fit w-full flex justify-center items-center rounded-lg shadow-lg">
-                            <div className="tracking-wider flex justify-center items-center w-full h-fit">
-                              <div className="tracking-wider text-center flex flex-col justify-center items-center">
-                                <div className="tracking-wider spinner-border -mt-36 -ml-36 w-12 h-12 rounded-full animate-spin border-8 border-solid border-purple-500 border-t-transparent shadow-md"></div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>}
-                    </div>
-                  ))
-                : pages &&
-                (quality === "low" ? pages?.chapter?.dataSaver : pages?.chapter?.data).map(
-                  (page, index) => (
-                    <div
-                      key={index}
-                      className="tracking-wider relative h-fit w-full flex justify-center items-center"
-                    >
-                      <div className={`relative w-auto h-fit`}>
-                        <Image
-                          key={imageKey}
-                          src={page}
-                          alt={`Page ${index + 1}`}
-                          height={1680}
-                          width={1680}
-                          className={`object-contain rounded-lg w-full max-w-[1280px] h-auto shadow-xl transition-all ${imageCache.includes(page) ? "block" : "hidden"
-                            }`}
-                          priority={index === 0}
-                          loading={index === 0 ? undefined : "eager"}
-                          onLoadingComplete={() => handleImageLoad(page)}
-                          onError={handleImageError}
-                          placeholder="blur"
-                          blurDataURL="/placeholder.jpg"
-                        />
-                        {!isLoadingOCR && chapterInfo?.translatedLanguage?.trim() !== "en" ? (
-                          <OCROverlay
-                            loading={overlayLoading}
-                            handleTranslate={memoizedHandleTranslate} // Use memoized version
-                            ready={Boolean(pageTranslations[page]?.translatedocrResult)}
-                            translatedTexts={pageTranslations[page]?.translatedocrResult}
-                            fullOCRResult={pageTranslations[page]?.ocrResult}
-                          />
-                        ) : (
-                          ""
-                        )}
-                        {!imageCache.includes(page) && <Placeholder />}
-                      </div>
-                      <div className="tracking-wider absolute top-52 transform space-y-4 flex flex-col justify-start items-end bottom-28 right-3">
-                        {!isLoadingOCR ? (
-                          <>
-                            {chapterInfo?.translatedLanguage?.trim() !== "en" && (
-                              <button
-                                disabled={panels === 2 || pageTranslations[page]}
-                                onClick={() => handleUpload(page, "translate")}
-                                className={`font-sans ${panels === 2 || pageTranslations[page] ? "hidden" : ""
-                                  } disabled:cursor-not-allowed mt-3 before:bg-opacity-60 min-w-[189px] transition-colors min-h-16 flex gap-4 justify-start items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page]
-                                    ? "shadow-[0px_0px_6px_rgba(0,0,0,1)] shadow-yellow-500 bg-yellow-400 bg-opacity-60 "
-                                    : "bg-[#1a063e]"
-                                  } backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-3 py-2 ease-in-out overflow-hidden border-2 rounded-full group`}
-                                type="submit"
-                              >
-                                <Languages className="tracking-wider w-12 h-12 bg-opacity-85 group-hover:border-2 group-hover:border-yellow-500 transition-all bg-gray-50 text-orange-400 ease-in-out duration-300 rounded-full border border-gray-700 p-3 transform group-hover:rotate-[360deg]" />
-                                {pageTranslations[page] ? "Translated" : "Translate"}
-                              </button>
-                            )}
-                            <TextToSpeech
-                              page={page}
-                              handleUpload={handleUpload}
-                              ready={Boolean(pageTTS[page] ? isItTextToSpeech : pageTranslations[page])}
-                              text={
-                                ((pageTTS[page] && isItTextToSpeech) || pageTranslations[page]) &&
-                                finalResult // Use memoized result
-                              }
-                              layout={layout}
-                            />
-                          </>
-                        ) : (
-                          <div className="tracking-wider h-fit w-full flex justify-center items-center rounded-lg shadow-lg">
-                            <div className="tracking-wider flex justify-center items-center w-full h-fit">
-                              <div className="tracking-wider text-center flex flex-col justify-center items-center">
-                                <div className="tracking-wider spinner-border -mt-36 -ml-36 w-12 h-12 rounded-full animate-spin border-8 border-solid border-purple-500 border-t-transparent shadow-md"></div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )
-                )
-            )}
-          </div>
+          <MiddleImageAndOptions
+            layout={layout}
+            isLoading={isLoading}
+            pages={pages}
+            quality={quality}
+            currentIndex={currentIndex}
+            panels={panels}
+            chapterInfo={chapterInfo}
+            pageTranslations={pageTranslations}
+            setPageTranslations={setPageTranslations}
+            pageTTS={pageTTS}
+            setPageTTS={setPageTTS}
+            fullOCRResult={fullOCRResult}
+            setFullOCRResult={setFullOCRResult}
+            isItTextToSpeech={isItTextToSpeech}
+            setIsItTextToSpeech={setIsItTextToSpeech}
+            finalResult={finalResult}
+            showMessage={showMessage}
+            setShowMessage={setShowMessage}
+            allAtOnce={allAtOnce}
+            goToPrevChapter={goToPrevChapter}
+            hasPrevChapter={hasPrevChapter}
+            goToNextChapter={goToNextChapter}
+            hasNextChapter={hasNextChapter}
+            memoizedHandleTranslate={memoizedHandleTranslate}
+          />
           <div>
             <BottomSettings
               allAtOnce={allAtOnce}

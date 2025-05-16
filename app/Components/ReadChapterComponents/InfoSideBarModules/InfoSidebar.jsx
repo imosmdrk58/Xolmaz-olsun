@@ -28,7 +28,13 @@ const InfoSidebar = memo(({
   panels,
   setCurrentIndex,
   chapterInfo,
+  currentChapterIndex,
+  goToNextChapter,
+  hasNextChapter,
+  hasPrevChapter,
+  goToChapter,
   currentIndex = 1,
+  goToPrevChapter,
   allChapters = [],
   onChapterChange,
 }) => {
@@ -57,19 +63,11 @@ const InfoSidebar = memo(({
 
   if (!mangaInfo || !chapterInfo) return null;
 
-  // Memoized current chapter index
-  const currentChapterIndex = useMemo(() => 
-    allChapters.findIndex(ch => ch.id === chapterInfo.id), 
-    [allChapters, chapterInfo.id]
-  );
-  const hasPrevChapter = useMemo(() => currentChapterIndex > 0);
-  const hasNextChapter = useMemo(() => currentChapterIndex < allChapters.length - 1);
-
   // Memoized event handlers
   const toggleFavorite = useCallback(() => setIsFavorite(prev => !prev), []);
 
   // Memoized sorted chapters
-  const sortedChapters = useMemo(() => 
+  const sortedChapters = useMemo(() =>
     [...allChapters].sort((a, b) => {
       const aNum = parseFloat(a.chapter);
       const bNum = parseFloat(b.chapter);
@@ -78,38 +76,22 @@ const InfoSidebar = memo(({
   );
 
   // Memoized filtered chapters
-  const filteredChapters = useMemo(() => 
+  const filteredChapters = useMemo(() =>
     searchQuery.trim()
       ? sortedChapters.filter(ch => ch.chapter.toLowerCase().includes(searchQuery.toLowerCase()))
-      : sortedChapters, 
+      : sortedChapters,
     [sortedChapters, searchQuery]
   );
 
-  // Memoized chapter navigation handlers
-  const goToChapter = useCallback((chapter) => {
-    if (onChapterChange) {
-      onChapterChange(chapter);
-      setChapterDropdownOpen(false);
-    }
-  }, [onChapterChange]);
-
-  const goToPrevChapter = useCallback(() => 
-    hasPrevChapter && goToChapter(allChapters[currentChapterIndex - 1]), 
-  [hasPrevChapter, currentChapterIndex, allChapters, goToChapter]
-  );
-  const goToNextChapter = useCallback(() => 
-    hasNextChapter && goToChapter(allChapters[currentChapterIndex + 1]), 
-  [hasNextChapter, currentChapterIndex, allChapters, goToChapter]
-  );
 
   console.log(allChapters.length)
   console.log(currentChapterIndex)
-  const goToFirstChapter = useCallback(() => 
-    goToChapter(allChapters[allChapters.length - 1]), 
+  const goToFirstChapter = useCallback(() =>
+    goToChapter(allChapters[allChapters.length - 1]),
     [allChapters, goToChapter]
   );
-  const goToLastChapter = useCallback(() => 
-    goToChapter(allChapters[0]), 
+  const goToLastChapter = useCallback(() =>
+    goToChapter(allChapters[0]),
     [allChapters, goToChapter]
   );
 
@@ -191,7 +173,7 @@ const InfoSidebar = memo(({
             <div className="tracking-wider ml-3 flex-1">
               <h2 className="tracking-wider text-base font-bold text-white line-clamp-1">{mangaInfo.title}</h2>
               <div className="tracking-wider flex items-center mt-1.5 gap-1.5 flex-wrap">
-                <span className={`px-1.5 py-0.5 text-xs rounded-md font-medium ${mangaInfo.status === 'ongoing' ? 'bg-green-900/30 text-green-400 border border-green-700/20' : mangaInfo.status === 'completed' ? 'bg-blue-900/30 text-blue-400 border border-blue-700/20' :mangaInfo.status === 'hiatus' ? 'bg-gray-800/50 text-orange-400 border border-orange-700/20':mangaInfo.status === 'cancelled'?"bg-gray-800/50 text-red-400 border border-red-700/20" :'bg-gray-800/50 text-gray-400 border border-gray-700/20'}`}>
+                <span className={`px-1.5 py-0.5 text-xs rounded-md font-medium ${mangaInfo.status === 'ongoing' ? 'bg-green-900/30 text-green-400 border border-green-700/20' : mangaInfo.status === 'completed' ? 'bg-blue-900/30 text-blue-400 border border-blue-700/20' : mangaInfo.status === 'hiatus' ? 'bg-gray-800/50 text-orange-400 border border-orange-700/20' : mangaInfo.status === 'cancelled' ? "bg-gray-800/50 text-red-400 border border-red-700/20" : 'bg-gray-800/50 text-gray-400 border border-gray-700/20'}`}>
                   {mangaInfo.status.toUpperCase()}
                 </span>
                 <span className="tracking-wider px-1.5 py-0.5 text-xs bg-purple-900/30 text-purple-400 rounded-md font-medium border border-purple-700/20">{mangaInfo.year}</span>
