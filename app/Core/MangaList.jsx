@@ -100,6 +100,23 @@ export default function MangaList() {
   const queryClient = useQueryClient();
   const [isDataProcessed, setIsDataProcessed] = useState(false);
   const showcaseRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if screen width is mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Set initial value
+    checkIfMobile();
+    
+    // Add event listener
+    window.addEventListener('resize', checkIfMobile);
+    
+    // Clean up
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
 
   const processMangaData = async (mangaList, type) => {
     if (!mangaList || mangaList.length === 0) return [];
@@ -311,22 +328,21 @@ export default function MangaList() {
   }
 
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 12;
+  const ITEMS_PER_PAGE = isMobile ? 8 : 12;
 
   const totalPages = Math.ceil(processedLatestMangas.length / ITEMS_PER_PAGE);
 
   const currentMangas = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     return processedLatestMangas.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [processedLatestMangas, currentPage]);
+  }, [processedLatestMangas, currentPage, ITEMS_PER_PAGE]);
 
   const goToPage = useCallback((page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
     window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-    }, [totalPages]);
+  }, [totalPages]);
 
-  console.log(processedFavouriteMangas)
   return (
     <div ref={showcaseRef} className="min-h-screen w-full text-white">
       {isLoadingState ? (
@@ -334,34 +350,42 @@ export default function MangaList() {
       ) : (
         <>
           <Suspense fallback={<LoadingSpinner text="Loading Mangas..." />}>
-            <div className="w-full shadow-[5px_5px_50px_rgba(0,0,0,1)] shadow-black  h-fit">
+            <div className="w-full shadow-[5px_5px_50px_rgba(0,0,0,1)] shadow-black h-fit">
               <SliderComponent handleMangaClicked={handleMangaClicked} processedRandomMangas={processedRandomMangas} />
             </div>
 
-            <div className="flex mt-10 bg-gradient-to-t from-transparent via-black/30 to-black/10 flex-row justify-between items-start">
-              <MangaCard
-                handleMangaClicked={handleMangaClicked}
-                processedLatestMangas={currentMangas}
-                loadMoreMangas={loadMoreMangas}
-                totalPages={totalPages}
-                currentPage={currentPage}
-              />
+            <div className="flex flex-row md:flex-row mt-6 md:mt-10 bg-gradient-to-t from-transparent via-black/30 to-black/10">
+              <div className={`w-[70%] `}>
+                <MangaCard
+                  handleMangaClicked={handleMangaClicked}
+                  processedLatestMangas={currentMangas}
+                  loadMoreMangas={loadMoreMangas}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                />
+              </div>
 
-              <AsideComponent
-                handleMangaClicked={handleMangaClicked}
-                processedMangas={processedMangas}
-                processedLatestMangas={processedLatestMangas}
-                processedFavouriteMangas={processedFavouriteMangas}
-              />
+              <div className={`w-[30%] `}>
+                <AsideComponent
+                  handleMangaClicked={handleMangaClicked}
+                  processedMangas={processedMangas}
+                  processedLatestMangas={processedLatestMangas}
+                  processedFavouriteMangas={processedFavouriteMangas}
+                  isMobile={isMobile}
+                />
+              </div>
             </div>
             {/* Pagination Controls */}
-            <MangaCardPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={goToPage}
-              loadMoreMangas={loadMoreMangas}
-              onLoadMore={loadMoreMangas}
-            />
+            {/* <div className="w-full flex justify-center mb-8">
+              <MangaCardPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={goToPage}
+                loadMoreMangas={loadMoreMangas}
+                onLoadMore={loadMoreMangas}
+                isMobile={isMobile}
+              />
+            </div> */}
           </Suspense>
         </>
       )}

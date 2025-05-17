@@ -37,30 +37,30 @@ function AsideComponent({
   return (
     <>
       {mangaToDisplay.length > 0 && (
-        <div className="w-5/12">
-          <div className="pl-7 text-white shadow-lg w-full">
+        <div className="w-full overflow-hidden">
+          <div className=" pl-2 sm:pl-7 text-white shadow-lg w-full">
             {/* Section Header */}
-            <div className="pb-7 text-2xl font-bold text-purple-200 tracking-wide uppercase ">
-              <h1 className="border-b-4 border-purple-900 flex flex-row w-fit gap-4 items-center pb-2">
+            <div className="pb-7 text-lg lg:text-2xl font-bold text-purple-200 tracking-wide uppercase ">
+              <h1 className="border-b-4 border-purple-900 flex flex-row w-fit gap-2 items-center pb-2">
                 <Crown className="w-6 h-6 text-white fill-white"/>
-                <span>
-                  {selectedCategory === "Top"
+                <span className="line-clamp-1">
+                  {(selectedCategory === "Top"
                     ? "Top Manga"
                     : selectedCategory === "Favourite"
                     ? "Favourite Manga"
-                    : "New Manga"}
+                    : "New Manga")}
                 </span>
               </h1>
             </div>
-            <div className="w-full p-3 rounded-lg mb-2">
-              <div className="grid grid-cols-3 gap-3">
+            <div className="w-full lg:p-3 rounded-lg mb-2">
+              <div className="grid  grid-cols-3 gap-1 lg:gap-3">
                 {["Top", "Favourite", "New"].map((category, index) => {
                   const Icon = categoryIcons[category];
                   return (
                     <span
                 key={index}
                 onClick={() => handleCategoryChange(category)}
-                className={`relative cursor-pointer flex justify-center items-center min-w-[127px] px-3 py-2 rounded-xl overflow-hidden
+                className={`relative cursor-pointer flex justify-center items-center xl:min-w-[127px] lg:px-3 py-2 rounded-xl overflow-hidden
                   ${
                     selectedCategory === category
                       ? "brightness-150 shadow-[0_0_10px_rgba(0,0,0,1)] shadow-purple-500"
@@ -75,9 +75,9 @@ function AsideComponent({
                 }}
               >
                       <Icon
-                        className={`w-7 h-7 ${category=="Top"?"fill-yellow-500/10 text-yellow-600":category=="Favourite"?"fill-rose-500/50 text-rose-500":"fill-white/70 text-black/70 "}  rounded-md p-1`}
+                        className={`w-5 h-5 sm:w-7 sm:h-7 ${category=="Top"?"fill-yellow-500/10 text-yellow-600":category=="Favourite"?"fill-rose-500/50 text-rose-500":"fill-white/70 text-black/70 "}  rounded-md p-1`}
                       />
-                      <span className="font-semibold text-[16px] ml-1 flex py-2 text-purple-300">
+                      <span className="font-semibold hidden sm:text-[16px] ml-1 xl:flex py-2 text-purple-300">
                         {category}
                       </span>
                     </span>
@@ -86,59 +86,56 @@ function AsideComponent({
               </div>
             </div>
 
-            <div>
-              <ul className="flex flex-col">
-                {mangaToDisplay.slice(0, 10).map((manga, index) => (
-                  <li
-                    key={manga.id}
-                    className="cursor-pointer"
-                    onClick={() => handleMangaClicked(manga)}
-                  >
-                    <div className="relative flex w-full gap-5 py-3.5 items-center transition-all duration-300 hover:bg-gray-800 rounded-lg">
-                      <div className="relative left-4 top-0 flex h-[72px] w-10 items-center justify-center text-right">
-                        <span className="text-5xl font-extrabold text-gray-400">
-                          {index + 1}
-                        </span>
-                      </div>
+             <div className="mt-2 -ml-0.5">
+            <ul className="flex flex-col space-y-1 sm:space-y-2">
+              {mangaToDisplay.slice(0, 10).map((manga, index) => (
+                <li
+                  key={manga.id}
+                  className="cursor-pointer"
+                  onClick={() => handleMangaClicked(manga)}
+                >
+                  <div className="relative flex w-full gap-0.5 sm:gap-2 lg:gap-3 py-2 items-center transition-all duration-300 hover:bg-gray-800 rounded-lg sm:px-2">
+                    {/* Rank Number */}
+                    <div className="flex-shrink-0 w-5 sm:w-6 lg:w-8 text-left">
+                      <span className="text-3xl sm:text-5xl font-bold text-gray-400">
+                        {index + 1}
+                      </span>
+                    </div>
 
-                      <div className="flex items-center gap-5 pl-12.8">
-                        {/* Manga Cover - replaced with Image icon */}
-                        <div
-                          className="relative w-[48px] h-[48px] rounded-lg shadow-md transition-all duration-300 hover:scale-105 flex items-center justify-center bg-gray-700"
-                          title={manga?.title ?? "Unavailable"}
-                        >
-                        <Image width={300} height={300}
-                        className="w-full min-w-12 h-full object-cover rounded-lg"
+                    {/* Manga Cover */}
+                    <div className="flex-shrink-0 w-8 h-12 sm:w-10 sm:h-14 lg:w-12 lg:h-16 rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-105">
+                      <Image 
+                        width={100} 
+                        height={150}
+                        className="w-full h-full object-cover"
                         src={manga?.coverImageUrl}
                         alt={manga?.title ?? 'No title'}
                       />
-                        </div>
+                    </div>
 
-                        <div className="flex flex-col justify-center gap-1.6">
-                          {/* Manga Title */}
-                          <h3>
-                            <div className="font-semibold line-clamp-1 text-white text-lg hover:text-yellow-300 transition duration-300">
-                              {manga?.title ?? "Untitled Manga"}
-                            </div>
-                          </h3>
+                    {/* Manga Details */}
+                    <div className="flex flex-col justify-center ml-1 sm:ml-2 min-w-0">
+                      {/* Manga Title */}
+                      <h3 className="font-semibold text-[10px] sm:text-sm lg:text-base line-clamp-1 text-white hover:text-yellow-300 transition duration-300">
+                        {manga?.title ?? "Untitled Manga"}
+                      </h3>
 
-                          {/* Manga Rating */}
-                          <div className="flex items-center gap-1.5 text-gray-400">
-                            <Star
-                              className="w-4 h-4 text-yellow-400"
-                              aria-hidden="true"
-                            />
-                            <span className="text-sm">
-                              {manga?.rating?.rating?.bayesian?.toFixed(2) ?? "0"}
-                            </span>
-                          </div>
-                        </div>
+                      {/* Manga Rating */}
+                      <div className="flex items-center gap-1 text-gray-400">
+                        <Star
+                          className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400"
+                          aria-hidden="true"
+                        />
+                        <span className="text-xs sm:text-sm">
+                          {manga?.rating?.rating?.bayesian?.toFixed(2) ?? "0"}
+                        </span>
                       </div>
                     </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
           </div>
         </div>
       )}
