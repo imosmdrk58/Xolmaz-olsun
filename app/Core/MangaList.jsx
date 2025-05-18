@@ -354,8 +354,8 @@ export default function MangaList() {
               <SliderComponent handleMangaClicked={handleMangaClicked} processedRandomMangas={processedRandomMangas} />
             </div>
 
-            <div className="flex flex-row md:flex-row mt-6 md:mt-10 bg-gradient-to-t from-transparent via-black/30 to-black/10">
-              <div className={`w-[70%] `}>
+            <div className="flex flex-col-reverse md:flex-row mt-6 md:mt-10 bg-gradient-to-t from-transparent via-black/30 to-black/10">
+              <div className={`md:w-[70%] `}>
                 <MangaCard
                   handleMangaClicked={handleMangaClicked}
                   processedLatestMangas={currentMangas}
@@ -365,7 +365,7 @@ export default function MangaList() {
                 />
               </div>
 
-              <div className={`w-[30%] `}>
+              <div className={`md:w-[30%] `}>
                 <AsideComponent
                   handleMangaClicked={handleMangaClicked}
                   processedMangas={processedMangas}
@@ -376,7 +376,7 @@ export default function MangaList() {
               </div>
             </div>
             {/* Pagination Controls */}
-            {/* <div className="w-full flex justify-center mb-8">
+            <div className="w-full flex justify-center mb-8">
               <MangaCardPagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -385,7 +385,7 @@ export default function MangaList() {
                 onLoadMore={loadMoreMangas}
                 isMobile={isMobile}
               />
-            </div> */}
+            </div>
           </Suspense>
         </>
       )}
