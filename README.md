@@ -45,35 +45,45 @@
 ---
 
 ## 📸 **Screenshots**
- Feast your eyes on the stunning UI, two previews per row.
+
+Feast your eyes on the stunning UI, two previews per row.
+
+### 📱 Mobile View
+
+<img src="./livedemoimages/m1.png" width="150" style="margin-right: 10px;" />&nbsp;&nbsp; <img src="./livedemoimages/m2.png" width="150" style="margin-right: 100px;" />&nbsp;&nbsp;  <img src="./livedemoimages/m3.png" width="150" />
+
+---
+
+### 💻 Laptop View
 
 | 🌐 Landing Page |
-|-----------------|
+| -------------- |
 | ![Landing Page](./livedemoimages/1.png) |
 
 | 📚 Manga List | 📚 Manga List |
-|------------------|-----------------|
-| ![Manga List](./livedemoimages/2.png) | ![Manga List](./livedemoimages/3.png)  |
+| ------------ | ------------ |
+| ![Manga List](./livedemoimages/2.png) | ![Manga List](./livedemoimages/3.png) |
 
 | 📄 Manga Chapter | 📄 Manga Chapter |
-|----------------|-------------------|
+| --------------- | ---------------- |
 | ![Manga Chapter](./livedemoimages/4.png) | ![Manga Chapter](./livedemoimages/5.png) |
 
 | 📺 Read Chapter | 📺 Read Chapter |
-|-------------------|-------------------|
+| -------------- | -------------- |
 | ![Read Chapter](./livedemoimages/6.png) | ![Read Chapter](./livedemoimages/7.png) |
 
 | 📺 Read Chapter | 📺 Read Chapter |
-|-------------------|-------------------|
+| -------------- | -------------- |
 | ![Read Chapter](./livedemoimages/8.png) | ![Read Chapter](./livedemoimages/9.png) |
 
 | 🔍 Search Page | 🔍 Search Page |
-|-------------------|-------------------|
+| ------------- | ------------- |
 | ![Search Page](./livedemoimages/10.png) | ![Search Page](./livedemoimages/11.png) |
 
 | 🔍 Search Page |
-|-------------------|
-|  ![Search Page](./livedemoimages/12.png) |
+| ------------- |
+| ![Search Page](./livedemoimages/12.png) |
+
 ---
 
 ## ✨ **Core Features**
