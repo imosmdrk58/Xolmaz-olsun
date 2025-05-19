@@ -1,8 +1,10 @@
+
 "use client";
 import React, { useState, useEffect, useRef, useMemo, useCallback, lazy } from "react";
 import { ChevronLeft, ChevronRight } from 'lucide-react'; // Import lucide icons
 const StableFlag = React.memo(lazy(() => import('../StableFlag')));
 import Image from "next/image";
+
 // Memoized thumbnail component to reduce unnecessary renders
 const MangaThumbnail = React.memo(({
   manga,
@@ -13,12 +15,12 @@ const MangaThumbnail = React.memo(({
   return (
     <div
       className={`
-        relative cursor-pointer  transition-all duration-300
+        relative cursor-pointer transition-all duration-300
         ${index === activeIndex ? 'ring-2 ring-purple-600' : 'opacity-70 hover:opacity-100'}
       `}
       onClick={() => handleThumbnailClick(index)}
     >
-      <div className="w-full aspect-[2/3]  overflow-hidden">
+      <div className="w-full aspect-[2/3] overflow-hidden">
         <Image width={300} height={300}
           src={manga.coverImageUrl}
           alt={manga.title}
@@ -50,10 +52,12 @@ const MangaThumbnail = React.memo(({
 
 MangaThumbnail.displayName = "MangaThumbnail";
 
-const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) => {
+const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
   const [mangas, setMangas] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
   const showcaseRef = useRef(null);
   const timerRef = useRef(null);
   const progressRef = useRef(null);
@@ -127,6 +131,26 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
     }, 500);
   }, [isTransitioning, activeIndex]);
 
+  // Touch event handlers for mobile swipe
+  const handleTouchStart = (e) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStart - touchEnd > 75) {
+      // Swipe left - go to next
+      handleNext();
+    } else if (touchEnd - touchStart > 75) {
+      // Swipe right - go to previous
+      handlePrev();
+    }
+  };
+
   // Separate the progress animation into its own function
   const startProgressAnimation = useCallback(() => {
     if (!progressRef.current) return;
@@ -175,7 +199,10 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
   return (
     <div
       ref={showcaseRef}
-      className="relative w-full h-[89vh] border-b-[16px] border-black/10 overflow-hidden bg-black/60"
+      className="relative w-full min-h-[59vh] sm:h-[89vh] border-b-[16px] border-black/10 overflow-hidden bg-black/60"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Background noise texture - simplified with static positioning */}
       <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20viewBox%3D%270%200%20200%20200%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cfilter%20id%3D%27noiseFilter%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.65%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23noiseFilter%29%27%2F%3E%3C%2Fsvg%3E')]" />
@@ -200,72 +227,122 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
             }}
           />
 
-          {/* Overlay Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />
+          {/* Overlay Gradient - enhanced for mobile to make content more readable */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/60 sm:to-transparent z-10" />
 
-          {/* Content Container */}
-          <div className="relative h-full z-20 flex items-center">
-            <div className="w-full max-w-2xl px-8 md:px-16 py-12">
+          {/* Mobile Navigation Controls + Indicators - Only visible on mobile and in a single line */}
+          <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center z-40 md:hidden">
+            <div className="flex space-x-3 items-center bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm">
+              <button
+                onClick={handlePrev}
+                className="w-8 h-8 bg-black/50 border border-white/10 rounded-full flex items-center justify-center text-white mr-2"
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              {/* Dot indicators in the middle */}
+              <div className="flex space-x-2 items-center">
+                {mangas.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full cursor-pointer ${index === activeIndex ? "bg-purple-600 w-3" : "bg-white/40"
+                      } transition-all duration-300`}
+                    onClick={() => handleThumbnailClick(index)}
+                  ></div>
+                ))}
+              </div>
+
+              <button
+                onClick={handleNext}
+                className="w-8 h-8 bg-black/50 border border-white/10 rounded-full flex items-center justify-center text-white ml-2"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Content Container with CoverImage repositioned */}
+          <div className="relative h-full z-20 flex items-center justify-between">
+            {/* Left Side - Title and Description */}
+            <div className="w-[75%] md:w-3/5 px-6 md:px-16 pt-12 pb-32 sm:py-12">
               {/* Language Tag */}
-              <div className="inline-flex items-center px-3 py-1 mb-6 rounded-full border border-purple-600/30 bg-black/30 backdrop-blur-sm">
+              <div className="inline-flex items-center px-3 py-1 mb-4 md:mb-6 rounded-full border border-purple-600/30 bg-black/30 backdrop-blur-sm">
                 <StableFlag code={activeManga?.originalLanguage || "UN"} />
                 <span className="text-purple-600 text-xs uppercase tracking-widest">
                   {activeManga?.originalLanguage || "Unknown"}
                 </span>
               </div>
 
-              {/* Title */}
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white leading-tight transition-all duration-500">
+              {/* Title - Smaller text size on mobile */}
+              <h1 className="text-xl relative z-50  sm:text-3xl md:text-5xl font-bold mb-4 md:mb-6 text-white leading-tight transition-all duration-500">
                 <span className="block relative">
-                  <span className="relative z-10">{activeManga?.title.length > 40
+                  <span className="relative line-clamp-1 md:line-clamp-none z-10">{activeManga?.title.length > 40
                     ? `${activeManga?.title.slice(0, 40)}...`
                     : activeManga?.title}</span>
-                  <span className="absolute -bottom-3 left-0 h-3 w-24 bg-purple-600/50 z-0"></span>
+                  <span className="absolute -bottom-2 md:-bottom-3 left-0 h-2 md:h-3 w-16 md:w-24 bg-purple-600/50 z-0"></span>
                 </span>
+
               </h1>
 
-              {/* Description */}
-              <p className="text-gray-300 mb-8 max-w-xl transition-all duration-500">
+              {/* Description - Smaller text on mobile */}
+              <p className="text-[11px] relative z-50 sm:text-sm md:text-base text-gray-300 mb-6 md:mb-8 max-w-xl transition-all duration-500">
                 {activeManga?.description.length > 180
-                  ? `${activeManga?.description.slice(0, 180)}...`
+                  ? `${activeManga?.description.slice(0, 120)}...`
                   : activeManga?.description}
               </p>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-4">
+              {/* Action Buttons - Smaller on mobile */}
+              <div className="flex flex-wrap relative z-50 gap-3 md:gap-4">
                 <button
                   onClick={() => handleMangaClicked(activeManga)}
-                  className="px-6 py-3 bg-purple-600 text-black font-medium rounded-sm hover:bg-purple-300 transition-colors"
+                  className="px-3 md:px-6 py-2 md:py-3 bg-purple-600 text-black text-[11px] sm:text-sm md:text-base font-medium rounded-sm hover:bg-purple-300 transition-colors"
                 >
                   Read Now
                 </button>
-                <button className="px-6 py-3 bg-transparent border border-purple-600/50 text-purple-600 font-medium rounded-sm hover:bg-purple-600/10 transition-colors">
+                <button className="px-3 md:px-6 py-2 md:py-3 bg-transparent border border-purple-600/50 text-purple-600 text-[11px] sm:text-sm md:text-base font-medium rounded-sm hover:bg-purple-600/10 transition-colors">
                   Add to Collection
                 </button>
               </div>
             </div>
-          </div>
+            {/* Mobile Cover Image - positioned above the content */}
+            <div
+              className="absolute  top-[70px] right-3 w-24 h-44   md:hidden z-30 transition-all duration-500"
+              style={{
+                boxShadow: "0 20px 40px rgba(0,0,0,0.5), 0 0 30px rgba(0,0,0,0.3)",
+              }}
+            >
+              <Image width={300} height={300}
+                src={activeManga?.coverImageUrl}
+                alt={activeManga?.title}
+                className="w-full  object-cover h-full absolute"
+              />
+              <div
+                className="absolute z-50 inset-0 bg-gradient-to-r [box-shadow:inset_0_0_20px_10px_rgba(20,20,20,1)]"
+              />            </div>
+            {/* Right Side - Cover Image */}
+            <div className="hidden md:block md:w-2/5 h-full relative">
+              <div
+                className="absolute top-1/2 -translate-y-1/2 right-16 w-64 h-96 z-30 transition-all duration-500"
+                style={{
+                  boxShadow: "0 20px 40px rgba(0,0,0,0.5), 0 0 30px rgba(0,0,0,0.3)",
+                }}
+              >
+                <Image width={300} height={300}
+                  src={activeManga?.coverImageUrl}
+                  alt={activeManga?.title}
+                  className="w-full h-full object-cover rounded-sm"
+                />
 
-          {/* Cover Image - simplified with standard transition */}
-          <div
-            className="absolute right-8 top-1/2 transform -translate-y-1/2 w-56 h-80 md:w-64 md:h-96 z-30 hidden md:block transition-all duration-500"
-            style={{
-              boxShadow: "0 30px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,0,0,0.3)",
-            }}
-          >
-            <Image width={300} height={300}
-              src={activeManga?.coverImageUrl}
-              alt={activeManga?.title}
-              className="w-full h-full object-cover rounded-sm"
-            />
+                {/* Cover light effect */}
+                <div className="absolute inset-0 rounded-sm bg-gradient-to-tr from-transparent via-white to-transparent opacity-20" />
+              </div>
+            </div>
 
-            {/* Cover light effect - static positioning */}
-            <div className="absolute inset-0 rounded-sm bg-gradient-to-tr from-transparent via-white to-transparent opacity-20" />
           </div>
         </div>
 
-        {/* Right Panel - Navigation & Thumbnails */}
-        <div className="relative w-full md:w-1/3 h-full bg-black/80 backdrop-blur-sm flex flex-col">
+        {/* Right Panel - Navigation & Thumbnails - Hidden on mobile */}
+        <div className="relative w-full md:w-1/3 h-full bg-black/80 backdrop-blur-sm hidden md:flex flex-col">
           {/* Navigation Controls */}
           <div className="h-24 border-b py-3 border-white/10 flex items-center justify-between px-8">
             <button
@@ -295,7 +372,7 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
           </div>
 
           {/* Thumbnails Grid */}
-          <div className="flex-grow p-6  overflow-y-auto"
+          <div className="flex-grow p-6 overflow-y-auto"
             style={{
               scrollbarWidth: "thin",
               scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)", // Purple scrollbar
@@ -318,7 +395,7 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
         </div>
       </div>
 
-      {/* Navigation Side Indicators - simplified */}
+      {/* Navigation Side Indicators - Only visible on desktop */}
       <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-40 hidden md:block">
         <button
           onClick={handlePrev}
@@ -338,4 +415,4 @@ const CinematicMangaShowcase = ({ processedRandomMangas, handleMangaClicked }) =
   );
 };
 
-export default React.memo(CinematicMangaShowcase);
+export default React.memo(SliderComponent);

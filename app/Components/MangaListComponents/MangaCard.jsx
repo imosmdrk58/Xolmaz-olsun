@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import React, { useCallback, lazy, useMemo } from 'react';
 import { getRatingColor } from '../../constants/Flags';
-import { Star, MessageSquareText, Heart as HeartIcon,Dot } from 'lucide-react';
+import { Star, MessageSquareText, Heart as HeartIcon,Dot, Rocket } from 'lucide-react';
 const StableFlag = React.memo(lazy(() => import('../StableFlag')));
 
 const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadMoreMangas,totalPages,currentPage }) => {
@@ -14,17 +14,17 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadM
     return (
         MemoMangas && (
             <div className="w-full flex flex-col">
-                <div className="mx-1 sm:mx-5 pb-2 mb-4 xl:mx-20 sm:pb-7 text-lg md:text-2xl font-bold text-purple-200 tracking-wide uppercase">
-                    <h1 className="border-b-4 border-purple-900 w-fit pb-2">Latest Releases</h1>
+                <div className="mx-1 sm:mx-5 flex justify-center items-center md:block pb-2 mb-6 md:mb-3 xl:mx-20 sm:pb-7 text-lg md:text-2xl font-bold text-purple-200 tracking-wide uppercase">
+                    <h1 className="border-b-4 border-purple-900 w-fit pb-2 flex flex-row items-center justify-center gap-2"><Rocket  className=' fill-white w-8 h-7 text-white font-extrabold'/>Latest Releases</h1>
                 </div>
-                <div className="grid w-[95%] sm:gap-y-4 mx-1 md:mx-5 xl:ml-16 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1">
+                <div className="grid w-[95%] sm:gap-y-4 mx-auto md:mx-5 xl:ml-16 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                     {MemoMangas.map((manga, index) => (
                         <div
                             key={manga.id}
                             onClick={() => stableHandleMangaClicked(manga)}
                             className="manga-card cursor-pointer w-full flex justify-center items-start"
                         >
-                            <div className="w-full sm:w-[250px] overflow-hidden sm:min-h-[400px] rounded-lg bg-[#0c0221] p-[5px] shadow-slate-600 shadow-[0_0_4px_rgba(0,0,0,1)] transition-transform duration-300 ease-out hover:scale-[102%] will-change-transform">
+                            <div className="w-full sm:w-[250px] overflow-hidden min-h-[290px] sm:min-h-[400px] rounded-lg bg-[#0c0221] p-[5px] shadow-slate-600 shadow-[0_0_4px_rgba(0,0,0,1)] transition-transform duration-300 ease-out hover:scale-[102%] will-change-transform">
                                 <div className="relative flex h-[155px] sm:h-[250px] flex-col rounded-[5px] bg-gradient-to-tr from-[#049fbb] to-[#50f6ff]">
                                     <Image
                                         src={manga.coverImageUrl || '/placeholder.jpg'}
@@ -56,11 +56,11 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadM
                                         <div className="flex">
                                             <span
                                                 className={`${manga.contentRating.toUpperCase() === 'SAFE'
-                                                        ? 'pr-4 xl:pr-8'
+                                                        ? 'pr-6 xl:pr-8'
                                                         : manga.contentRating.toUpperCase() === 'EROTICA'
                                                             ? ' pr-2 xl:pr-5'
-                                                            : 'pr-2'
-                                                    } z-10 tracking-widest mt-[1px] sm:mt-[2px] mr-2 top-0 right-0 bg-gray-900 flex items-center justify-end text-center border-2 absolute py-[3px] sm:py-[7px] min-w-36 text-[8px] sm:text-[10px] font-semibold rounded-lg md:rounded-xl text-white bg-opacity-70 ${getRatingColor(manga.contentRating.toString() + 'Border') ||
+                                                            : 'pr-1'
+                                                    } z-10 tracking-widest mt-[1px] sm:mt-[2px] mr-2 top-0 right-0 bg-gray-900 flex items-center justify-end text-center border-2 absolute py-[3px] sm:py-[7px] min-w-36 text-[6px] sm:text-[10px] font-semibold rounded-lg md:rounded-xl text-white bg-opacity-70 ${getRatingColor(manga.contentRating.toString() + 'Border') ||
                                                     getRatingColor('default')
                                                     } backdrop-blur-lg ${getRatingColor(manga.contentRating) || getRatingColor('default')
                                                     }`}
@@ -107,7 +107,8 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadM
                                                 </span>
                                             ))}
                                         </div>
-                                        <p className="text-[7px] mx-auto sm:text-xs tracking-widest w-full pr-6 relative z-30 flex justify-center items-center text-center bottom-1 text-gray-400 mt-4">
+                                        <div className=' h-8'/>
+                                        <p className="text-[7px] bottom-2 md:bottom-3 pr-6 mx-auto sm:text-xs tracking-widest w-full absolute z-30 flex justify-center items-center text-center  text-gray-400 mt-4">
                                             Last updated:{' '}
                                             {(() => {
                                                 const minutes = Math.floor((new Date() - new Date(manga.updatedAt)) / 60000);

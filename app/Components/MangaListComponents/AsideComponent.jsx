@@ -37,10 +37,10 @@ function AsideComponent({
   return (
     <>
       {mangaToDisplay.length > 0 && (
-        <div className="w-full mb-10 overflow-hidden">
+        <div className="w-full mb-16 overflow-hidden">
           <div className=" pl-2 sm:pl-7 text-white shadow-lg w-full">
             {/* Section Header */}
-            <div className="pb-7 text-lg lg:text-2xl font-bold text-purple-200 tracking-wide uppercase ">
+            <div className="pb-7 text-lg lg:text-2xl flex justify-center sm:block font-bold text-purple-200 tracking-wide uppercase ">
               <h1 className="border-b-4 border-purple-900 flex flex-row w-fit gap-2 items-center pb-2">
                 <Crown className="w-6 h-6 text-white fill-white" />
                 <span className="line-clamp-1">
@@ -53,16 +53,16 @@ function AsideComponent({
               </h1>
             </div>
             <div className="w-full lg:p-3 rounded-lg mb-2">
-              <div className="grid  grid-cols-3 gap-1 lg:gap-3">
+              <div className="grid  grid-cols-3 mx-2 md:mx-0  gap-3">
                 {["Top", "Favourite", "New"].map((category, index) => {
                   const Icon = categoryIcons[category];
                   return (
                     <span
                       key={index}
                       onClick={() => handleCategoryChange(category)}
-                      className={`relative cursor-pointer flex justify-center items-center xl:min-w-[127px] lg:px-3 py-2 rounded-xl overflow-hidden
+                      className={`relative h-12  cursor-pointer flex justify-center items-center xl:min-w-[127px] lg:px-3 py-2 rounded-xl overflow-hidden
                   ${selectedCategory === category
-                          ? "brightness-150 shadow-[0_0_10px_rgba(0,0,0,1)] shadow-purple-500"
+                          ? "brightness-150 shadow-[0_0_5px_rgba(0,0,0,1)] shadow-purple-500 sm:shadow-[0_0_10px_rgba(0,0,0,1)] sm:shadow-purple-500"
                           : ""
                         } 
                   before:absolute tracking-tighter before:inset-0 before:opacity-0 before:transition-opacity before:duration-500 before:content-[''] group-hover:before:opacity-100
@@ -74,9 +74,9 @@ function AsideComponent({
                       }}
                     >
                       <Icon
-                        className={`w-5 h-5 sm:w-7 sm:h-7 ${category == "Top" ? "fill-yellow-500/10 text-yellow-600" : category == "Favourite" ? "fill-rose-500/50 text-rose-500" : "fill-white/70 text-black/70 "}  rounded-md p-1`}
+                        className={`w-6 h-6 sm:w-7 sm:h-7 ${category == "Top" ? "fill-yellow-500/10 text-yellow-600" : category == "Favourite" ? "fill-rose-500/50 text-rose-500" : "fill-white/70 text-black/70 "}  rounded-md p-1`}
                       />
-                      <span className="font-semibold md:hidden  sm:text-[16px] ml-1 xl:flex py-2 text-purple-300">
+                      <span className="font-semibold md:hidden tracking-wide text-[12px] sm:text-[16px] ml-1 xl:flex py-2 text-purple-300">
                         {category}
                       </span>
                     </span>
