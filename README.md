@@ -7,8 +7,9 @@
 
 
 > **Dive into a Universe of Manga, Manhwa, and Manhua!**  
-> AI Manga Reader is a breathtaking Next.js web app that redefines manga reading with **AI-powered OCR translation** (via `easyocr-js`), **text-to-speech (TTS)** with 20+ customizable voices, and a silky-smooth interface. Powered by the **MangaDex API**, it offers trending searches, multi-language support, flexible reading modes (vertical/horizontal), and lightning-fast performance. 🚀
-
+> AI Manga Reader is a sleek Next.js web app that transforms how you read manga. Powered by the MangaDex API, it gives you instant access to a huge collection of manga in multiple languages, with flexible reading modes like vertical, horizontal, single, or dual-panel views.
+What sets it apart is its AI-powered OCR translation (using ***easyocr-js*** package) that instantly translates text from manga images, making foreign-language titles easy to enjoy. Plus, the built-in text-to-speech (TTS) feature offers over 20 customizable voices so you can listen to your favorite manga anywhere, anytime.
+With trending searches, smart filters, and personalized settings that save your preferences, AI Manga Reader delivers a fast, smooth, and immersive experience on desktop, tablet, and mobile. Whether you’re new to manga or a longtime fan, this app makes reading more accessible and enjoyable than ever. 🚀
 ---
 
 ## 📑 **Table of Contents**
