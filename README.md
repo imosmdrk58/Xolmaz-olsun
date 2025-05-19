@@ -12,27 +12,6 @@ What sets it apart is its AI-powered OCR translation (using ***easyocr-js*** pac
 With trending searches, smart filters, and personalized settings that save your preferences, AI Manga Reader delivers a fast, smooth, and immersive experience on desktop, tablet, and mobile. Whether you’re new to manga or a longtime fan, this app makes reading more accessible and enjoyable than ever. 🚀
 ---
 
-## 📑 **Table of Contents**
-
-1. 🌍 Project Overview
-2. ✨ Core Features
-    - 📚 Landing Page
-    - 📖 Manga List
-    - 📄 Manga Chapter
-    - 📺 Read Chapter
-    - 🔍 Search Page
-    - 🧭 Top Navigation Bar
-3. ⚡ Performance Optimizations
-4. 📸 Screenshots
-5. 🚀 Getting Started
-6. 🎯 How to Use
-7. 🛣 Roadmap
-8. 🤝 Contributing
-9. 🙏 Acknowledgments
-10. 📜 License
-
----
-
 ## 🌍 **Project Overview**
 
 **AI Manga Reader** is your portal to an unparalleled manga experience. Built with **Next.js** and fueled by the **MangaDex API**, it blends cutting-edge technology with a passion for storytelling. From **real-time OCR translation** using `easyocr-js` to **AI-driven TTS**, this app makes manga accessible and immersive for fans worldwide.
@@ -49,13 +28,12 @@ With trending searches, smart filters, and personalized settings that save your 
 
 Feast your eyes on the stunning UI, two previews per row.
 
-### 📱 Mobile View
+
 
 <img src="./livedemoimages/m1.png" width="150" style="margin-right: 10px;" />&nbsp;&nbsp; <img src="./livedemoimages/m2.png" width="150" style="margin-right: 100px;" />&nbsp;&nbsp;  <img src="./livedemoimages/m3.png" width="150" />
 
 ---
 
-### 💻 Laptop View
 
 | 🌐 Landing Page |
 | -------------- |
