@@ -437,7 +437,7 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
-      <main className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-[90%] mx-auto px-2  py-6">
+      <main className="max-w-full sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-[90%] mx-auto px-2  py-6">
         {/* Results header with controls */}
         <SearchTotalAndFilterOptions
           handleSearch={handleSearch}
@@ -510,7 +510,7 @@ const SearchPage = () => {
             <div
               className={
                 viewMode === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-5 gap-2 mt-5 relative z-10"
+                  ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-5 gap-2 mt-5 relative z-10"
                   : "flex flex-col space-y-2 z-10 mt-5"
               }
             >

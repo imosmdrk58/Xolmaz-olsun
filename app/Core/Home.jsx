@@ -267,7 +267,7 @@ const processMangaData = useCallback(async (mangaList, type) => {
       <button
         key={manga.id || index}
         onClick={() => handleMangaClicked(manga)}
-        className="bg-gray-800 text-sm rounded-md px-3 py-2 m-1 hover:bg-opacity-45 hover:bg-purple-800 transition duration-200"
+        className="bg-gray-800 text-[10px] sm:text-sm rounded-md px-3 py-2 m-1 hover:bg-opacity-45 hover:bg-purple-800 transition duration-200"
       >
         {manga.title.length > 35 ? manga.title.slice(0, 35) + "..." : manga.title}
       </button>
@@ -294,7 +294,7 @@ const processMangaData = useCallback(async (mangaList, type) => {
       <div
         className={`w-full  ${isVisible ? "opacity-100" : "opacity-0"} transition-opacity flex justify-center items-center h-screen duration-300 bg-gradient-to-b from-purple-900/30 to-gray-900 pt-8 pb-12`}
       >
-        <div className="container mt-52 md:mt-0 mx-auto px-4 py-6">
+        <div className="container mt-16 md:mt-0 mx-auto px-4 py-6">
           {/* Logo */}
          <LOGO/>
 
@@ -323,7 +323,7 @@ const processMangaData = useCallback(async (mangaList, type) => {
             {error && (
               <div className="bg-red-600 text-white px-4 py-2 mb-4 rounded-md text-center">{error}</div>
             )}
-            <div className="flex flex-wrap items-center justify-center">
+            <div className="flex h-40 sm:h-auto overflow-hidden flex-wrap items-center justify-center">
               <span className="text-gray-400 mr-2 mb-2">Top search:</span>
               {renderedTopSearches}
             </div>

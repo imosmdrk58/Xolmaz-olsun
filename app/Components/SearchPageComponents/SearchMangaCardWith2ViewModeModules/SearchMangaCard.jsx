@@ -1,6 +1,6 @@
 import React, { memo, lazy, useMemo } from "react";
 import Image from "next/image";
-import { Heart, MessageSquareText, Bookmark } from 'lucide-react';
+import { Heart, MessageSquareText, Bookmark } from "lucide-react";
 const StableFlag = memo(lazy(() => import("../../StableFlag")));
 
 const contentRatingStyles = {
@@ -48,13 +48,11 @@ const SearchMangaCard = ({
   StarRating,
   timeSinceUpdate,
 }) => {
-  // Memoize remainingTagsCount
   const remainingTagsCount = useMemo(() => {
     const limit = 3;
     return manga.flatTags.length - limit;
   }, [manga.flatTags]);
 
-  // Memoize ratingStyle
   const ratingStyle = useMemo(
     () =>
       contentRatingStyles[manga.contentRating?.toLowerCase()] || {
@@ -64,7 +62,6 @@ const SearchMangaCard = ({
     [manga.contentRating]
   );
 
-  // Memoize statusStyle
   const statusStyle = useMemo(
     () =>
       statusStyles[manga.status] || {
@@ -75,7 +72,6 @@ const SearchMangaCard = ({
     [manga.status]
   );
 
-  // Memoize bayesian rating
   const bayesianRating = useMemo(
     () => manga?.rating?.rating?.bayesian || 0,
     [manga?.rating?.rating?.bayesian]
@@ -83,7 +79,7 @@ const SearchMangaCard = ({
 
   return (
     <article
-      className="relative group w-full max-w-[280px] sm:max-w-[300px] mx-auto tracking-wide flex justify-center cursor-pointer"
+      className="relative group w-full  mx-auto tracking-wide flex justify-center cursor-pointer"
       onClick={handleMangaClicked}
       role="button"
     >
@@ -91,54 +87,51 @@ const SearchMangaCard = ({
         className={`relative w-full rounded-2xl overflow-hidden bg-slate-900 transition-shadow ease-out 
           hover:shadow-[0px_0px_7px_rgba(0,0,0,1)] hover:shadow-purple-500 shadow-[0px_0px_2px_rgba(0,0,0,1)] shadow-purple-500 scale-100 transform`}
       >
-        <div className="absolute group inset-0 z-10 h-20 bg-gradient-to-b from-black via-black/70 to-transparent" />
-        <div className="relative h-[360px] sm:h-[400px] overflow-hidden rounded-2xl">
+        <div className="absolute group inset-0 z-10 h-16 sm:h-20 bg-gradient-to-b from-black via-black/70 to-transparent" />
+        <div className="relative h-[240px] sm:h-[360px] md:h-[400px] overflow-hidden rounded-2xl">
           <Image
             src={manga.coverImageUrl || "/placeholder.jpg"}
             alt={manga.title}
             fill
-            className={`object-cover transition-transform ease-out group-hover:scale-[102%]`}
+            className="object-cover transition-transform ease-out group-hover:scale-[102%]"
             placeholder="blur"
             blurDataURL="/placeholder.jpg"
             priority={false}
           />
-          {/* Content Rating Badge */}
           <span
-            className={`absolute z-20 top-3 right-2 min-w-24 flex justify-center items-center rounded-lg bg-opacity-40 border-2 py-1 px-4 text-xs sm:text-[10px] font-extrabold shadow-lg backdrop-blur-md cursor-default select-none ${ratingStyle.badge} ${ratingStyle.text} opacity-70`}
+            className={`absolute z-20 top-2 sm:top-3 right-1.5 sm:right-2 min-w-20 sm:min-w-24 flex justify-center items-center rounded-lg bg-opacity-40 border-2 py-0.5 sm:py-1 px-2 sm:px-4 text-[10px] font-extrabold shadow-lg backdrop-blur-md cursor-default select-none ${ratingStyle.badge} ${ratingStyle.text} opacity-70`}
           >
             {(manga.contentRating || "Unknown").toUpperCase()}
           </span>
-          {/* Status Badge */}
           <div
-            className={`absolute z-20 top-3 left-2 min-w-24 flex justify-center items-center gap-2 rounded-lg bg-opacity-40 border-2 py-1 px-4 font-bold shadow-lg backdrop-blur-md cursor-default select-none border-gray-700 bg-[#121212] opacity-70`}
+            className={`absolute z-20 top-2 sm:top-3 left-1.5 sm:left-2 min-w-20 sm:min-w-24 flex justify-center items-center gap-1 sm:gap-2 rounded-lg bg-opacity-40 border-2 py-0.5 sm:py-1 px-2 sm:px-4 font-bold shadow-lg backdrop-blur-md cursor-default select-none border-gray-700 bg-[#121212] opacity-70`}
           >
-            <span className={`relative flex h-2.5 w-2 rounded-full ${statusStyle.icon}`} />
-            <span className={`${statusStyle.text} text-xs sm:text-[11px] font-extrabold  tracking-wider`}>
+            <span className={`relative flex h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full ${statusStyle.icon}`} />
+            <span className={`${statusStyle.text} text-[10px] sm:text-xs font-extrabold `}>
               {(manga.status || "unknown").charAt(0).toUpperCase() +
                 (manga.status || "unknown").slice(1)}
             </span>
           </div>
         </div>
-        {/* Info Section */}
-        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 bg-gradient-to-t from-black via-black/90 to-transparent">
-          <div className="flex items-center gap-2 mb-2">
-            <StableFlag code={manga.originalLanguage || "UN"} className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-            <h1 className="text-white font-bold text-lg sm:text-xl line-clamp-1">{manga.title}</h1>
+        <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 md:p-5 bg-gradient-to-t from-black via-black/90 to-transparent">
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+            <StableFlag code={manga.originalLanguage || "UN"} className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 flex-shrink-0" />
+            <h1 className="text-white font-bold text-base sm:text-lg md:text-xl line-clamp-1">{manga.title}</h1>
           </div>
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between items-center mb-1.5 sm:mb-2">
             {bayesianRating > 0 && (
-              <div className="flex items-center gap-1">
-                <span className="text-amber-400 font-bold text-xs sm:text-base">
+              <div className="flex items-center gap-0.5 sm:gap-1">
+                <span className="text-amber-400 font-bold text-[10px] sm:text-xs md:text-base">
                   {bayesianRating.toFixed(1)}
                 </span>
                 <StarRating rating={bayesianRating} />
               </div>
             )}
-            <span className="text-xs sm:text-xs text-gray-400 font-medium tracking-wide">
+            <span className="text-[10px] sm:text-xs text-gray-400 font-medium tracking-wide">
               {timeSinceUpdate(manga.updatedAt)}
             </span>
           </div>
-          <div className="flex justify-between text-xs sm:text-xs bg-slate-800/40 backdrop-blur-md p-2 sm:p-3 rounded-lg">
+          <div className="flex justify-between text-[10px] sm:text-xs bg-slate-800/40 backdrop-blur-md p-1.5 sm:p-2 md:p-3 rounded-lg">
             {[
               {
                 icon: Heart,
@@ -160,26 +153,26 @@ const SearchMangaCard = ({
               },
             ].map(({ icon: Icon, value, label, color }) => (
               <div key={label} className="flex flex-col items-center">
-                <div className="flex items-center gap-1">
-                  <Icon className={`w-5 h-5  ${color}`} />
-                  <span className={`${color} font-semibold`}>{formatCount(value)}</span>
+                <div className="flex items-center gap-0.5 sm:gap-1">
+                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${color}`} />
+                  <span className={`${color} font-semibold text-[10px] sm:text-xs`}>{formatCount(value)}</span>
                 </div>
-                <span className="text-[10px] sm:text-xs text-gray-500">{label}</span>
+                <span className="text-[8px] sm:text-[10px] md:text-xs text-gray-500">{label}</span>
               </div>
             ))}
           </div>
-          <div className="flex flex-wrap gap-1 mt-2 overflow-hidden h-6">
+          <div className="flex flex-wrap gap-1 mt-1.5 sm:mt-2 overflow-hidden h-5 sm:h-6">
             {(manga.flatTags || []).slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="bg-slate-800/70 backdrop-blur-sm text-white/90 text-[10px] sm:text-xs px-2 py-0.5 rounded-md border border-slate-700/50 hover:bg-purple-900/40 transition-colors truncate"
+                className="bg-slate-800/70 backdrop-blur-sm text-white/90 text-[8px] sm:text-[10px] md:text-xs px-1.5 sm:px-2 py-0.5 rounded-md border border-slate-700/50 hover:bg-purple-900/40 transition-colors truncate"
                 title={tag}
               >
                 {tag}
               </span>
             ))}
             {remainingTagsCount > 0 && (
-              <span className="bg-purple-800/60 text-purple-100 text-[10px] sm:text-xs px-2 py-0.5 rounded-md border border-purple-700/50 truncate">
+              <span className="bg-purple-800/60 text-purple-100 text-[8px] sm:text-[10px] md:text-xs px-1.5 sm:px-2 py-0.5 rounded-md border border-purple-700/50 truncate">
                 +{remainingTagsCount}
               </span>
             )}

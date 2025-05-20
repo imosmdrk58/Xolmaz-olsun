@@ -85,9 +85,9 @@ function SearchTotalAndFilterOptions({
   );
 
   return (
-    <div className=" w-full bg-black/10 relative z-50 bg-opacity-90 backdrop-blur-md rounded-2xl p-2 justify-center flex flex-col items-center md:block  md:p-8 shadow-2xl border border-purple-900/30">
+    <div className="w-full bg-black/10 relative z-50 bg-opacity-90 backdrop-blur-md rounded-2xl p-2 justify-center flex flex-col items-center md:block md:p-8 shadow-2xl border border-purple-900/30">
       {/* Search Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 w-full">
         <div className="flex-1 w-full">
           <form onSubmit={handleSearch} className="relative w-full">
             <input
@@ -95,27 +95,27 @@ function SearchTotalAndFilterOptions({
               value={searchText}
               onChange={handleSearchChange}
               placeholder="Search manga..."
-              className="w-full px-5 py-4 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-xl text-purple-50 placeholder-purple-300/50 focus:outline-none focus:ring-2 focus:ring-purple-600/70 focus:border-purple-600 transition-all duration-300 shadow-inner pl-12"
+              className="w-full pr-4 py-3 sm:pr-5 sm:py-4 bg-black/60 backdrop-blur-sm border border-purple-800/50 rounded-xl text-purple-50 placeholder-purple-300/50 focus:outline-none focus:ring-2 focus:ring-purple-600/70 focus:border-purple-600 transition-all duration-300 shadow-inner pl-12 "
             />
             <div
               className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-purple-400"
               aria-label="Search"
             >
-              <Search className="h-6 w-6 saturate-0 brightness-150" />
+              <Search className="h-5 w-5 sm:h-6 sm:w-6 saturate-0 brightness-150" />
             </div>
             <button
               type="submit"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-gradient-to-br from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 text-white px-4 py-2 rounded-lg transition duration-300 shadow-lg hover:shadow-purple-500/30"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-br from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition duration-300 shadow-lg hover:shadow-purple-500/30 text-sm sm:text-base"
             >
               Search
             </button>
           </form>
         </div>
 
-        <div className="flex items-center gap-4 self-end lg:self-auto flex-wrap">
+        <div className="flex items-center gap-3 self-end lg:self-auto flex-wrap">
           {/* Results count */}
           {searchQuery && (
-            <div className="hidden lg:flex items-center gap-2 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-purple-900/30">
+            <div className="hidden  lg:flex items-center gap-2 bg-black/50 backdrop-blur-sm px-4 py-2.5 rounded-lg border border-purple-900/50">
               <span className="text-purple-400 font-bold">
                 {filteredResults.length}
               </span>
@@ -128,15 +128,16 @@ function SearchTotalAndFilterOptions({
           {/* Filter button */}
           <button
             onClick={toggleFilterPanel}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-300 ${isFilterOpen
-              ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-xl shadow-purple-700/30"
-              : "bg-black/60 hover:bg-black/80 text-purple-200 border border-purple-900/50 hover:border-purple-700/70"
-              }`}
+            className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg font-medium transition-all duration-300 ${
+              isFilterOpen
+                ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white shadow-xl shadow-purple-700/30"
+                : "bg-black/60 hover:bg-black/80 text-purple-200 border border-purple-900/50 hover:border-purple-700/70"
+            }`}
             aria-expanded={isFilterOpen}
             aria-controls="filter-panel"
           >
-            <Filter className="h-5 w-5" />
-            <span>Filters</span>
+            <Filter className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="text-sm sm:text-base">Filters</span>
             {activeFilterCount > 0 && (
               <span className="flex items-center justify-center min-w-5 h-5 px-1.5 bg-purple-300 text-purple-900 text-xs font-bold rounded-full">
                 {activeFilterCount}
@@ -148,25 +149,27 @@ function SearchTotalAndFilterOptions({
           <div className="flex bg-black/60 border border-purple-900/50 rounded-lg overflow-hidden shadow-lg">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2.5 transition-all duration-300 ${viewMode === "grid"
-                ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
-                : "text-purple-300 hover:text-white hover:bg-purple-900/30"
-                }`}
+              className={`p-2 transition-all duration-300 ${
+                viewMode === "grid"
+                  ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
+                  : "text-purple-300 hover:text-white hover:bg-purple-900/30"
+              }`}
               aria-label="Grid view"
               aria-pressed={viewMode === "grid"}
             >
-              <Grid className="h-5 w-5" />
+              <Grid className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2.5 transition-all duration-300 ${viewMode === "list"
-                ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
-                : "text-purple-300 hover:text-white hover:bg-purple-900/30"
-                }`}
+              className={`p-2 transition-all duration-300 ${
+                viewMode === "list"
+                  ? "bg-gradient-to-r from-purple-700 to-indigo-900 text-white"
+                  : "text-purple-300 hover:text-white hover:bg-purple-900/30"
+              }`}
               aria-label="List view"
               aria-pressed={viewMode === "list"}
             >
-              <List className="h-5 w-5" />
+              <List className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
         </div>
@@ -174,14 +177,14 @@ function SearchTotalAndFilterOptions({
 
       {/* Search query display and results count (mobile) */}
       {searchQuery && (
-        <div className={`flex flex-col  ${isFilterOpen?"mb-4":"mb-0"}  md:flex-row justify-between items-start md:items-center gap-2 `}>
-          <h1 className="text-xl sm:text-2xl font-bold">
+        <div className={`flex -mt-16 relative -z-10 md:-mt-0 flex-col ${isFilterOpen ? "mb-4" : "mb-0"} md:flex-row justify-between items-start md:items-center gap-2 w-full`}>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
             <span className="text-purple-500">Results for </span>
             <span className="text-white">"</span>
             <span className="text-purple-300 font-semibold">{searchQuery}</span>
             <span className="text-white">"</span>
           </h1>
-          <p className="text-purple-300/70 lg:hidden">
+          <p className="text-purple-300/70 lg:hidden text-sm sm:text-base">
             {filteredResults.length > 0 &&
               `${filteredResults.length} ${filteredResults.length === 1 ? "result" : "results"
               } found`}
@@ -296,13 +299,13 @@ function SearchTotalAndFilterOptions({
 
       {/* Active Filters Display */}
       {hasActiveFilters && !isFilterOpen && (
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-4 sm:mb-6 w-full">
           <button
             onClick={clearAllFilters}
-            className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-sm text-purple-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-1.5 bg-black/60 border border-purple-800/50 rounded-full px-3 py-1.5 text-xs sm:text-sm text-purple-400 hover:text-white transition-colors"
           >
             Clear All
-            <X className="h-4 w-4" />
+            <X className="h-3 w-3 sm:h-4 sm:w-4" />
           </button>
         </div>
       )}

@@ -7,17 +7,17 @@ const SearchMangaCard = memo(
 const SearchMangaList = memo(
   lazy(() => import("./SearchMangaCardWith2ViewModeModules/SearchMangaList"))
 );
+
 // Memoized StarRating component
 const StarRating = memo(({ rating }) => {
   const fullStars = Math.floor(rating / 2);
   const fractionalPart = rating / 2 - fullStars;
-  const hasHalfStar = fractionalPart >= 0.35; // Show half star if fractional part is 0.35 or more
+  const hasHalfStar = fractionalPart >= 0.35;
 
   return (
     <div className="flex gap-0.5" aria-label={`Rating: ${rating.toFixed(1)} out of 10`}>
       {[...Array(5)].map((_, i) => {
         if (i < fullStars) {
-          // Full star
           return (
             <Star
               key={i}
@@ -27,7 +27,6 @@ const StarRating = memo(({ rating }) => {
           );
         }
         if (i === fullStars && hasHalfStar) {
-          // Half star
           return (
             <Star
               key={i}
@@ -47,11 +46,10 @@ const StarRating = memo(({ rating }) => {
             </Star>
           );
         }
-        // Empty star
         return (
           <Star
             key={i}
-            className="w-[15px] h-[15px]  text-slate-600 fill-current"
+            className="w-[15px] h-[15px] text-slate-600 fill-current"
             aria-hidden="true"
           />
         );
@@ -60,7 +58,6 @@ const StarRating = memo(({ rating }) => {
   );
 });
 
-// Move formatCount and timeSinceUpdate outside the component for stability
 const formatCount = (num) => {
   if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
   if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
@@ -80,16 +77,12 @@ const timeSinceUpdate = (dateString) => {
 
 const SearchMangaCardWith2ViewMode = ({ manga, viewMode }) => {
   const navigate = useNavigate();
-
-  // Memoize manga ID to stabilize handleMangaClicked
   const mangaId = useMemo(() => manga.id, [manga.id]);
 
-  // Stabilize handleMangaClicked with useCallback and stable dependencies
   const handleMangaClicked = useCallback(() => {
     navigate(`/manga/${mangaId}/chapters`, { state: { manga } });
   }, [navigate, mangaId, manga]);
 
-  // Memoize props to ensure stability
   const cardProps = useMemo(
     () => ({
       StarRating,

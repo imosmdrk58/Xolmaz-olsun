@@ -27,7 +27,7 @@ const TopNavbar = () => {
       <div className="flex items-center">
         <a href="/" className="flex items-center mr-4">
           <Image
-            className="rounded-full"
+            className="rounded-full w-12  md:w-16  "
             src="/logo.svg"
             width={40}
             height={40}

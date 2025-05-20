@@ -16,7 +16,7 @@ const LandingContent= () => {
     ];
   
     return (
-      <div className="bg-gray-900 mt-44 md:mt-0 min-h-screen text-gray-100">
+      <div className="bg-gray-900 mt-72 sm:mt-0 min-h-screen text-gray-100">
         <main className="max-w-4xl mx-auto px-6 py-16 -mt-10">
           {/* Introduction */}
           <div className="bg-gray-800 rounded-xl p-8 mb-12 shadow-xl">
