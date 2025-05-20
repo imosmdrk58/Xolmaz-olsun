@@ -7,29 +7,9 @@
 
 
 > **Dive into a Universe of Manga, Manhwa, and Manhua!**  
-> AI Manga Reader is a breathtaking Next.js web app that redefines manga reading with **AI-powered OCR translation** (via `easyocr-js`), **text-to-speech (TTS)** with 20+ customizable voices, and a silky-smooth interface. Powered by the **MangaDex API**, it offers trending searches, multi-language support, flexible reading modes (vertical/horizontal), and lightning-fast performance. 🚀
-
----
-
-## 📑 **Table of Contents**
-
-1. 🌍 Project Overview
-2. ✨ Core Features
-    - 📚 Landing Page
-    - 📖 Manga List
-    - 📄 Manga Chapter
-    - 📺 Read Chapter
-    - 🔍 Search Page
-    - 🧭 Top Navigation Bar
-3. ⚡ Performance Optimizations
-4. 📸 Screenshots
-5. 🚀 Getting Started
-6. 🎯 How to Use
-7. 🛣 Roadmap
-8. 🤝 Contributing
-9. 🙏 Acknowledgments
-10. 📜 License
-
+> AI Manga Reader is a sleek Next.js web app that transforms how you read manga. Powered by the MangaDex API, it gives you instant access to a huge collection of manga in multiple languages, with flexible reading modes like vertical, horizontal, single, or dual-panel views.
+What sets it apart is its AI-powered OCR translation (using ***easyocr-js*** package) that instantly translates text from manga images, making foreign-language titles easy to enjoy. Plus, the built-in text-to-speech (TTS) feature offers over 20 customizable voices so you can listen to your favorite manga anywhere, anytime.
+With trending searches, smart filters, and personalized settings that save your preferences, AI Manga Reader delivers a fast, smooth, and immersive experience on desktop, tablet, and mobile. Whether you’re new to manga or a longtime fan, this app makes reading more accessible and enjoyable than ever. 🚀
 ---
 
 ## 🌍 **Project Overview**
@@ -45,35 +25,44 @@
 ---
 
 ## 📸 **Screenshots**
- Feast your eyes on the stunning UI, two previews per row.
+
+Feast your eyes on the stunning UI, two previews per row.
+
+
+
+<img src="./livedemoimages/m1.png" width="150" style="margin-right: 10px;" />&nbsp;&nbsp; <img src="./livedemoimages/m2.png" width="150" style="margin-right: 100px;" />&nbsp;&nbsp;  <img src="./livedemoimages/m3.png" width="150" />
+
+---
+
 
 | 🌐 Landing Page |
-|-----------------|
+| -------------- |
 | ![Landing Page](./livedemoimages/1.png) |
 
 | 📚 Manga List | 📚 Manga List |
-|------------------|-----------------|
-| ![Manga List](./livedemoimages/2.png) | ![Manga List](./livedemoimages/3.png)  |
+| ------------ | ------------ |
+| ![Manga List](./livedemoimages/2.png) | ![Manga List](./livedemoimages/3.png) |
 
 | 📄 Manga Chapter | 📄 Manga Chapter |
-|----------------|-------------------|
+| --------------- | ---------------- |
 | ![Manga Chapter](./livedemoimages/4.png) | ![Manga Chapter](./livedemoimages/5.png) |
 
 | 📺 Read Chapter | 📺 Read Chapter |
-|-------------------|-------------------|
+| -------------- | -------------- |
 | ![Read Chapter](./livedemoimages/6.png) | ![Read Chapter](./livedemoimages/7.png) |
 
 | 📺 Read Chapter | 📺 Read Chapter |
-|-------------------|-------------------|
+| -------------- | -------------- |
 | ![Read Chapter](./livedemoimages/8.png) | ![Read Chapter](./livedemoimages/9.png) |
 
 | 🔍 Search Page | 🔍 Search Page |
-|-------------------|-------------------|
+| ------------- | ------------- |
 | ![Search Page](./livedemoimages/10.png) | ![Search Page](./livedemoimages/11.png) |
 
 | 🔍 Search Page |
-|-------------------|
-|  ![Search Page](./livedemoimages/12.png) |
+| ------------- |
+| ![Search Page](./livedemoimages/12.png) |
+
 ---
 
 ## ✨ **Core Features**
