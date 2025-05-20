@@ -30,7 +30,7 @@ Feast your eyes on the stunning UI, two previews per row.
 
 
 
-<img src="./livedemoimages/m1.png" width="150" style="margin-right: 10px;" />&nbsp;&nbsp; <img src="./livedemoimages/m2.png" width="150" style="margin-right: 100px;" />&nbsp;&nbsp;  <img src="./livedemoimages/m3.png" width="150" />
+<img src="./livedemoimages/m1.png" width="150" style="margin-right: 10px;" />&nbsp;&nbsp; <img src="./livedemoimages/m2.png" width="150" style="margin-right: 100px;" />&nbsp;&nbsp;  <img src="./livedemoimages/m3.png" width="150" />&nbsp;&nbsp;  <img src="./livedemoimages/m4.png" width="150" />&nbsp;&nbsp;  <img src="./livedemoimages/m5.png" width="150" />&nbsp;&nbsp;  <img src="./livedemoimages/m6.png" width="150" />&nbsp;&nbsp;  <img src="./livedemoimages/m11.png" width="150" />&nbsp;&nbsp;  <img src="./livedemoimages/m12.png" width="150" />&nbsp;&nbsp;  <img src="./livedemoimages/m13.png" width="150" />
 
 ---
 
