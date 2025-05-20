@@ -150,9 +150,9 @@ const AboutManga = ({ manga, handleChapterClick, last }) => {
               </div>
             <div className={`flex flex-col gap-4 sm:gap-2`}>
               {/* Tags and Rating */}
-              <div className={`mt-2  ${isExpanded?"flex sm:flex ":"hidden sm:flex "} sm:mt-3 sm:mx-2 flex-wrap gap-2 justify-center sm:justify-start`}>
+              <div className={`mt-2 space-y-1 ${isExpanded?"flex sm:flex ":"hidden sm:flex "} sm:mt-3 sm:mx-2 flex-wrap gap-2 justify-center sm:justify-start`}>
                 <span
-                  className={`rounded-md px-2 sm:px-3 py-1 text-xs sm:text-base font-semibold text-white shadow-[0_0_3px_rgba(0,0,0,1)] shadow-purple-500 hover:scale-105 transition-transform duration-150 ${getRatingColor(
+                  className={`rounded-md h-fit mt-1 px-2 sm:px-3 py-1.5 text-xs sm:text-base font-semibold text-white shadow-[0_0_3px_rgba(0,0,0,1)] shadow-purple-500 hover:scale-105 transition-transform duration-150 ${getRatingColor(
                     manga.contentRating
                   )}`}
                 >
