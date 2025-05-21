@@ -124,14 +124,15 @@ export default function ReadChapter() {
   );
   return (
     pages && !isError ? (
-      <div className="tracking-wider flex flex-row w-full justify-between items-start h-full -mt-5 bg-[#070920] backdrop-blur-md text-white">
+      <div
+        className="tracking-wider flex flex-row w-full h-[90vh] md:h-[91.3vh] justify-between items-start -mt-5 bg-[#070920] backdrop-blur-md text-white overflow-hidden"
+      >
         <InfoSidebar
           panels={panels}
           pages={pages && (quality === "low" ? pages?.chapter?.dataSaver : pages?.chapter?.data)}
           setCurrentIndex={setCurrentIndex}
           currentIndex={currentIndex}
           allChapters={chapters}
-
           currentChapterIndex={currentChapterIndex}
           goToNextChapter={goToNextChapter}
           goToPrevChapter={goToPrevChapter}
@@ -139,47 +140,55 @@ export default function ReadChapter() {
           hasNextChapter={hasNextChapter}
           hasPrevChapter={hasPrevChapter}
           goToChapter={goToChapter}
-
           chapterInfo={chapterInfo}
           isCollapsed={isCollapsed}
           mangaInfo={mangaInfo}
           setIsCollapsed={setIsCollapsed}
+          className="min-w-[200px] max-w-[300px] sm:max-w-[350px] flex-shrink-0"
         />
+
         <div
           ref={scrollContainerRef}
-          style={{
+          className="tracking-wider flex flex-col flex-grow min-w-0 h-full w-full max-w-full  scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-900"
+        >
+          {/* MiddleImageAndOptions scrollable area */}
+          <div 
+            style={{
             scrollbarWidth: "thin",
             scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)",
           }}
-          className="tracking-wider flex flex-col h-[91.2vh] flex-1 w-full overflow-y-scroll"
-        >
-          <MiddleImageAndOptions
-            layout={layout}
-            isLoading={isLoading}
-            pages={pages}
-            quality={quality}
-            currentIndex={currentIndex}
-            panels={panels}
-            chapterInfo={chapterInfo}
-            pageTranslations={pageTranslations}
-            setPageTranslations={setPageTranslations}
-            pageTTS={pageTTS}
-            setPageTTS={setPageTTS}
-            fullOCRResult={fullOCRResult}
-            setFullOCRResult={setFullOCRResult}
-            isItTextToSpeech={isItTextToSpeech}
-            setIsItTextToSpeech={setIsItTextToSpeech}
-            finalResult={finalResult}
-            showMessage={showMessage}
-            setShowMessage={setShowMessage}
-            allAtOnce={allAtOnce}
-            goToPrevChapter={goToPrevChapter}
-            hasPrevChapter={hasPrevChapter}
-            goToNextChapter={goToNextChapter}
-            hasNextChapter={hasNextChapter}
-            memoizedHandleTranslate={memoizedHandleTranslate}
-          />
-          <div>
+          className="flex-grow overflow-y-auto min-w-0 max-w-full scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-900">
+            <MiddleImageAndOptions
+              layout={layout}
+              isLoading={isLoading}
+              pages={pages}
+              quality={quality}
+              currentIndex={currentIndex}
+              panels={panels}
+              chapterInfo={chapterInfo}
+              pageTranslations={pageTranslations}
+              setPageTranslations={setPageTranslations}
+              pageTTS={pageTTS}
+              setPageTTS={setPageTTS}
+              fullOCRResult={fullOCRResult}
+              setFullOCRResult={setFullOCRResult}
+              isItTextToSpeech={isItTextToSpeech}
+              setIsItTextToSpeech={setIsItTextToSpeech}
+              finalResult={finalResult}
+              showMessage={showMessage}
+              setShowMessage={setShowMessage}
+              allAtOnce={allAtOnce}
+              goToPrevChapter={goToPrevChapter}
+              hasPrevChapter={hasPrevChapter}
+              goToNextChapter={goToNextChapter}
+              hasNextChapter={hasNextChapter}
+              memoizedHandleTranslate={memoizedHandleTranslate}
+              className="min-w-0 max-w-full"
+            />
+          </div>
+
+          {/* BottomSettings fixed height, no overflow */}
+          <div className="flex-shrink-0 w-full max-w-full">
             <BottomSettings
               allAtOnce={allAtOnce}
               quality={quality}
@@ -199,7 +208,7 @@ export default function ReadChapter() {
                 className="tracking-wider cursor-pointer fixed bottom-32 right-8 w-16 h-16 rounded-full border-4 border-violet-200 bg-black flex items-center justify-center duration-300 hover:rounded-[50px] hover:w-24 group/button overflow-hidden active:scale-90"
                 onClick={() => {
                   if (scrollContainerRef.current) {
-                    scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                    scrollContainerRef.current.scrollTo({ top: 0, behavior: "smooth" });
                   }
                 }}
               >
@@ -211,19 +220,8 @@ export default function ReadChapter() {
             )}
           </div>
         </div>
-
-        {showMessage && layout !== "vertical" && (
-          <div className="tracking-wider absolute z-50 text-wrap w-fit max-w-72 top-12 border-purple-500 border right-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg transition-opacity duration-300">
-            <button
-              className="tracking-wider absolute top-1 right-1 text-white bg-purple-600 hover:bg-gray-500 rounded-full p-1 px-2.5"
-              onClick={() => setShowMessage(false)}
-            >
-              ✖
-            </button>
-            <p>{finalResult || "No text Available"}</p>
-          </div>
-        )}
       </div>
+
     ) : (
       <LoadingSpinner text="Loading Chapter..." />
     )
