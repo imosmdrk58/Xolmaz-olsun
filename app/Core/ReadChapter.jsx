@@ -148,16 +148,16 @@ export default function ReadChapter() {
         />
 
         <div
-          ref={scrollContainerRef}
           className="tracking-wider flex flex-col flex-grow min-w-0 h-full w-full max-w-full  scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-900"
         >
           {/* MiddleImageAndOptions scrollable area */}
-          <div 
+          <div
+            ref={scrollContainerRef}
             style={{
-            scrollbarWidth: "thin",
-            scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)",
-          }}
-          className="flex-grow overflow-y-auto min-w-0 max-w-full scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-900">
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)",
+            }}
+            className="flex-grow overflow-y-auto min-w-0 max-w-full scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-900">
             <MiddleImageAndOptions
               layout={layout}
               isLoading={isLoading}
