@@ -137,7 +137,7 @@ const BottomSettings = ({
     ) : (
       <div className={`${isCollapsed ? "w-[95.2%]" : "w-[77.7%]"} h-20 sm:h-24 fixed bottom-0 bg-[#070920] flex items-center justify-between px-4 sm:px-6 py-4 backdrop-blur-md shadow-xl border-t border-blue-950 flex-col sm:flex-row gap-4 sm:gap-0`}>
         <div className="flex w-full items-center justify-start md:justify-around space-x-2 flex-row gap-12 sm:gap-0">
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden w-1/2 justify-between md:flex items-center space-x-2">
             <LayoutSelector layout={layout} setLayout={setLayout} />
             <QualitySelector quality={quality} setQuality={setQuality} />
           </div>

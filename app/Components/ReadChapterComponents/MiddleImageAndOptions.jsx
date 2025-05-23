@@ -6,11 +6,11 @@ import {
     ArrowLeft,
 } from 'lucide-react';
 import Image from 'next/image';
-const TextToSpeech = memo(lazy(() => import('./TextToSpeech')));
+const TextToSpeech = lazy(() => import('./TextToSpeech'));
 const OCROverlay = memo(lazy(() => import('./OCROverlay')));
 const LoadingSpinner = memo(lazy(() => import('../LoadingSpinner')));
 const Placeholder = memo(lazy(() => import('./Placeholder')));
-
+import handleTranslate from '../../util/ReadChapterUtils/handleTranslate';
 function MiddleImageAndOptions({
     layout,
     isLoading,
@@ -27,14 +27,12 @@ function MiddleImageAndOptions({
     setFullOCRResult,
     isItTextToSpeech,
     setIsItTextToSpeech,
-    finalResult,
     setShowMessage,
     allAtOnce,
     goToPrevChapter,
     hasPrevChapter,
     goToNextChapter,
     hasNextChapter,
-    memoizedHandleTranslate
 }) {
     if (!(chapterInfo && pages)) return null
     const [imageCache, setImageCache] = useState([]);
@@ -45,6 +43,12 @@ function MiddleImageAndOptions({
     const handleImageLoad = useCallback((url) => {
         setImageCache((prevCache) => [...prevCache, url]);
     }, []);
+
+
+    const memoizedHandleTranslate = useCallback(
+        (text) => handleTranslate(text),
+        []
+    );
 
 
     const handleImageError = useCallback(() => {
@@ -113,7 +117,7 @@ function MiddleImageAndOptions({
             if (from === "translate") {
                 const translated = await memoizedHandleTranslate(processedText);
                 const translatedocrResult = await translateAll(ocrResult);
-
+                console.log(translated)
                 setPageTranslations((prev) => ({
                     ...prev,
                     [imageUrl]: {
@@ -196,26 +200,24 @@ function MiddleImageAndOptions({
                                                     <button
                                                         disabled={panels === 2 || pageTranslations[page]}
                                                         onClick={() => handleUpload(page, "translate")}
-                                                        className={`group py-4 ${panels === 2 || pageTranslations[page] ? "hidden" : ""
-                                                            } px-2 mb-4 before:bg-opacity-60 flex items-center justify-start min-w-[48px] h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
-                                  shadow-[0px_0px_10px_rgba(0,0,0,1)] shadow-yellow-500 bg-[#1a063e] bg-opacity-60  hover:min-w-[182px] hover:shadow-lg disabled:cursor-not-allowed 
-                                  ${pageTranslations[page]
-                                                                ? "shadow-[0px_0px_6px rgba(0,0,0,1)] shadow-yellow-500 bg-yellow-400 bg-opacity-60"
-                                                                : "bg-[#1a063e]"
-                                                            } 
-                                  backdrop-blur-md lg:font-semibold border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 
-                                  before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] 
-                                  hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 ease-in-out`}
+                                                        className={`group py-2 sm:py-4 px-1 sm:px-2 mb-4 before:bg-opacity-60 flex items-center justify-start min-w-[36px] sm:min-w-[48px] h-12 sm:h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
+    shadow-[0px_0px_10px_rgba(0,0,0,1)] shadow-yellow-500 bg-[#1a063e] bg-opacity-60 hover:min-w-[140px] sm:hover:min-w-[182px] hover:shadow-lg disabled:cursor-not-allowed 
+    ${panels === 2 || pageTranslations[page] ? "hidden" : ""}  backdrop-blur-md lg:font-semibold border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 
+    before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] 
+    hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 ease-in-out`}
                                                     >
-                                                        <Languages className="tracking-wider w-16 p-4 text-orange-400 h-16 bg-opacity-85 group-hover:border-2 group-hover:border-yellow-500 transition-all bg-gray-50 ease-in-out duration-300 rounded-full border border-gray-700  transform group-hover:rotate-[360deg]" />
+                                                        <Languages
+                                                            className="tracking-wider w-10 h-10 sm:w-16 sm:h-16 p-2 sm:p-4 text-orange-400 bg-opacity-85 group-hover:border-2 group-hover:border-yellow-500 transition-all bg-gray-50 ease-in-out duration-300 rounded-full border border-gray-700 transform group-hover:rotate-[360deg]"
+                                                        />
                                                         <span
-                                                            className={`absolute font-sans font-bold left-20 text-lg tracking-tight text-gray-100 opacity-0 transform translate-x-4 transition-all duration-300 
-                                      group-hover:opacity-100 group-hover:text-black group-hover:translate-x-0 ${pageTranslations[page] ? "text-yellow-300" : ""
+                                                            className={`absolute font-sans font-bold left-14 sm:left-20 text-sm sm:text-lg tracking-tight text-gray-100 opacity-0 transform translate-x-2 sm:translate-x-4 transition-all duration-300 
+      group-hover:opacity-100 group-hover:text-black group-hover:translate-x-0 ${pageTranslations[page] ? "text-yellow-300" : ""
                                                                 }`}
                                                         >
                                                             {pageTranslations[page] ? "Translated" : "Translate"}
                                                         </span>
                                                     </button>
+
                                                 )}
                                                 <TextToSpeech
                                                     page={page}
@@ -223,7 +225,7 @@ function MiddleImageAndOptions({
                                                     ready={Boolean(pageTTS[page] ? isItTextToSpeech : pageTranslations[page])}
                                                     text={
                                                         ((pageTTS[page] && isItTextToSpeech) || pageTranslations[page]) &&
-                                                        finalResult // Use memoized result
+                                                        pageTranslations[page].textResult // Use memoized result
                                                     }
                                                 />
                                             </>
@@ -245,7 +247,7 @@ function MiddleImageAndOptions({
                                     (page, index) => (
                                         <div
                                             key={index}
-                                            className={`tracking-wider ${allAtOnce && (quality === "low" ? pages?.chapter?.dataSaver : pages?.chapter?.data).map((p) => {
+                                            className={`tracking-wider px-4 md:px-0 ${allAtOnce && (quality === "low" ? pages?.chapter?.dataSaver : pages?.chapter?.data).map((p) => {
                                                 if (!imageCache.includes(p)) return false
                                             }).includes(false) ? "hidden" : "block"} relative h-fit w-full flex justify-center items-center`}
                                         >
@@ -286,13 +288,10 @@ function MiddleImageAndOptions({
                                                                 disabled={panels === 2 || pageTranslations[page]}
                                                                 onClick={() => handleUpload(page, "translate")}
                                                                 className={`font-sans ${panels === 2 || pageTranslations[page] ? "hidden" : ""
-                                                                    } disabled:cursor-not-allowed mt-3 before:bg-opacity-60 min-w-[189px] transition-colors min-h-16 flex gap-4 justify-start items-center mx-auto shadow-xl text-lg text-white ${pageTranslations[page]
-                                                                        ? "shadow-[0px_0px_6px_rgba(0,0,0,1)] shadow-yellow-500 bg-yellow-400 bg-opacity-60 "
-                                                                        : "bg-[#1a063e]"
-                                                                    } backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-3 py-2 ease-in-out overflow-hidden border-2 rounded-full group`}
+                                                                    } tracking-wider text-[11px] font-sans before:bg-opacity-60 min-w-[125px] sm:min-w-[189px] transition-colors flex gap-2 justify-start items-center mx-auto shadow-xl sm:text-lg text-white bg-[#1a063e] backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] hover:text-black before:-z-10 before:aspect-square before:hover:scale-200 before:hover:duration-300 relative z-10 px-2 py-1 sm:px-3 sm:py-2 ease-in-out overflow-hidden border-2 rounded-full group`}
                                                                 type="submit"
                                                             >
-                                                                <Languages className="tracking-wider w-12 h-12 bg-opacity-85 group-hover:border-2 group-hover:border-yellow-500 transition-all bg-gray-50 text-orange-400 ease-in-out duration-300 rounded-full border border-gray-700 p-3 transform group-hover:rotate-[360deg]" />
+                                                                <Languages className="tracking-wider w-8 h-8 sm:w-12 sm:h-12 bg-opacity-85 group-hover:border-2 group-hover:border-yellow-500 transition-all bg-gray-50 text-orange-400 ease-in-out duration-300 rounded-full border border-gray-700 p-2 md:p-3 transform group-hover:rotate-[360deg]" />
                                                                 {pageTranslations[page] ? "Translated" : "Translate"}
                                                             </button>
                                                         )}
@@ -302,7 +301,7 @@ function MiddleImageAndOptions({
                                                             ready={Boolean(pageTTS[page] ? isItTextToSpeech : pageTranslations[page])}
                                                             text={
                                                                 ((pageTTS[page] && isItTextToSpeech) || pageTranslations[page]) &&
-                                                                finalResult // Use memoized result
+                                                                pageTranslations[page].textResult // Use memoized result
                                                             }
                                                             layout={layout}
                                                         />
@@ -348,10 +347,9 @@ function MiddleImageAndOptions({
                                         <ArrowRight className="w-5 h-5 font-bold" />
                                     </button>
                                 </div>
-                    //for all at once loading while all the other pages are loading this is shown
                                 {(allAtOnce && (quality === "low" ? pages?.chapter?.dataSaver : pages?.chapter?.data).map((p) => {
                                     if (!imageCache.includes(p)) return false
-                                }).includes(false)) && <div className=' absolute top-7 left-1/2'><Placeholder /></div>}
+                                }).includes(false)) && <div className=' absolute top-7 left-[40%]'><Placeholder /></div>}
                             </div>
                         )
                 )}

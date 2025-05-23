@@ -13,7 +13,7 @@
     "@vitalets/google-translate-api": "^9.2.1",
     "axios": "^1.7.9",
     "babel-plugin-react-compiler": "^19.0.0-beta-ebf51a3-20250411",
-    "easyocr-js": "^1.1.1",
+    "easyocr-js": "^1.1.2",
     "framer-motion": "^12.4.4",
     "gtts": "^0.2.1",
     "lucide-react": "^0.509.0",

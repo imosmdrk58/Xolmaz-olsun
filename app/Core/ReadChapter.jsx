@@ -3,7 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, memo, useCallback, lazy, useRef, useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import sortAndJoinOCR from '../util/ReadChapterUtils/sortAndjoinOCR';
 import handleTranslate from '../util/ReadChapterUtils/handleTranslate';
 import { ArrowUp } from 'lucide-react';
 
@@ -11,8 +10,8 @@ const InfoSidebar = memo(lazy(() => import('../Components/ReadChapterComponents/
 const BottomSettings = memo(lazy(() => import('../Components/ReadChapterComponents/BottomSettingsModules/BottomSettings')));
 const LoadingSpinner = memo(lazy(() => import('../Components/LoadingSpinner')));
 
-import _MiddleImageAndOptions from "../Components/ReadChapterComponents/MiddleImageAndOptions";
-const MiddleImageAndOptions = memo(_MiddleImageAndOptions);
+import MiddleImageAndOptions from "../Components/ReadChapterComponents/MiddleImageAndOptions";
+// const MiddleImageAndOptions = memo(_MiddleImageAndOptions);
 export default function ReadChapter() {
   const { mangaId, chapterId } = useParams();
   const location = useLocation();
@@ -31,11 +30,10 @@ export default function ReadChapter() {
   const [pageTTS, setPageTTS] = useState({});
 
   const [quality, setQuality] = useState("low");
-  const [finalResult, setFinalResult] = useState();
   const scrollContainerRef = useRef(null);
   // Memoize handleTranslate to ensure stable reference for props and callbacks
 
-  const momoizedSortAndJoinOCR = useCallback((fullOCRResult) => sortAndJoinOCR(fullOCRResult))
+  // const momoizedSortAndJoinOCR = useCallback((fullOCRResult) => sortAndJoinOCR(fullOCRResult))
 
   const { data: pages, isLoading, isError } = useQuery({
     queryKey: ['chapterPages', chapterId],
@@ -55,10 +53,7 @@ export default function ReadChapter() {
     retry: 2,
   });
 
-  const memoizedHandleTranslate = useCallback(
-    (text) => handleTranslate(text),
-    []
-  );
+
   const handleChapterClick = useCallback(
     (id) => {
       navigate(`/manga/${mangaId}/chapter/${id.id}/read`, {
@@ -67,14 +62,7 @@ export default function ReadChapter() {
     },
     [navigate, mangaId, mangaInfo, pages]
   );
-  useEffect(() => {
-    async function doFullTextOCR() {
-      setFinalResult(isItTextToSpeech ? momoizedSortAndJoinOCR(fullOCRResult) : await memoizedHandleTranslate(momoizedSortAndJoinOCR(fullOCRResult)));
-    }
-    doFullTextOCR()
-  }, [momoizedSortAndJoinOCR, isItTextToSpeech, memoizedHandleTranslate, fullOCRResult])
 
-  console.log(finalResult)
   useEffect(() => {
     if (pages && pages?.chapter?.dataSaver?.length > 0 && pages?.chapter?.data?.length > 0) {
       const currentPage = quality === "low" ? pages?.chapter?.dataSaver[currentIndex] : pages?.chapter?.data[currentIndex];
@@ -154,10 +142,10 @@ export default function ReadChapter() {
           <div
             ref={scrollContainerRef}
             style={{
-              scrollbarWidth: "thin",
+              scrollbarWidth: "none",
               scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)",
             }}
-            className="flex-grow overflow-y-auto min-w-0 max-w-full scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-900">
+            className="flex-grow scroll overflow-y-auto min-w-0 max-w-full scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-900">
             <MiddleImageAndOptions
               layout={layout}
               isLoading={isLoading}
@@ -174,7 +162,6 @@ export default function ReadChapter() {
               setFullOCRResult={setFullOCRResult}
               isItTextToSpeech={isItTextToSpeech}
               setIsItTextToSpeech={setIsItTextToSpeech}
-              finalResult={finalResult}
               showMessage={showMessage}
               setShowMessage={setShowMessage}
               allAtOnce={allAtOnce}
@@ -182,13 +169,12 @@ export default function ReadChapter() {
               hasPrevChapter={hasPrevChapter}
               goToNextChapter={goToNextChapter}
               hasNextChapter={hasNextChapter}
-              memoizedHandleTranslate={memoizedHandleTranslate}
               className="min-w-0 max-w-full"
             />
           </div>
 
           {/* BottomSettings fixed height, no overflow */}
-          <div className="flex-shrink-0 w-full max-w-full">
+          <div className="flex-shrink-0 relative z-50 w-full max-w-full">
             <BottomSettings
               allAtOnce={allAtOnce}
               quality={quality}
