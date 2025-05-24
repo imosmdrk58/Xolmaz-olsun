@@ -13,6 +13,7 @@ AIAudio/
 !.yarn/releases
 !.yarn/versions
 extra.ts
+sortAndjoinOCR.js
 uploads
 scripts/ocr.py
 # testing
