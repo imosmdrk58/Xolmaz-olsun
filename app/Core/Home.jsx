@@ -42,117 +42,6 @@ const Home = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-// Process manga data (memoized outside component)
-const processMangaData = useCallback(async (mangaList, type) => {
-  if (!mangaList || mangaList.length === 0) return [];
-
-  const page = 1; // Fixed page for topManga
-  const cacheKey = `processed_${type}_${page}`;
-  const cachedData = getFromStorage(cacheKey);
-  if (cachedData?.data) return cachedData.data;
-
-  // Batch fetch ratings
-  const mangaIds = mangaList.map((manga) => manga.id);
-  let ratings;
-  const ratingsCacheKey = `manga_ratings_batch_${mangaIds.join("_")}`;
-  const cachedRatings = getFromStorage(ratingsCacheKey);
-
-  if (cachedRatings?.data) {
-    ratings = cachedRatings.data;
-  } else {
-    try {
-      const response = await fetch(
-        "https://api.mangadex.org/statistics/manga?" +
-          mangaIds.map((id) => `manga[]=${id}`).join("&")
-      );
-      if (response.ok) {
-        const ratingData = await response.json();
-        ratings = ratingData.statistics || {};
-        saveToStorage(ratingsCacheKey, ratings);
-      }
-    } catch (err) {
-      console.error("Error fetching batch ratings:", err);
-    }
-  }
-
-  const result = await Promise.all(
-    mangaList.map(async (manga) => {
-      const { id, attributes, relationships, type } = manga;
-
-      const {
-        title,
-        links,
-        availableTranslatedLanguages,
-        latestUploadedChapter,
-        originalLanguage,
-        description,
-        altTitles,
-        contentRating,
-        publicationDemographic,
-        status,
-        year,
-        updatedAt,
-        tags,
-      } = attributes;
-
-      const grouped = relationships.reduce((acc, rel) => {
-        if (!acc[rel.type]) acc[rel.type] = [];
-        acc[rel.type].push(rel);
-        return acc;
-      }, {});
-
-      const coverArt = grouped.cover_art?.[0]?.attributes?.fileName;
-      const coverImageUrl = coverArt
-        ? `https://mangadex.org/covers/${id}/${coverArt}.256.jpg`
-        : null;
-      const authorName = grouped.author?.[0]?.attributes?.name || "N/A";
-      const artistName = grouped.artist?.[0]?.attributes?.name || "N/A";
-      const creatorName = grouped.creator?.[0]?.attributes?.name || "N/A";
-      const rating = ratings[id] || {};
-
-      const groupedTags = tags?.reduce((acc, tag) => {
-        const group = tag.attributes?.group || "Unknown Group";
-        const tagName = tag.attributes?.name?.en || "Unknown Tag";
-        if (!acc[group]) acc[group] = [];
-        acc[group].push(tagName);
-        return acc;
-      }, {});
-
-      const groupedTagsArray = Object.keys(groupedTags || {}).map((group) => ({
-        group,
-        tags: groupedTags[group],
-      }));
-
-      return {
-        id,
-        title: title?.en || Object?.values(altTitles?.[0] || {})[0] || "Untitled",
-        description: description?.en || "No description available.",
-        altTitle: Object.values(altTitles?.[0] || { none: "N/A" })[0] || "N/A",
-        contentRating: contentRating || "N/A",
-        status: status || "Unknown",
-        altTitles: altTitles || [],
-        year: year || "N/A",
-        updatedAt: updatedAt ? new Date(updatedAt) : "N/A",
-        tags: groupedTagsArray,
-        flatTags: tags?.map((tag) => tag.attributes?.name?.en || "Unknown Tag") || [],
-        coverImageUrl,
-        authorName,
-        artistName,
-        rating,
-        links,
-        creatorName,
-        MangaStoryType: publicationDemographic || "N/A",
-        availableTranslatedLanguages: availableTranslatedLanguages || [],
-        latestUploadedChapter,
-        originalLanguage,
-        type,
-      };
-    })
-  );
-  saveToStorage(cacheKey, result);
-  return result;
-},[]);
-
   // Debounce function memoized
   const debounce = useCallback((func, wait) => {
     let timeout;
@@ -182,61 +71,62 @@ const processMangaData = useCallback(async (mangaList, type) => {
 
   // Fetch TopManga list on mount
   useEffect(() => {
-    const fetchTopMangaList = async () => {
-      try {
-        const cached = getFromStorage("topMangaList");
-        if (cached?.data) {
-          setTopSearches(cached.data);
-          return;
-        }
+ // In your Home component, update the fetchTopMangaList function:
+const fetchTopMangaList = async () => {
+  try {
+    const cached = getFromStorage("topMangaList");
+    if (cached?.data) {
+      setTopSearches(cached.data);
+      return;
+    }
 
-        const listResponse = await fetch(
-          "https://api.mangadex.org/user/0dd9b63a-f561-4632-b739-84397cb60ca7/list?limit=10"
-        );
-        if (!listResponse.ok) throw new Error(`Failed to fetch lists: ${listResponse.status}`);
+    const listResponse = await fetch(
+      "https://api.mangadex.org/user/0dd9b63a-f561-4632-b739-84397cb60ca7/list?limit=10"
+    );
+    if (!listResponse.ok) throw new Error(`Failed to fetch lists: ${listResponse.status}`);
 
-        const listData = await listResponse.json();
-        if (listData.result !== "ok" || !Array.isArray(listData.data))
-          throw new Error("Invalid list response");
+    const listData = await listResponse.json();
+    if (listData.result !== "ok" || !Array.isArray(listData.data))
+      throw new Error("Invalid list response");
 
-        const topMangaList = listData.data.find(
-          (list) => list.id === "864f1275-0048-4ffd-b6ee-bde52f3bc80b"
-        );
-        if (!topMangaList) throw new Error("TopManga list not found");
+    const topMangaList = listData.data.find(
+      (list) => list.id === "864f1275-0048-4ffd-b6ee-bde52f3bc80b"
+    );
+    if (!topMangaList) throw new Error("TopManga list not found");
 
-        const mangaIds = topMangaList.relationships
-          .filter((rel) => rel.type === "manga" && rel.id)
-          .map((rel) => rel.id);
+    const mangaIds = topMangaList.relationships
+      .filter((rel) => rel.type === "manga" && rel.id)
+      .map((rel) => rel.id)
+      .slice(0, 10); // Limit to 10 IDs
 
-        if (mangaIds.length === 0) throw new Error("No manga IDs found");
+    if (mangaIds.length === 0) throw new Error("No manga IDs found");
 
-        const mangaResponse = await fetch(
-          `https://api.mangadex.org/manga?${mangaIds
-            .map((id) => `ids[]=${id}`)
-            .join("&")}&includes[]=cover_art&includes[]=author&includes[]=artist`
-        );
-        if (!mangaResponse.ok)
-          throw new Error(`Failed to fetch manga details: ${mangaResponse.status}`);
+    // Use your new API endpoint
+    const mangaResponse = await fetch(`/api/manga/${mangaIds.join(',')}`);
+    if (!mangaResponse.ok) {
+      throw new Error(`Failed to fetch manga details: ${mangaResponse.status}`);
+    }
 
-        const mangaData = await mangaResponse.json();
-        if (mangaData.result !== "ok" || !Array.isArray(mangaData.data))
-          throw new Error("Invalid manga response");
+    const mangaData = await mangaResponse.json();
+    if (!mangaData.data || !Array.isArray(mangaData.data)) {
+      throw new Error("Invalid manga response");
+    }
 
-        const processedManga = await processMangaData(mangaData.data.slice(0, 10), "topManga");
+    const processedManga = mangaData.data; // Already processed by the API
 
-        if (processedManga.length > 0) {
-          setTopSearches(processedManga);
-          saveToStorage("topMangaList", processedManga);
-        } else {
-          throw new Error("No valid manga found");
-        }
-      } catch (err) {
-        setError("Failed to load TopManga list. Showing default titles.");
-        console.error(err);
-        setTopSearches(TopFavouriteMangas);
-        saveToStorage("topMangaList", TopFavouriteMangas);
-      }
-    };
+    if (processedManga.length > 0) {
+      setTopSearches(processedManga);
+      saveToStorage("topMangaList", processedManga);
+    } else {
+      throw new Error("No valid manga found");
+    }
+  } catch (err) {
+    setError("Failed to load TopManga list. Showing default titles.");
+    console.error(err);
+    setTopSearches(TopFavouriteMangas);
+    saveToStorage("topMangaList", TopFavouriteMangas);
+  }
+};
 
     fetchTopMangaList();
   }, []);

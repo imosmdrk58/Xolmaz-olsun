@@ -107,123 +107,16 @@ export default function MangaList() {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     // Set initial value
     checkIfMobile();
-    
+
     // Add event listener
     window.addEventListener('resize', checkIfMobile);
-    
+
     // Clean up
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
-
-  const processMangaData = async (mangaList, type) => {
-    if (!mangaList || mangaList.length === 0) return [];
-
-    const cacheKey = `processed_${type}_${page}`;
-    const cachedData = getFromStorage(cacheKey);
-    if (cachedData?.data) return cachedData.data;
-
-    // Batch fetch ratings
-    const mangaIds = mangaList.map((manga) => manga.id);
-    let ratings = {};
-    const ratingsCacheKey = `manga_ratings_batch_${mangaIds.join('_')}`;
-    const cachedRatings = getFromStorage(ratingsCacheKey);
-
-    if (cachedRatings?.data) {
-      ratings = cachedRatings.data;
-    } else {
-      try {
-        const response = await fetch(
-          'https://api.mangadex.org/statistics/manga?' +
-          mangaIds.map((id) => `manga[]=${id}`).join('&')
-        );
-        if (response.ok) {
-          const ratingData = await response.json();
-          ratings = ratingData.statistics || {};
-          saveToStorage(ratingsCacheKey, ratings);
-        }
-      } catch (err) {
-        console.error('Error fetching batch ratings:', err);
-      }
-    }
-
-    const result = await Promise.all(
-      mangaList.map(async (manga) => {
-        const { id, attributes, relationships, type } = manga;
-
-        const {
-          title,
-          links,
-          availableTranslatedLanguages,
-          latestUploadedChapter,
-          originalLanguage,
-          description,
-          altTitles,
-          contentRating,
-          publicationDemographic,
-          status,
-          year,
-          updatedAt,
-          tags,
-        } = attributes;
-
-        const grouped = relationships.reduce((acc, rel) => {
-          if (!acc[rel.type]) acc[rel.type] = [];
-          acc[rel.type].push(rel);
-          return acc;
-        }, {});
-
-        const coverArt = grouped.cover_art?.[0]?.attributes?.fileName;
-        const coverImageUrl = `https://mangadex.org/covers/${id}/${coverArt}.256.jpg`;
-        const authorName = grouped.author;
-        const artistName = grouped.artist;
-        const creatorName = grouped.creator ?? 'N/A';
-        const rating = ratings[id] || {};
-
-        const groupedTags = tags?.reduce((acc, tag) => {
-          const group = tag.attributes?.group || 'Unknown Group';
-          const tagName = tag.attributes?.name?.en || 'Unknown Tag';
-          if (!acc[group]) acc[group] = [];
-          acc[group].push(tagName);
-          return acc;
-        }, {});
-
-        const groupedTagsArray = Object.keys(groupedTags || {}).map((group) => ({
-          group,
-          tags: groupedTags[group],
-        }));
-
-        return {
-          id,
-          title: title?.en || Object?.values(altTitles?.[0] || {})[0] || 'Untitled',
-          description: description?.en || 'No description available.',
-          altTitle: Object.values(altTitles?.[0] || { none: 'N/A' })[0] || 'N/A',
-          contentRating: contentRating || 'N/A',
-          status: status || 'Unknown',
-          altTitles: altTitles || [],
-          year: year || 'N/A',
-          updatedAt: updatedAt ? new Date(updatedAt) : 'N/A',
-          tags: groupedTagsArray,
-          flatTags: tags?.map((tag) => tag.attributes?.name?.en || 'Unknown Tag') || [],
-          coverImageUrl,
-          authorName,
-          artistName,
-          rating,
-          links,
-          creatorName,
-          MangaStoryType: publicationDemographic,
-          availableTranslatedLanguages: availableTranslatedLanguages || [],
-          latestUploadedChapter,
-          originalLanguage,
-          type,
-        };
-      })
-    );
-    saveToStorage(cacheKey, result);
-    return result;
-  };
 
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ['mangas', page],
@@ -253,10 +146,10 @@ export default function MangaList() {
 
       const [processedMangas, processedFavouriteMangas, processedLatestMangas, processedRandomMangas] =
         await Promise.all([
-          getFromStorage(cacheKeys.mangas) || processMangaData(mangas.data || [], 'rating'),
-          getFromStorage(cacheKeys.favourite) || processMangaData(favouriteMangas.data || [], 'favourite'),
-          getFromStorage(cacheKeys.latest) || processMangaData(latestMangas.data || [], 'latest'),
-          getFromStorage(cacheKeys.random) || processMangaData(randomMangas.data || [], 'random'),
+          getFromStorage(cacheKeys.mangas) || mangas.data || [],
+          getFromStorage(cacheKeys.favourite) || favouriteMangas.data || [],
+          getFromStorage(cacheKeys.latest) || latestMangas.data || [],
+          getFromStorage(cacheKeys.random) || randomMangas.data || [],
         ]);
 
       return { processedMangas, processedFavouriteMangas, processedLatestMangas, processedRandomMangas };
@@ -343,6 +236,8 @@ export default function MangaList() {
     window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
   }, [totalPages]);
 
+
+  console.log(processedLatestMangas)
   return (
     <div ref={showcaseRef} className="min-h-screen w-full text-white">
       {isLoadingState ? (
