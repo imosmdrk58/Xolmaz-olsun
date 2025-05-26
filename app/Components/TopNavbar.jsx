@@ -20,9 +20,9 @@ const TopNavbar = () => {
 
   const toggleSearch = () => setIsSearchOpen(!isSearchOpen);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
+ 
   return (
-    <header className="fixed top-0 w-full z-[9999] bg-gradient-to-b from-purple-900/30 to-gray-950/60 bg-opacity-90 backdrop-blur-md flex items-center justify-between h-16 sm:h-20 px-4 sm:px-20">
+    <header suppressHydrationWarning className="fixed top-0 w-full z-[9999] bg-gradient-to-b from-purple-900/30 to-gray-950/60 bg-opacity-90 backdrop-blur-md flex items-center justify-between h-16 sm:h-20 px-4 sm:px-20">
       {/* Left Section - Logo and Navigation */}
       <div className="flex items-center">
         <a href="/" className="flex items-center mr-4">

@@ -25,7 +25,6 @@ const InfoSidebar = memo(({
   panels,
   setCurrentIndex,
   chapterInfo,
-  currentChapterIndex,
   goToNextChapter,
   hasNextChapter,
   hasPrevChapter,
@@ -33,12 +32,18 @@ const InfoSidebar = memo(({
   currentIndex = 1,
   goToPrevChapter,
   allChapters = [],
-  onChapterChange,
 }) => {
   const [isFavorite, setIsFavorite] = useState(() => localStorage.getItem(`favorite_${mangaInfo?.id}`) === 'true');
   const [chapterDropdownOpen, setChapterDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('desc');
+
+console.log( isCollapsed,
+  pages,
+  mangaInfo,
+  panels,
+  chapterInfo,
+  allChapters,)
 
   const dropdownRef = useRef(null);
 
@@ -58,7 +63,7 @@ const InfoSidebar = memo(({
 
   if (!mangaInfo || !chapterInfo) return null;
 
-  const toggleFavorite = useCallback(() => setIsFavorite(prev => !prev), []);
+  // const toggleFavorite = useCallback(() => setIsFavorite(prev => !prev), []);
 
   const sortedChapters = useMemo(() =>
     [...allChapters].sort((a, b) => {
@@ -94,7 +99,7 @@ const InfoSidebar = memo(({
     return (
       <MemoCollapsedSideBarStrip
         isFavorite={isFavorite}
-        toggleFavorite={toggleFavorite}
+        toggleFavorite={()=>{}}
         mangaInfo={mangaInfo}
         setIsCollapsed={setIsCollapsed}
         CoverImage={CoverImage}
@@ -143,7 +148,7 @@ const InfoSidebar = memo(({
             </h1>
           </div>
           <button
-            onClick={toggleFavorite}
+            onClick={()=>{}}
             className={`w-7 md:w-9 h-7 md:h-9 rounded-lg flex items-center justify-center transition-all duration-300 group ${isFavorite ? 'bg-red-900/30 text-red-400 border border-red-700/20' : 'bg-gray-800/50 text-gray-400 border border-gray-700/20 hover:bg-red-900/30 hover:text-red-400'}`}
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >

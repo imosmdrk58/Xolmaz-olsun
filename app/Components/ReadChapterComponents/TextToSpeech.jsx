@@ -30,7 +30,7 @@ const TextToSpeech = ({ text, handleUpload, page, ready, layout = "horizontal" }
         window.speechSynthesis.cancel();
       };
     }, []);
-
+console.log(text)
     const handleSpeak = useCallback(() => {
       if (!text?.trim()) {
         return window.toast
@@ -72,7 +72,7 @@ const TextToSpeech = ({ text, handleUpload, page, ready, layout = "horizontal" }
           <button
             onClick={() => handleUpload(page, "speak")}
             disabled={isSpeaking}
-            className={`group py-2 px-1 before:bg-opacity-60 flex items-center justify-start min-w-[36px] sm:min-w-[48px] h-12 sm:h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
+            className={`group py-2 px-1.5 before:bg-opacity-60 flex items-center justify-start min-w-[36px] sm:min-w-[48px] h-12 sm:h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
             shadow-[0px_0px_10px_rgba(0,0,0,1)] shadow-violet-500 bg-[#2f0a6e] border-2 border-violet-800 hover:min-w-[140px] sm:hover:min-w-[189px] hover:shadow-lg disabled:cursor-not-allowed 
             backdrop-blur-md lg:font-semibold before:absolute before:w-full before:transition-all before:duration-700 
             before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] 
@@ -83,7 +83,7 @@ const TextToSpeech = ({ text, handleUpload, page, ready, layout = "horizontal" }
             />
             <span
               className={`absolute font-sans font-bold left-12 sm:left-20 text-[11px] sm:text-lg tracking-tight text-gray-100 opacity-0 transform translate-x-2 sm:translate-x-4 transition-all duration-300 
-              group-hover:opacity-100 group-hover:text-black group-hover:translate-x-0`}
+              group-hover:opacity-100 whitespace-nowrap group-hover:text-black group-hover:translate-x-0`}
             >
               Read Aloud
             </span>
@@ -184,7 +184,7 @@ const TextToSpeech = ({ text, handleUpload, page, ready, layout = "horizontal" }
             <button
               onClick={handleSpeak}
               disabled={isSpeaking}
-              className={`group py-2 px-1 before:bg-opacity-60 flex items-center justify-start min-w-[36px] sm:min-w-[48px] h-12 sm:h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
+              className={`group py-2 px-1.5 before:bg-opacity-60 flex items-center justify-start min-w-[36px] sm:min-w-[48px] h-12 sm:h-20 text-gray-100 rounded-full cursor-pointer relative overflow-hidden transition-all duration-300  
               hover:brightness-100 bg-purple-900 bg-opacity-50 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 hover:min-w-[140px] sm:hover:min-w-[189px] hover:shadow-lg disabled:cursor-not-allowed 
               brightness-150 backdrop-blur-md lg:font-semibold border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 
               before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full before:bg-[#FFFFFF] 

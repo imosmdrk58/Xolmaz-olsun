@@ -44,12 +44,12 @@ function MiddleImageAndOptions({
         setImageCache((prevCache) => [...prevCache, url]);
     }, []);
 
-
     const memoizedHandleTranslate = useCallback(
         (text) => handleTranslate(text),
         []
     );
-
+    console.log(pageTranslations) 
+    console.log(pageTTS) 
 
     const handleImageError = useCallback(() => {
         setImageKey((prevKey) => prevKey + 1);
@@ -218,14 +218,15 @@ function MiddleImageAndOptions({
                                                         </span>
                                                     </button>
 
-                                                )}
+                                                )}{console.log(JSON.stringify(pageTTS[page]))
+                                                }
                                                 <TextToSpeech
                                                     page={page}
                                                     handleUpload={handleUpload}
                                                     ready={Boolean(pageTTS[page] ? isItTextToSpeech : pageTranslations[page])}
                                                     text={
                                                         ((pageTTS[page] && isItTextToSpeech) || pageTranslations[page]) &&
-                                                        pageTranslations[page].textResult // Use memoized result
+                                                            pageTranslations[page] ? pageTranslations[page]?.textResult : pageTTS[page]?.textResult // Use memoized result
                                                     }
                                                 />
                                             </>
@@ -301,7 +302,7 @@ function MiddleImageAndOptions({
                                                             ready={Boolean(pageTTS[page] ? isItTextToSpeech : pageTranslations[page])}
                                                             text={
                                                                 ((pageTTS[page] && isItTextToSpeech) || pageTranslations[page]) &&
-                                                                pageTranslations[page].textResult // Use memoized result
+                                                                    pageTranslations[page] ? pageTranslations[page]?.textResult : pageTTS[page]?.textResult // Use memoized result
                                                             }
                                                             layout={layout}
                                                         />

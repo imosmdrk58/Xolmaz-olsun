@@ -1,4 +1,4 @@
-import React, { useState, useMemo, lazy, Suspense } from 'react';
+import { useState, useMemo, lazy, Suspense } from 'react';
 import { Eye, ChevronDown, ChevronRight, List } from 'lucide-react';
 import { langFullNames } from '../../constants/Flags';
 
@@ -194,7 +194,7 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
 
                       {/* Expand/collapse indicator */}
                       <div
-                        className={`flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full ${
+                        className={`flex items-center p-1 justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full ${
                           activeChapter === groupedChapter.chapter
                             ? "bg-purple-900"
                             : "bg-gray-700"
@@ -264,7 +264,7 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
                               {translation.translatedLanguage.toUpperCase()}
                             </span>
 
-                            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-gray-900/50 transform hover:scale-110 transition-transform">
+                            <div className="w-6 h-6 p-2 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-gray-900/50 transform hover:scale-110 transition-transform">
                               <Eye size={14} className="sm:size-16 text-white" />
                             </div>
                           </div>
