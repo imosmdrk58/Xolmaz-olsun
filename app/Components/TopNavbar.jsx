@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Search, Menu, X } from "lucide-react";
 
@@ -7,6 +7,11 @@ const TopNavbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentPath, setCurrentPath] = useState(false);
+
+useEffect(()=>{
+  setCurrentPath(window.location.pathname)
+},[])
 
   const handleSearch = useCallback(
     (e) => {
@@ -38,9 +43,9 @@ const TopNavbar = () => {
 
         {/* Navigation Links - Desktop */}
         <div className="hidden lg:flex space-x-7 text-gray-400">
-          <a href="/manga-list" className="font-bold text-white hover:text-white">Home</a>
-          <a href="/search" className="font-medium hover:text-white">Search</a>
-          <a href="#" className="font-medium hover:text-white">Library</a>
+          <a href="/manga-list" className={`${currentPath=="/manga-list"?"font-bold text-white":""}  hover:text-white`}>Home</a>
+          <a href="/search" className={`${currentPath=="/search"?"font-bold text-white":""} hover:text-white`}>Search</a>
+          <a href="/library" className={`${currentPath=="/library"?"font-bold text-white":""} hover:text-white`}>Library</a>
         </div>
 
         {/* Hamburger Menu - Mobile */}

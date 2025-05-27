@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import DifferentMetaDataChapter from './DifferentMetaDataChapter';
 import Image from 'next/image';
+import { useManga } from '../../../../components/providers/MangaContext';
 
 // const MemoPageAndChapterNavigation = memo(PageAndChapterNavigation);
 const MemoCollapsedSideBarStrip = memo(CollapsedSideBarStrip);
@@ -33,24 +34,13 @@ const InfoSidebar = memo(({
   goToPrevChapter,
   allChapters = [],
 }) => {
-  const [isFavorite, setIsFavorite] = useState(() => localStorage.getItem(`favorite_${mangaInfo?.id}`) === 'true');
   const [chapterDropdownOpen, setChapterDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('desc');
-
-console.log( isCollapsed,
-  pages,
-  mangaInfo,
-  panels,
-  chapterInfo,
-  allChapters,)
-
+  const { addToFavorite, getAllFavorites } = useManga();
   const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    localStorage.setItem(`favorite_${mangaInfo?.id}`, isFavorite);
-  }, [isFavorite, mangaInfo?.id]);
-
+  const isFavorite = useMemo(()=>getAllFavorites()[mangaInfo.id]);
+  console.log(getAllFavorites()[mangaInfo.id])
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -63,7 +53,7 @@ console.log( isCollapsed,
 
   if (!mangaInfo || !chapterInfo) return null;
 
-  // const toggleFavorite = useCallback(() => setIsFavorite(prev => !prev), []);
+  const toggleFavorite = useCallback(() => addToFavorite(mangaInfo, chapterInfo));
 
   const sortedChapters = useMemo(() =>
     [...allChapters].sort((a, b) => {
@@ -99,7 +89,7 @@ console.log( isCollapsed,
     return (
       <MemoCollapsedSideBarStrip
         isFavorite={isFavorite}
-        toggleFavorite={()=>{}}
+        toggleFavorite={toggleFavorite}
         mangaInfo={mangaInfo}
         setIsCollapsed={setIsCollapsed}
         CoverImage={CoverImage}
@@ -148,7 +138,7 @@ console.log( isCollapsed,
             </h1>
           </div>
           <button
-            onClick={()=>{}}
+            onClick={toggleFavorite}
             className={`w-7 md:w-9 h-7 md:h-9 rounded-lg flex items-center justify-center transition-all duration-300 group ${isFavorite ? 'bg-red-900/30 text-red-400 border border-red-700/20' : 'bg-gray-800/50 text-gray-400 border border-gray-700/20 hover:bg-red-900/30 hover:text-red-400'}`}
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >

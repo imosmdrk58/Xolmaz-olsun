@@ -48,6 +48,7 @@ const SearchMangaCard = ({
   StarRating,
   timeSinceUpdate,
 }) => {
+  console.log(manga)
   const remainingTagsCount = useMemo(() => {
     const limit = 3;
     return manga.flatTags.length - limit;

@@ -30,7 +30,7 @@ const TextToSpeech = ({ text, handleUpload, page, ready, layout = "horizontal" }
         window.speechSynthesis.cancel();
       };
     }, []);
-console.log(text)
+// console.log(text)
     const handleSpeak = useCallback(() => {
       if (!text?.trim()) {
         return window.toast

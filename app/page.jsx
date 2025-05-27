@@ -178,7 +178,7 @@ const Home = () => {
         backgroundPosition: "0 0, 25px 25px",
         backgroundSize: "50px 50px",
       }}
-      className="bg-gray-900 text-gray-100 min-h-screen"
+      className="bg-gray-900 text-gray-100 min-h-screen md:-mt-20"
     >
       <div
         className={`w-full  ${isVisible ? "opacity-100" : "opacity-0"} transition-opacity flex justify-center items-center h-screen duration-300 bg-gradient-to-b from-purple-900/30 to-gray-900 pt-8 pb-12`}

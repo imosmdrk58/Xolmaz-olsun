@@ -1,6 +1,8 @@
 import React, { useCallback, useMemo, memo, lazy } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/navigation';
 import { Star } from "lucide-react";
+import { useManga } from "../../../components/providers/MangaContext";
+
 const SearchMangaCard = memo(
   lazy(() => import("./SearchMangaCardWith2ViewModeModules/SearchMangaCard"))
 );
@@ -71,17 +73,50 @@ const timeSinceUpdate = (dateString) => {
   const days = Math.floor(hours / 24);
 
   if (days > 0) return `${days}d ago`;
-  if (hours > 0) return `${hours}h ${minutes % 60}m ago`;
-  return `${minutes}m ago`;
+  if (hours > 0) return `${hours}h ${minutes % 60}m`;
+  return `${minutes}m`;
+};
+
+// Clean manga object to remove circular references
+const cleanManga = (manga) => {
+  try {
+    return JSON.parse(
+      JSON.stringify(manga, (key, value) => {
+        // Skip React-specific or non-serializable properties
+        if (key.startsWith('__react')) return undefined;
+        if (typeof value === 'object' && value !== null) {
+          // Handle circular references by skipping them
+          try {
+            JSON.stringify(value);
+            return value;
+          } catch (e) {
+            return null; // Replace circular objects with null
+          }
+        }
+        return value;
+      })
+    );
+  } catch (error) {
+    console.error('Failed to clean manga:', error);
+    return { id: manga.id, title: manga.title || 'Unknown' }; // Fallback
+  }
 };
 
 const SearchMangaCardWith2ViewMode = ({ manga, viewMode }) => {
-  const navigate = useNavigate();
+    if (!manga.id) return null
+  const router = useRouter();
+  const { setSelectedManga } = useManga();
+const mangadata = useMemo(() => manga, [manga]);
   const mangaId = useMemo(() => manga.id, [manga.id]);
+// console.log(cleanManga(manga));
 
-  const handleMangaClicked = useCallback(() => {
-    navigate(`/manga/${mangaId}/chapters`, { state: { manga } });
-  }, [navigate, mangaId, manga]);
+  const handleMangaClicked = useCallback((manga) => {
+    if (manga) {
+      const cleanedManga = cleanManga(mangadata); // Clean before setting
+      setSelectedManga(cleanedManga);
+      router.push(`/manga/${mangaId}/chapters`);
+    }
+  }, [router, setSelectedManga]);
 
   const cardProps = useMemo(
     () => ({

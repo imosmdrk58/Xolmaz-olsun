@@ -32,7 +32,7 @@ export default function ReadChapter() {
     const chapters =useMemo(()=>getChapterListForManga(mangaId))
    const chapterInfo = useMemo(()=> chapters.filter((x)=>x.id==chapterId)[0]);
 
-   console.log(chapterInfo)
+  //  console.log(chapterInfo)
   const { data: pages, isLoading, isError } = useQuery({
     queryKey: ['chapterPages', chapterId],
     queryFn: async () => {
@@ -80,7 +80,7 @@ export default function ReadChapter() {
     }
   }, [mangaId, chapterInfo, selectedManga, pages, chapterId])
 
-  console.log(selectedManga);
+  // console.log(selectedManga);
 
   const currentChapterIndex = useMemo(() =>
     chapters &&chapters.findIndex(ch => ch.id === chapterInfo.id),

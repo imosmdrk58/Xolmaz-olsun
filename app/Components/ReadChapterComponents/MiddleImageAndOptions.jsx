@@ -48,8 +48,8 @@ function MiddleImageAndOptions({
         (text) => handleTranslate(text),
         []
     );
-    console.log(pageTranslations) 
-    console.log(pageTTS) 
+    // console.log(pageTranslations) 
+    // console.log(pageTTS) 
 
     const handleImageError = useCallback(() => {
         setImageKey((prevKey) => prevKey + 1);
@@ -117,7 +117,7 @@ function MiddleImageAndOptions({
             if (from === "translate") {
                 const translated = await memoizedHandleTranslate(processedText);
                 const translatedocrResult = await translateAll(ocrResult);
-                console.log(translated)
+                // console.log(translated)
                 setPageTranslations((prev) => ({
                     ...prev,
                     [imageUrl]: {
@@ -218,8 +218,7 @@ function MiddleImageAndOptions({
                                                         </span>
                                                     </button>
 
-                                                )}{console.log(JSON.stringify(pageTTS[page]))
-                                                }
+                                                )}
                                                 <TextToSpeech
                                                     page={page}
                                                     handleUpload={handleUpload}

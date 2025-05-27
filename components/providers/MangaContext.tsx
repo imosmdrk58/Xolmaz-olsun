@@ -88,7 +88,7 @@ interface Manga {
   type: string;
 }
 
-// Define Chapter type (assuming a structure based on typical MangaDex chapter data)
+// Define Chapter type
 interface Chapter {
   id: string;
   chapter: string;
@@ -98,23 +98,25 @@ interface Chapter {
   [key: string]: any;
 }
 
+// Define Favorite type
+interface Favorite {
+  mangaInfo: Manga;
+  chapterInfo: Chapter[];
+}
+
+// Update MangaContextType to include favorites
 interface MangaContextType {
-  // Selected Manga
   selectedManga: Manga | null;
   setSelectedManga: (manga: Manga | null) => void;
   getSelectedManga: () => Manga | null;
-
-  // Read History
   addToReadHistory: (manga: Manga) => void;
   getAllFromReadHistory: () => Manga[];
-
-  // Favorite Chapters
   addToFavoriteChapter: (chapter: Chapter) => void;
   getAllFromFavoriteChapter: () => Chapter[];
-
-  // Chapter List for Manga
   setChapterListForManga: (mangaId: string, chapters: Chapter[]) => void;
   getChapterListForManga: (mangaId: string) => Chapter[];
+  addToFavorite: (manga: Manga, chapter?: Chapter) => void; // New method
+  getAllFavorites: () => { [mangaId: string]: Favorite }; // New method
 }
 
 const MangaContext = createContext<MangaContextType | undefined>(undefined);
@@ -125,13 +127,15 @@ const STORAGE_KEYS = {
   FAVORITE_CHAPTERS: 'favoriteChapters',
   CHAPTER_LIST: 'chapterList',
   SELECTED_MANGA: 'selectedManga',
+  FAVORITES: 'favorites', // New storage key for favorites
 };
 
 export function MangaProvider({ children }: { children: ReactNode }) {
   const [selectedManga, setSelectedMangaState] = useState<Manga | null>(null);
   const [readHistory, setReadHistory] = useState<Manga[]>([]);
   const [favoriteChapters, setFavoriteChapters] = useState<Chapter[]>([]);
-  const [chapterLists, setChapterLists] = useState<{ [mangaId: string]: Chapter[] }>({}); // Store as object with mangaId keys
+  const [chapterLists, setChapterLists] = useState<{ [mangaId: string]: Chapter[] }>({});
+  const [favorites, setFavorites] = useState<{ [mangaId: string]: Favorite }>({}); // New state for favorites
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -159,6 +163,12 @@ export function MangaProvider({ children }: { children: ReactNode }) {
       if (storedChapterLists) {
         setChapterLists(JSON.parse(storedChapterLists));
       }
+
+      // Load Favorites
+      const storedFavorites = localStorage.getItem(STORAGE_KEYS.FAVORITES);
+      if (storedFavorites) {
+        setFavorites(JSON.parse(storedFavorites));
+      }
     } catch (error) {
       console.error('Error loading data from localStorage:', error);
     }
@@ -185,7 +195,7 @@ export function MangaProvider({ children }: { children: ReactNode }) {
   // Read History Methods
   const addToReadHistory = (manga: Manga) => {
     setReadHistory((prev) => {
-      const updatedHistory = [manga, ...prev.filter((item) => item.id !== manga.id)].slice(0, 50); // Limit to 50 items
+      const updatedHistory = [manga, ...prev.filter((item) => item.id !== manga.id)].slice(0, 50);
       try {
         localStorage.setItem(STORAGE_KEYS.READ_HISTORY, JSON.stringify(updatedHistory));
       } catch (error) {
@@ -217,23 +227,62 @@ export function MangaProvider({ children }: { children: ReactNode }) {
   };
 
   // Chapter List for Manga Methods
- const setChapterListForManga = (mangaId: string, chapters: Chapter[]) => {
-  setChapterLists((prev) => {
-    const updatedLists = {
-      ...prev,
-      [mangaId]: chapters,
-    };
-    try {
-      localStorage.setItem(STORAGE_KEYS.CHAPTER_LIST, JSON.stringify(updatedLists));
-    } catch (error) {
-      console.error('Error saving chapterLists to localStorage:', error);
-    }
-    return updatedLists;
-  });
-};
+  const setChapterListForManga = (mangaId: string, chapters: Chapter[]) => {
+    setChapterLists((prev) => {
+      const updatedLists = {
+        ...prev,
+        [mangaId]: chapters,
+      };
+      try {
+        localStorage.setItem(STORAGE_KEYS.CHAPTER_LIST, JSON.stringify(updatedLists));
+      } catch (error) {
+        console.error('Error saving chapterLists to localStorage:', error);
+      }
+      return updatedLists;
+    });
+  };
 
   const getChapterListForManga = (mangaId: string) => {
     return chapterLists[mangaId] || [];
+  };
+
+  // Favorites Methods
+  const addToFavorite = (manga: Manga, chapter?: Chapter) => {
+    setFavorites((prev) => {
+      const updatedFavorites = { ...prev };
+      const mangaId = manga.id;
+
+      // Initialize favorite entry if it doesn't exist
+      if (!updatedFavorites[mangaId]) {
+        updatedFavorites[mangaId] = {
+          mangaInfo: manga,
+          chapterInfo: [],
+        };
+      } else {
+        // Update mangaInfo in case it has changed
+        updatedFavorites[mangaId].mangaInfo = manga;
+      }
+
+      // Add chapter if provided and not already in favorites
+      if (chapter) {
+        const existingChapters = updatedFavorites[mangaId].chapterInfo;
+        if (!existingChapters.some((ch) => ch.id === chapter.id)) {
+          updatedFavorites[mangaId].chapterInfo = [chapter, ...existingChapters];
+        }
+      }
+
+      try {
+        localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(updatedFavorites));
+      } catch (error) {
+        console.error('Error saving favorites to localStorage:', error);
+      }
+
+      return updatedFavorites;
+    });
+  };
+
+  const getAllFavorites = () => {
+    return favorites;
   };
 
   return (
@@ -248,6 +297,8 @@ export function MangaProvider({ children }: { children: ReactNode }) {
         getAllFromFavoriteChapter,
         setChapterListForManga,
         getChapterListForManga,
+        addToFavorite,
+        getAllFavorites,
       }}
     >
       {children}

@@ -4,28 +4,37 @@
 /node_modules
 /.pnp
 .pnp.*
-Audiotest.jsx
-TranslatorTest.jsx
-AIAudio/
+
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+
+
+
+#Ignores defined by me
 extra.ts
 sortAndjoinOCR.js
 uploads
+OldStructure/
 scripts/ocr.py
+ai-manga-reader\app\api\manga\getAuthor
+/app/Components/ChaptersListComponents/Temp.jsx
+Audiotest.jsx
+TranslatorTest.jsx
+AIAudio/
+
 # testing
 /coverage
 apiVersion.ts
 # next.js
 /.next/
 /out/
-/app/Components/ChaptersListComponents/Temp.jsx
+
 # production
 /build
-ai-manga-reader\app\api\manga\getAuthor
+
 # misc
 .DS_Store
 *.pem

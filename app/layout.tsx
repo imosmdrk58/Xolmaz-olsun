@@ -1,11 +1,11 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Script from 'next/script';
 import TanstackProvider from '@/components/providers/TanstackProvider';
 import LoadingSpinner from './Components/LoadingSpinner';
-import TopNavBar from "./Components/TopNavbar";
-import { MangaProvider } from '@/components/providers/MangaContext'; // Adjust the import path as needed
+import TopNavBar from './Components/TopNavbar';
+import { MangaProvider } from '@/components/providers/MangaContext';
 import './globals.css';
 
 export default function RootLayout({
@@ -13,6 +13,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [isClient, setIsClient] = useState(false);
+
+  // Set isClient to true after mounting on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <html lang="en">
       <head>
@@ -34,10 +41,10 @@ export default function RootLayout({
         className="bg-[#070920] text-white"
       >
         <TanstackProvider>
-          <MangaProvider> {/* Add MangaProvider here */}
+          <MangaProvider>
             <Suspense fallback={<LoadingSpinner text="Please Wait..." />}>
-              <TopNavBar />
-              <div className='md:mt-20'>{children}</div>
+              {isClient && (window.location.pathname === '/' ? null : <TopNavBar />)}
+              {isClient &&<div className="mt-20">{children}</div>}
             </Suspense>
           </MangaProvider>
         </TanstackProvider>

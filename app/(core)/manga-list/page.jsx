@@ -9,10 +9,11 @@ import React, {
   useCallback,
 } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useManga } from '../../../components/providers/MangaContext'; // NEW: Import useManga
+import { useQuery } from '@tanstack/react-query';
+import { useManga } from '../../../components/providers/MangaContext';
 import LoadingSpinner from '../../Components/LoadingSpinner';
 import MangaCardPagination from "../../Components/MangaListComponents/MangaCardPagination";
+
 // Lazy load components with React.lazy
 const MangaCard = React.memo(
   lazy(() => import('../../Components/MangaListComponents/MangaCard'))
@@ -24,7 +25,8 @@ const SliderComponent = React.memo(
   lazy(() => import('../../Components/MangaListComponents/SliderComponent'))
 );
 
-const CACHE_DURATION = 120 * 60 * 60  // 1 hour
+// Fixed: 1 hour = 60 * 60 * 1000 milliseconds
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
 
 const getFromStorage = (key) => {
   if (typeof window === 'undefined') return null;
@@ -58,13 +60,21 @@ const saveToStorage = (key, data) => {
 
 const fetchMangaType = async (type, page) => {
   const cacheKey = `manga_${type}_${page}`;
+  
+  // Check localStorage first
   const cachedData = getFromStorage(cacheKey);
-  if (cachedData) return cachedData;
+  if (cachedData) {
+    console.log(`Cache hit for ${type} page ${page}`);
+    return cachedData;
+  }
 
+  console.log(`Fetching fresh data for ${type} page ${page}`);
   const response = await fetch(`/api/manga/${type}?page=${page}`);
   if (!response.ok) throw new Error(`Failed to fetch ${type} mangas`);
 
   const data = await response.json();
+  
+  // Save to localStorage after successful fetch
   saveToStorage(cacheKey, data);
   return data;
 };
@@ -73,11 +83,36 @@ const fetchAllMangaTypes = async ({ queryKey }) => {
   const [_, page] = queryKey;
 
   try {
+    // Check if we have all data in localStorage first
+    const cacheKeys = {
+      rating: `manga_rating_${page}`,
+      favourite: `manga_favourite_${page}`,
+      latest: `manga_latest_${page}`,
+      random: `manga_random_${page}`,
+    };
+
+    const cachedRating = getFromStorage(cacheKeys.rating);
+    const cachedFavourite = getFromStorage(cacheKeys.favourite);
+    const cachedLatest = getFromStorage(cacheKeys.latest);
+    const cachedRandom = getFromStorage(cacheKeys.random);
+
+    // If all data is cached, return it
+    if (cachedRating && cachedFavourite && cachedLatest && cachedRandom) {
+      console.log(`All data found in cache for page ${page}`);
+      return {
+        mangas: cachedRating,
+        favouriteMangas: cachedFavourite,
+        latestMangas: cachedLatest,
+        randomMangas: cachedRandom,
+      };
+    }
+
+    // Otherwise, fetch only the missing data
     const [rating, favourite, latest, random] = await Promise.all([
-      fetchMangaType('rating', page),
-      fetchMangaType('favourite', page),
-      fetchMangaType('latest', page),
-      fetchMangaType('random', page),
+      cachedRating || fetchMangaType('rating', page),
+      cachedFavourite || fetchMangaType('favourite', page),
+      cachedLatest || fetchMangaType('latest', page),
+      cachedRandom || fetchMangaType('random', page),
     ]);
 
     const result = {
@@ -94,14 +129,13 @@ const fetchAllMangaTypes = async ({ queryKey }) => {
   }
 };
 
-export default function MangaList() {
+const MangaList=()=> {
   const [page, setPage] = useState(1);
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const [isDataProcessed, setIsDataProcessed] = useState(false);
-  const showcaseRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
-  const { setSelectedManga } = useManga(); // NEW: Destructure setSelectedManga
+  const router = useRouter();
+  const showcaseRef = useRef(null);
+  const { setSelectedManga } = useManga();
 
   // Check if screen width is mobile
   useEffect(() => {
@@ -109,122 +143,54 @@ export default function MangaList() {
       setIsMobile(window.innerWidth <= 768);
     };
 
-    // Set initial value
     checkIfMobile();
-
-    // Add event listener
     window.addEventListener('resize', checkIfMobile);
-
-    // Clean up
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
 
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ['mangas', page],
     queryFn: fetchAllMangaTypes,
-    staleTime: CACHE_DURATION,
-    cacheTime: CACHE_DURATION * 2,
+    staleTime: CACHE_DURATION, // Data is fresh for 1 hour
+    gcTime: CACHE_DURATION * 2, // Keep in cache for 2 hours
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     retry: 2,
-    onError: (error) => {
-      console.error('Error in manga query:', error);
-    },
+    enabled: true, // Always enabled, but localStorage check prevents unnecessary fetches
   });
-
-  const processMutation = useMutation({
-    mutationFn: async (data) => {
-      const { mangas, favouriteMangas, latestMangas, randomMangas } = data || {};
-      if (!mangas || !favouriteMangas || !latestMangas || !randomMangas) return {};
-
-      const cacheKeys = {
-        mangas: `processedmanga_rating_${page}`,
-        favourite: `processedmanga_favourite_${page}`,
-        latest: `processedmanga_latest_${page}`,
-        random: `processedmanga_random_${page}`,
-      };
-
-      const [processedMangas, processedFavouriteMangas, processedLatestMangas, processedRandomMangas] =
-        await Promise.all([
-          getFromStorage(cacheKeys.mangas) || mangas.data || [],
-          getFromStorage(cacheKeys.favourite) || favouriteMangas.data || [],
-          getFromStorage(cacheKeys.latest) || latestMangas.data || [],
-          getFromStorage(cacheKeys.random) || randomMangas.data || [],
-        ]);
-
-      return { processedMangas, processedFavouriteMangas, processedLatestMangas, processedRandomMangas };
-    },
-    onSuccess: ({
-      processedMangas,
-      processedFavouriteMangas,
-      processedLatestMangas,
-      processedRandomMangas,
-    }) => {
-      if (processedMangas) queryClient.setQueryData(['processedMangas'], processedMangas);
-      if (processedFavouriteMangas)
-        queryClient.setQueryData(['processedFavouriteMangas'], processedFavouriteMangas);
-      if (processedLatestMangas)
-        queryClient.setQueryData(['processedLatestMangas'], processedLatestMangas);
-      if (processedRandomMangas)
-        queryClient.setQueryData(['processedRandomMangas'], processedRandomMangas);
-
-      // Cache each type separately with page number
-      saveToStorage(`processedmanga_rating_${page}`, processedMangas);
-      saveToStorage(`processedmanga_favourite_${page}`, processedFavouriteMangas);
-      saveToStorage(`processedmanga_latest_${page}`, processedLatestMangas);
-      saveToStorage(`processedmanga_random_${page}`, processedRandomMangas);
-
-      setIsDataProcessed(true);
-    },
-    onError: (error) => {
-      console.error('Error processing manga data:', error);
-    },
-  });
-
-  useEffect(() => {
-    if (data && !isDataProcessed) {
-      processMutation.mutate(data);
-    }
-  }, [data, isDataProcessed]);
 
   const handleMangaClicked = useCallback((manga) => {
-    setSelectedManga(manga); // NEW: Set the clicked manga in context
+    setSelectedManga(manga);
     router.push(`/manga/${manga.id}/chapters`);
   }, [router, setSelectedManga]);
 
   const loadMoreMangas = useCallback(() => {
-    setPage((prevPage) => {
-      const newPage = prevPage + 1;
-      setIsDataProcessed(false); // Reset processing state for new fetch
-      return newPage;
-    });
-  }, [page]);
+    setPage((prevPage) => prevPage + 1);
+    setCurrentPage(1); // Reset to first page when loading more data
+  }, []);
 
-  const processedMangas = useMemo(() => queryClient.getQueryData(['processedMangas']) || []);
-  const processedFavouriteMangas = useMemo(
-    () => queryClient.getQueryData(['processedFavouriteMangas']) || []
-  );
-  const processedLatestMangas = useMemo(
-    () => queryClient.getQueryData(['processedLatestMangas']) || []
-  );
-  const processedRandomMangas = useMemo(
-    () => queryClient.getQueryData(['processedRandomMangas']) || []
-  );
+  // Extract processed data directly from the query result
+  const processedData = useMemo(() => {
+    if (!data) return {
+      processedMangas: [],
+      processedFavouriteMangas: [],
+      processedLatestMangas: [],
+      processedRandomMangas: []
+    };
 
-  const isLoadingState = isLoading || !isDataProcessed || processedLatestMangas.length === 0;
+    return {
+      processedMangas: data.mangas?.data || [],
+      processedFavouriteMangas: data.favouriteMangas?.data || [],
+      processedLatestMangas: data.latestMangas?.data || [],
+      processedRandomMangas: data.randomMangas?.data || []
+    };
+  }, [data]);
 
-  if (isError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500">Error: {error.message}</p>
-      </div>
-    );
-  }
+  const { processedMangas, processedFavouriteMangas, processedLatestMangas, processedRandomMangas } = processedData;
 
-  const [currentPage, setCurrentPage] = useState(1);
+  // Pagination logic
   const ITEMS_PER_PAGE = isMobile ? 8 : 12;
-
   const totalPages = Math.ceil(processedLatestMangas.length / ITEMS_PER_PAGE);
 
   const currentMangas = useMemo(() => {
@@ -238,53 +204,63 @@ export default function MangaList() {
     window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
   }, [totalPages]);
 
-  console.log(processedLatestMangas)
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500">Error: {error.message}</p>
+      </div>
+    );
+  }
+
+  if (isLoading || processedLatestMangas.length === 0) {
+    return <LoadingSpinner text="Loading Mangas..." />;
+  }
+
   return (
     <div ref={showcaseRef} className="min-h-screen w-full text-white">
-      {isLoadingState ? (
-        <LoadingSpinner text="Loading Mangas..." />
-      ) : (
-        <>
-          <Suspense fallback={<LoadingSpinner text="Loading Mangas..." />}>
-            <div className="w-full shadow-[5px_5px_50px_rgba(0,0,0,1)] shadow-black h-fit">
-              <SliderComponent handleMangaClicked={handleMangaClicked} processedRandomMangas={processedRandomMangas} />
-            </div>
+      <Suspense fallback={<LoadingSpinner text="Loading Mangas..." />}>
+        <div className="w-full shadow-[5px_5px_50px_rgba(0,0,0,1)] shadow-black h-fit">
+          <SliderComponent 
+            handleMangaClicked={handleMangaClicked} 
+            processedRandomMangas={processedRandomMangas} 
+          />
+        </div>
 
-            <div className="flex flex-col-reverse md:flex-row mt-6 md:mt-10 bg-gradient-to-t from-transparent via-black/30 to-black/10">
-              <div className={`md:w-[70%] `}>
-                <MangaCard
-                  handleMangaClicked={handleMangaClicked}
-                  processedLatestMangas={currentMangas}
-                  loadMoreMangas={loadMoreMangas}
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                />
-              </div>
+        <div className="flex flex-col-reverse md:flex-row mt-6 md:mt-10 bg-gradient-to-t from-transparent via-black/30 to-black/10">
+          <div className="md:w-[70%]">
+            <MangaCard
+              handleMangaClicked={handleMangaClicked}
+              processedLatestMangas={currentMangas}
+              loadMoreMangas={loadMoreMangas}
+              totalPages={totalPages}
+              currentPage={currentPage}
+            />
+          </div>
 
-              <div className={`md:w-[30%] `}>
-                <AsideComponent
-                  handleMangaClicked={handleMangaClicked}
-                  processedMangas={processedMangas}
-                  processedLatestMangas={processedLatestMangas}
-                  processedFavouriteMangas={processedFavouriteMangas}
-                  isMobile={isMobile}
-                />
-              </div>
-            </div>
-            {/* Pagination Controls */}
-            <div className="w-full flex justify-center mb-8">
-              <MangaCardPagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={goToPage}
-                loadMoreMangas={loadMoreMangas}
-                onLoadMore={loadMoreMangas}
-                isMobile={isMobile}
-              />
-            </div>
-          </Suspense>
-        </>
-      )}
+          <div className="md:w-[30%]">
+            <AsideComponent
+              handleMangaClicked={handleMangaClicked}
+              processedMangas={processedMangas}
+              processedLatestMangas={processedLatestMangas}
+              processedFavouriteMangas={processedFavouriteMangas}
+              isMobile={isMobile}
+            />
+          </div>
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="w-full flex justify-center mb-8">
+          <MangaCardPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={goToPage}
+            loadMoreMangas={loadMoreMangas}
+            onLoadMore={loadMoreMangas}
+            isMobile={isMobile}
+          />
+        </div>
+      </Suspense>
     </div>
   );
 }
+export default MangaList
