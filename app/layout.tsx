@@ -2,10 +2,10 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import Script from 'next/script';
-import TanstackProvider from '@/components/providers/TanstackProvider';
+import TanstackProvider from '@/app/providers/TanstackProvider';
 import LoadingSpinner from './Components/LoadingSpinner';
 import TopNavBar from './Components/TopNavbar';
-import { MangaProvider } from '@/components/providers/MangaContext';
+import { MangaProvider } from '@/app/providers/MangaContext';
 import './globals.css';
 
 export default function RootLayout({

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import DifferentMetaDataChapter from './DifferentMetaDataChapter';
 import Image from 'next/image';
-import { useManga } from '../../../../components/providers/MangaContext';
+import { useManga } from '../../../providers/MangaContext';
 
 // const MemoPageAndChapterNavigation = memo(PageAndChapterNavigation);
 const MemoCollapsedSideBarStrip = memo(CollapsedSideBarStrip);

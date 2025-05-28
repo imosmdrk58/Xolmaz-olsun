@@ -40,8 +40,8 @@ function AsideComponent({
         <div className="w-full mb-16 overflow-hidden">
           <div className=" pl-2 sm:pl-7 text-white shadow-lg w-full">
             {/* Section Header */}
-            <div className="pb-7 text-lg lg:text-2xl flex justify-center sm:block font-bold text-purple-200 tracking-wide uppercase ">
-              <h1 className="border-b-4 border-purple-900 flex flex-row w-fit gap-2 items-center pb-2">
+            <div className="pb-7 text-lg lg:text-2xl ml-4 flex justify-center sm:block font-bold text-purple-200 tracking-wide uppercase ">
+              <h1 className="border-b-4 border-purple-900 flex flex-row w-fit  gap-2 items-center pb-2">
                 <Crown className="w-6 h-6 text-white fill-white" />
                 <span className="line-clamp-1">
                   {(selectedCategory === "Top"

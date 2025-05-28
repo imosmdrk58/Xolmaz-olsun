@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState, Suspense, lazy, useMemo } from 'react';
 import LoadingSpinner from '../../../../Components/LoadingSpinner';
-import { useManga } from '../../../../../components/providers/MangaContext';
+import { useManga } from '../../../../providers/MangaContext';
 
 // Lazy load components
 const AboutManga = React.memo(
@@ -32,7 +32,7 @@ const getAvailableStorage = async () => {
 export default function MangaChapters() {
   const { mangaId } = useParams();
   const router = useRouter();
-  const { selectedManga, setChapterListForManga } = useManga();
+  const { selectedManga, setChapterListForManga,addToReadHistory } = useManga();
 
   // Use selectedManga only if it matches mangaId, else null
   const manga = useMemo(() => (selectedManga && selectedManga.id === mangaId ? selectedManga : null), []);
@@ -112,6 +112,7 @@ export default function MangaChapters() {
     (chapter) => {
       console.log('handleChapterClick - mangaId:', mangaId, 'chapters:', chapters);
       setChapterListForManga(mangaId, chapters);
+      addToReadHistory(manga,chapter,chapters)
       router.push(`/manga/${mangaId}/chapter/${chapter.id}/read`);
     },
     [mangaId, router, chapters] // Added chapters to dependencies

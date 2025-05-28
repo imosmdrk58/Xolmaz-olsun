@@ -98,25 +98,33 @@ interface Chapter {
   [key: string]: any;
 }
 
+// Define ReadHistoryEntry type with allChaptersList
+interface ReadHistoryEntry {
+  manga: Manga;
+  chapters: Chapter[];
+  lastChapterRead: Chapter | null;
+  allChaptersList: Chapter[];
+}
+
 // Define Favorite type
 interface Favorite {
   mangaInfo: Manga;
   chapterInfo: Chapter[];
 }
 
-// Update MangaContextType to include favorites
+// Update MangaContextType to reflect the new readHistory structure
 interface MangaContextType {
   selectedManga: Manga | null;
   setSelectedManga: (manga: Manga | null) => void;
   getSelectedManga: () => Manga | null;
-  addToReadHistory: (manga: Manga) => void;
-  getAllFromReadHistory: () => Manga[];
+  addToReadHistory: (manga: Manga, chapter?: Chapter, allChaptersList?: Chapter[]) => void;
+  getAllFromReadHistory: () => ReadHistoryEntry[];
   addToFavoriteChapter: (chapter: Chapter) => void;
   getAllFromFavoriteChapter: () => Chapter[];
   setChapterListForManga: (mangaId: string, chapters: Chapter[]) => void;
   getChapterListForManga: (mangaId: string) => Chapter[];
-  addToFavorite: (manga: Manga, chapter?: Chapter) => void; // New method
-  getAllFavorites: () => { [mangaId: string]: Favorite }; // New method
+  addToFavorite: (manga: Manga, chapter?: Chapter) => void;
+  getAllFavorites: () => { [mangaId: string]: Favorite };
 }
 
 const MangaContext = createContext<MangaContextType | undefined>(undefined);
@@ -127,15 +135,15 @@ const STORAGE_KEYS = {
   FAVORITE_CHAPTERS: 'favoriteChapters',
   CHAPTER_LIST: 'chapterList',
   SELECTED_MANGA: 'selectedManga',
-  FAVORITES: 'favorites', // New storage key for favorites
+  FAVORITES: 'favorites',
 };
 
 export function MangaProvider({ children }: { children: ReactNode }) {
   const [selectedManga, setSelectedMangaState] = useState<Manga | null>(null);
-  const [readHistory, setReadHistory] = useState<Manga[]>([]);
+  const [readHistory, setReadHistory] = useState<ReadHistoryEntry[]>([]);
   const [favoriteChapters, setFavoriteChapters] = useState<Chapter[]>([]);
   const [chapterLists, setChapterLists] = useState<{ [mangaId: string]: Chapter[] }>({});
-  const [favorites, setFavorites] = useState<{ [mangaId: string]: Favorite }>({}); // New state for favorites
+  const [favorites, setFavorites] = useState<{ [mangaId: string]: Favorite }>({});
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -193,9 +201,39 @@ export function MangaProvider({ children }: { children: ReactNode }) {
   };
 
   // Read History Methods
-  const addToReadHistory = (manga: Manga) => {
+  const addToReadHistory = (manga: Manga, chapter?: Chapter, allChaptersList?: Chapter[]) => {
     setReadHistory((prev) => {
-      const updatedHistory = [manga, ...prev.filter((item) => item.id !== manga.id)].slice(0, 50);
+      const existingEntry = prev.find((entry) => entry.manga.id === manga.id);
+      let updatedHistory: ReadHistoryEntry[];
+
+      if (existingEntry) {
+        // Update existing entry
+        const updatedChapters = chapter
+          ? [chapter, ...existingEntry.chapters.filter((ch) => ch.id !== chapter.id)]
+          : existingEntry.chapters;
+        updatedHistory = prev.map((entry) =>
+          entry.manga.id === manga.id
+            ? {
+                manga,
+                chapters: updatedChapters,
+                lastChapterRead: chapter || existingEntry.lastChapterRead,
+                allChaptersList: allChaptersList || existingEntry.allChaptersList,
+              }
+            : entry
+        );
+      } else {
+        // Add new entry
+        updatedHistory = [
+          {
+            manga,
+            chapters: chapter ? [chapter] : [],
+            lastChapterRead: chapter || null,
+            allChaptersList: allChaptersList || [],
+          },
+          ...prev,
+        ].slice(0, 50); // Limit history to 50 entries
+      }
+
       try {
         localStorage.setItem(STORAGE_KEYS.READ_HISTORY, JSON.stringify(updatedHistory));
       } catch (error) {

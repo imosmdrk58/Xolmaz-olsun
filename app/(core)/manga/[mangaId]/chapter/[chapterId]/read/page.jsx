@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, memo, useCallback, lazy, useRef, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowUp } from 'lucide-react';
-import { useManga } from '../../../../../../../components/providers/MangaContext';
+import { useManga } from '../../../../../../providers/MangaContext';
 
 const InfoSidebar = memo(lazy(() => import('../../../../../../Components/ReadChapterComponents/InfoSideBarModules/InfoSidebar')));
 const BottomSettings = memo(lazy(() => import('../../../../../../Components/ReadChapterComponents/BottomSettingsModules/BottomSettings')));
@@ -28,9 +28,9 @@ export default function ReadChapter() {
   const [quality, setQuality] = useState("low");
 
   const scrollContainerRef = useRef(null);
-    const { selectedManga, getChapterListForManga } = useManga();
-    const chapters =useMemo(()=>getChapterListForManga(mangaId))
-   const chapterInfo = useMemo(()=> chapters.filter((x)=>x.id==chapterId)[0]);
+  const { selectedManga, getChapterListForManga,addToReadHistory } = useManga();
+  const chapters = useMemo(() => getChapterListForManga(mangaId))
+  const chapterInfo = useMemo(() => chapters.filter((x) => x.id == chapterId)[0]);
 
   //  console.log(chapterInfo)
   const { data: pages, isLoading, isError } = useQuery({
@@ -53,6 +53,7 @@ export default function ReadChapter() {
 
   const handleChapterClick = useCallback(
     (id) => {
+      addToReadHistory(selectedManga, id)
       router.push(`/manga/${mangaId}/chapter/${id.id}/read`);
     },
     [router, mangaId, pages]
@@ -83,7 +84,7 @@ export default function ReadChapter() {
   // console.log(selectedManga);
 
   const currentChapterIndex = useMemo(() =>
-    chapters &&chapters.findIndex(ch => ch.id === chapterInfo.id),
+    chapters && chapters.findIndex(ch => ch.id === chapterInfo.id),
     [chapters, chapterInfo]
   );
   const hasPrevChapter = useMemo(() => currentChapterIndex > 0);

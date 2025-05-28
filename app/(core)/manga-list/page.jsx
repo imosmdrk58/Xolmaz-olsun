@@ -10,9 +10,10 @@ import React, {
 } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { useManga } from '../../../components/providers/MangaContext';
+import { useManga } from '../../providers/MangaContext';
 import LoadingSpinner from '../../Components/LoadingSpinner';
 import MangaCardPagination from "../../Components/MangaListComponents/MangaCardPagination";
+import MangaReadHistory from '../../Components/MangaListComponents/MangaReadHistory';
 
 // Lazy load components with React.lazy
 const MangaCard = React.memo(
@@ -238,6 +239,7 @@ const MangaList=()=> {
           </div>
 
           <div className="md:w-[30%]">
+            <MangaReadHistory/>
             <AsideComponent
               handleMangaClicked={handleMangaClicked}
               processedMangas={processedMangas}
