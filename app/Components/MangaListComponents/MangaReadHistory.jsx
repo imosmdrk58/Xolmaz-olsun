@@ -8,7 +8,7 @@ function MangaReadHistory() {
     const { getAllFromReadHistory, addToReadHistory, setChapterListForManga } = useManga();
     const [readHistory, setReadHistory] = useState([]);
     const router = useRouter();
-    const [shownMangasInHistory, setShownMangasInHistory] = useState(3);
+    const [shownMangasInHistory, setShownMangasInHistory] = useState(2);
     const [isExpanded, setIsExpanded] = useState(false);
     const { setSelectedManga } = useManga();
 
@@ -34,7 +34,7 @@ function MangaReadHistory() {
     const handleToggleExpand = () => {
         const newExpanded = !isExpanded;
         setIsExpanded(newExpanded);
-        setShownMangasInHistory(newExpanded ? readHistory.length : 3);
+        setShownMangasInHistory(newExpanded ? readHistory.length : 2);
     };
 
     // Calculate reading progress for a manga
@@ -54,14 +54,9 @@ function MangaReadHistory() {
         };
     };
 
-    // Format last read time (mock implementation - you'd get this from your data)
-    const getLastReadTime = () => {
-        const times = ['2 hours ago', '1 day ago', '3 days ago', '1 week ago', '2 weeks ago'];
-        return times[Math.floor(Math.random() * times.length)];
-    };
     console.log(readHistory)
     return (
-        <div className="w-full px-6 mb-8">
+        <div className="w-[100% -12px] ml-2 px-6 mb-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-9">
                 <div className="flex items-center gap-3">
@@ -95,14 +90,11 @@ function MangaReadHistory() {
             {/* Content */}
             <div className="space-y-4">
                 {readHistory.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 px-4 bg-gradient-to-br from-gray-900/50 to-gray-800/30 rounded-xl border border-gray-700/50 backdrop-blur-sm relative overflow-hidden">
+                    <div className="flex flex-col items-center ml-2 mt-11 justify-center py-16 px-4 bg-gradient-to-br from-gray-900/50 to-gray-800/30 rounded-xl border border-gray-700/30 backdrop-blur-sm relative overflow-hidden">
                         {/* Background decoration */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5" />
-                        <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-2xl" />
-                        <div className="absolute bottom-4 left-4 w-16 h-16 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-xl" />
 
                         <div className="relative z-10 flex flex-col items-center">
-                            <div className="w-20 h-20 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center mb-6 border border-purple-500/20 shadow-lg">
+                            <div className="w-20 h-20 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full flex items-center justify-center mb-6 border border-purple-500/20 shadow-lg">
                                 <BookOpen className="w-10 h-10 text-purple-400" />
                             </div>
                             <h3 className="text-xl font-semibold text-gray-200 mb-3">No Reading History Yet</h3>
@@ -118,7 +110,7 @@ function MangaReadHistory() {
                 ) : (
                     <>
                         <div className="space-y-3">
-                            {readHistory.slice(0, shownMangasInHistory).map((item, index) => {
+                            {readHistory.sort((item1,item2)=>new Date(item2.lastReadAT)-new Date(item1.lastReadAT)).slice(0, shownMangasInHistory).map((item, index) => {
                                 const progress = calculateProgress(item);
                                 return (
                                     <div
@@ -187,12 +179,15 @@ function MangaReadHistory() {
                                                             <div className="w-1 h-1 bg-gray-600 rounded-full" />
                                                             <span className="text-xs text-gray-500">
                                                                 {(() => {
-                                                                    const readableAt = new Date(item.lastChapterRead.readableAt);
+                                                                    const readableAt = new Date(item.lastReadAT);
                                                                     const now = new Date();
                                                                     const diffInMs = now - readableAt;
                                                                     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
                                                                     const diffInMonths = Math.floor(diffInDays / 30);
                                                                     const diffInYears = Math.floor(diffInDays / 365);
+                                                                    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+                                                                    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+                                                                    const diffInSeconds = Math.floor(diffInMs / 1000);
 
                                                                     if (diffInYears >= 1) {
                                                                         return `${diffInYears} year${diffInYears > 1 ? 's' : ''} ago`;
@@ -200,8 +195,12 @@ function MangaReadHistory() {
                                                                         return `${diffInMonths} month${diffInMonths > 1 ? 's' : ''} ago`;
                                                                     } else if (diffInDays >= 1) {
                                                                         return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+                                                                    } else if (diffInHours >= 1) {
+                                                                        return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+                                                                    } else if (diffInMinutes >= 1) {
+                                                                        return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
                                                                     } else {
-                                                                        return 'Today';
+                                                                        return `${diffInSeconds} second${diffInSeconds !== 1 ? 's' : ''} ago`;
                                                                     }
                                                                 })()}
                                                             </span>
@@ -253,7 +252,7 @@ function MangaReadHistory() {
                         </div>
 
                         {/* Expand/Collapse Button */}
-                        {readHistory.length > 3 && (
+                        {readHistory.length > 2 && (
                             <button
                                 onClick={handleToggleExpand}
                                 className="w-full flex items-center justify-center gap-2 pt-2.5 text-sm font-medium text-gray-400 hover:text-gray-300 hover:bg-gray-800/30 rounded-lg transition-all duration-200"

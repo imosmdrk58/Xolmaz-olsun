@@ -218,6 +218,7 @@ export function MangaProvider({ children }: { children: ReactNode }) {
                 chapters: updatedChapters,
                 lastChapterRead: chapter || existingEntry.lastChapterRead,
                 allChaptersList: allChaptersList || existingEntry.allChaptersList,
+                lastReadAT:new Date()
               }
             : entry
         );
@@ -229,6 +230,7 @@ export function MangaProvider({ children }: { children: ReactNode }) {
             chapters: chapter ? [chapter] : [],
             lastChapterRead: chapter || null,
             allChaptersList: allChaptersList || [],
+            lastReadAT:new Date()
           },
           ...prev,
         ].slice(0, 50); // Limit history to 50 entries
