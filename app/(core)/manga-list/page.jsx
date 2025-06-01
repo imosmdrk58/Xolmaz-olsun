@@ -14,6 +14,7 @@ import { useManga } from '../../providers/MangaContext';
 import LoadingSpinner from '../../Components/LoadingSpinner';
 import MangaCardPagination from "../../Components/MangaListComponents/MangaCardPagination";
 import MangaReadHistory from '../../Components/MangaListComponents/MangaReadHistory';
+import LatestActivityComments from '../../Components/MangaListComponents/LatestActivityComments';
 
 // Lazy load components with React.lazy
 const MangaCard = React.memo(
@@ -218,7 +219,7 @@ const MangaList=()=> {
   }
 
   return (
-    <div ref={showcaseRef} className="min-h-screen w-full text-white">
+    <div ref={showcaseRef} className="min-h-screen w-full bg-black/40 text-white">
       <Suspense fallback={<LoadingSpinner text="Loading Mangas..." />}>
         <div className="w-full shadow-[5px_5px_50px_rgba(0,0,0,1)] shadow-black h-fit">
           <SliderComponent 
@@ -226,7 +227,7 @@ const MangaList=()=> {
             processedRandomMangas={processedRandomMangas} 
           />
         </div>
-
+<div><LatestActivityComments/></div>
         <div className="flex flex-col-reverse md:flex-row mt-6 md:mt-10 bg-gradient-to-t from-transparent via-black/30 to-black/10">
           <div className="md:w-[70%]">
             <MangaCard

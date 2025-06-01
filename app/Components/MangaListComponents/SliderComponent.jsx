@@ -20,7 +20,7 @@ const MangaThumbnail = React.memo(({
       `}
       onClick={() => handleThumbnailClick(index)}
     >
-      <div className="w-full aspect-[2/3] overflow-hidden">
+      <div className="w-full  overflow-hidden">
         <Image width={300} height={300}
           src={manga.coverImageUrl}
           alt={manga.title}
@@ -199,7 +199,7 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
   return (
     <div
       ref={showcaseRef}
-      className="relative w-full min-h-[59vh] sm:h-[89vh] border-b-[16px] border-black/10 overflow-hidden bg-black/60"
+      className="relative w-full min-h-[59vh] sm:h-[60vh] border-b-[16px] border-black/10 overflow-hidden bg-black/60"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -264,7 +264,7 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
           {/* Content Container with CoverImage repositioned */}
           <div className="relative h-full z-20 flex items-center justify-between">
             {/* Left Side - Title and Description */}
-            <div className="w-[75%] md:w-3/5 px-6 md:px-16 pt-12 pb-32 sm:py-12">
+            <div className="w-[75%] md:w-4/5 px-6 md:px-16 md:pl-24 pt-12 pb-32 sm:py-12">
               {/* Language Tag */}
               <div className="inline-flex items-center px-3 py-1 mb-4 md:mb-6 rounded-full border border-purple-600/30 bg-black/30 backdrop-blur-sm">
                 <StableFlag code={activeManga?.originalLanguage || "UN"} />
@@ -285,9 +285,9 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
               </h1>
 
               {/* Description - Smaller text on mobile */}
-              <p className="text-[11px] relative z-50 sm:text-sm md:text-base text-gray-300 mb-6 md:mb-8 max-w-xl transition-all duration-500">
+              <p className="text-[11px] relative z-50 line-clamp-3 sm:text-sm md:text-base text-gray-300 mb-6 md:mb-8 max-w-xl md:max-w-2xl transition-all duration-500">
                 {activeManga?.description.length > 180
-                  ? `${activeManga?.description.slice(0, 120)}...`
+                  ? `${activeManga?.description.slice(0, 140)}...`
                   : activeManga?.description}
               </p>
 
@@ -322,7 +322,7 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
             {/* Right Side - Cover Image */}
             <div className="hidden md:block md:w-2/5 h-full relative">
               <div
-                className="absolute top-1/2 -translate-y-1/2 right-16 w-64 h-96 z-30 transition-all duration-500"
+                className="absolute top-1/2 -translate-y-1/2 right-16 w-56 h-80 z-30 transition-all duration-500"
                 style={{
                   boxShadow: "0 20px 40px rgba(0,0,0,0.5), 0 0 30px rgba(0,0,0,0.3)",
                 }}
@@ -372,13 +372,13 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
           </div>
 
           {/* Thumbnails Grid */}
-          <div className="flex-grow p-6 overflow-y-auto"
+          <div className="flex-grow p-6 pt-3 overflow-y-auto"
             style={{
               scrollbarWidth: "thin",
               scrollbarColor: "rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)", // Purple scrollbar
             }}
           >
-            <h3 className="text-white/50 uppercase text-xs tracking-widest mb-6">Discover More</h3>
+            <h3 className="text-white/50 uppercase text-xs tracking-widest mb-3">Discover More</h3>
 
             <div className="grid grid-cols-2 gap-4">
               {mangas.map((manga, index) => (
