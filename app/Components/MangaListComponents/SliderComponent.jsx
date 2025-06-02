@@ -20,7 +20,7 @@ const MangaThumbnail = React.memo(({
       `}
       onClick={() => handleThumbnailClick(index)}
     >
-      <div className="w-full  overflow-hidden">
+      <div className="w-full aspect-[2/3]  overflow-hidden">
         <Image width={300} height={300}
           src={manga.coverImageUrl}
           alt={manga.title}
@@ -322,7 +322,7 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
             {/* Right Side - Cover Image */}
             <div className="hidden md:block md:w-2/5 h-full relative">
               <div
-                className="absolute top-1/2 -translate-y-1/2 right-16 w-56 h-80 z-30 transition-all duration-500"
+                className="absolute top-1/2  -translate-y-1/2 right-16 w-56 h-80 z-30 transition-all duration-500"
                 style={{
                   boxShadow: "0 20px 40px rgba(0,0,0,0.5), 0 0 30px rgba(0,0,0,0.3)",
                 }}

@@ -10,7 +10,7 @@ import {
   UserPlus,
   TrendingUp
 } from "lucide-react";
-
+import Image from "next/image"
 function AsideComponent({
   processedMangas = [],
   processedLatestMangas = [],
@@ -156,12 +156,15 @@ const TitleIcon= statConfig[selectedCategory].titleIcon
 
             {/* Cover */}
             <div className="flex-shrink-0  w-12 h-16 rounded-md overflow-hidden shadow-md">
-              <img
-                src={manga.coverImageUrl}
+              <Image
+              width={300}
+              height={300}
+                src={manga.coverImageUrl || "./placeholder.jpg"}
                 alt={manga.title ?? "Manga cover"}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
+                onError={()=> "./placeholder.jpg"}
               />
             </div>
 

@@ -62,7 +62,7 @@ const saveToStorage = (key, data) => {
 
 const fetchMangaType = async (type, page) => {
   const cacheKey = `manga_${type}_${page}`;
-  
+
   // Check localStorage first
   const cachedData = getFromStorage(cacheKey);
   if (cachedData) {
@@ -75,7 +75,7 @@ const fetchMangaType = async (type, page) => {
   if (!response.ok) throw new Error(`Failed to fetch ${type} mangas`);
 
   const data = await response.json();
-  
+
   // Save to localStorage after successful fetch
   saveToStorage(cacheKey, data);
   return data;
@@ -131,7 +131,7 @@ const fetchAllMangaTypes = async ({ queryKey }) => {
   }
 };
 
-const MangaList=()=> {
+const MangaList = () => {
   const [page, setPage] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
@@ -222,13 +222,13 @@ const MangaList=()=> {
     <div ref={showcaseRef} className="min-h-screen w-full bg-black/40 text-white">
       <Suspense fallback={<LoadingSpinner text="Loading Mangas..." />}>
         <div className="w-full shadow-[5px_5px_50px_rgba(0,0,0,1)] shadow-black h-fit">
-          <SliderComponent 
-            handleMangaClicked={handleMangaClicked} 
-            processedRandomMangas={processedRandomMangas} 
+          <SliderComponent
+            handleMangaClicked={handleMangaClicked}
+            processedRandomMangas={processedRandomMangas}
           />
         </div>
-<div><LatestActivityComments/></div>
-        <div className="flex flex-col-reverse md:flex-row mt-6 md:mt-10 bg-gradient-to-t from-transparent via-black/30 to-black/10">
+        <div><LatestActivityComments /></div>
+        <div className="flex flex-col-reverse md:flex-row mt-6 md:mt-0 bg-gradient-to-t from-transparent via-black/30 to-black/10">
           <div className="md:w-[70%]">
             <MangaCard
               handleMangaClicked={handleMangaClicked}
@@ -240,7 +240,7 @@ const MangaList=()=> {
           </div>
 
           <div className="md:w-[30%]">
-            <MangaReadHistory/>
+            <MangaReadHistory />
             <AsideComponent
               handleMangaClicked={handleMangaClicked}
               processedMangas={processedMangas}
