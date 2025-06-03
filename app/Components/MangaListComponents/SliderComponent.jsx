@@ -218,7 +218,7 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
       {/* Main Content Area */}
       <div className="absolute inset-0 flex flex-col md:flex-row">
         {/* Left Panel - Feature Display */}
-        <div className="relative w-full md:w-2/3 h-full overflow-hidden">
+        <div className="relative w-full md:w-[73%] h-full overflow-hidden">
           {/* Background Image - static with opacity */}
           <div
             className="absolute inset-0 bg-cover bg-center filter blur-md opacity-30 transition-opacity duration-500"
@@ -232,7 +232,7 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
 
           {/* Mobile Navigation Controls + Indicators - Only visible on mobile and in a single line */}
           <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center z-40 md:hidden">
-            <div className="flex space-x-3 items-center bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm">
+            <div className="flex space-x-3  items-center bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm">
               <button
                 onClick={handlePrev}
                 className="w-8 h-8 bg-black/50 border border-white/10 rounded-full flex items-center justify-center text-white mr-2"
@@ -286,9 +286,7 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
 
               {/* Description - Smaller text on mobile */}
               <p className="text-[11px] relative z-50 line-clamp-3 sm:text-sm md:text-base text-gray-300 mb-6 md:mb-8 max-w-xl md:max-w-2xl transition-all duration-500">
-                {activeManga?.description.length > 180
-                  ? `${activeManga?.description.slice(0, 140)}...`
-                  : activeManga?.description}
+                {activeManga?.description}
               </p>
 
               {/* Action Buttons - Smaller on mobile */}
@@ -322,7 +320,7 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
             {/* Right Side - Cover Image */}
             <div className="hidden md:block md:w-2/5 h-full relative">
               <div
-                className="absolute top-1/2  -translate-y-1/2 right-16 w-56 h-80 z-30 transition-all duration-500"
+                className="absolute top-1/2  -translate-y-1/2 right-16 w-64 h-[360px]  z-30 transition-all duration-500"
                 style={{
                   boxShadow: "0 20px 40px rgba(0,0,0,0.5), 0 0 30px rgba(0,0,0,0.3)",
                 }}
@@ -342,29 +340,29 @@ const SliderComponent = ({ processedRandomMangas, handleMangaClicked }) => {
         </div>
 
         {/* Right Panel - Navigation & Thumbnails - Hidden on mobile */}
-        <div className="relative w-full md:w-1/3 h-full bg-black/80 backdrop-blur-sm hidden md:flex flex-col">
+        <div className="relative w-full md:w-[27%] h-full bg-black/80 backdrop-blur-sm hidden md:flex flex-col">
           {/* Navigation Controls */}
           <div className="h-24 border-b py-3 border-white/10 flex items-center justify-between px-8">
             <button
               onClick={handlePrev}
-              className="flex items-center gap-2 text-white/70 hover:text-purple-600 transition-colors group"
+              className="flex items-center gap-3 text-white/70 hover:text-purple-600 transition-colors group"
             >
               <span className="w-8 h-8 flex items-center justify-center border border-white/30 rounded-full group-hover:border-purple-600 transition-colors">
                 <ChevronLeft size={18} />
               </span>
-              <span className="hidden sm:block uppercase text-xs tracking-widest">Previous</span>
+              <span className="hidden sm:block uppercase text-[11px] tracking-widest">Prev</span>
             </button>
 
             <div className="text-center">
-              <span className="block text-white/50 text-sm">{activeIndex + 1} / {mangas.length}</span>
-              <span className="block text-white/30 text-xs">Swipe to navigate</span>
+              <span className="block text-white/50 text-xs">{activeIndex + 1} / {mangas.length}</span>
+              <span className="block text-white/30 text-[11px]">Swipe to navigate</span>
             </div>
 
             <button
               onClick={handleNext}
-              className="flex items-center gap-2 text-white/70 hover:text-purple-600 transition-colors group"
+              className="flex items-center gap-3 text-white/70 hover:text-purple-600 transition-colors group"
             >
-              <span className="hidden sm:block uppercase text-xs tracking-widest">Next</span>
+              <span className="hidden sm:block uppercase text-[11px] tracking-widest">Next</span>
               <span className="w-8 h-8 flex items-center justify-center border border-white/30 rounded-full group-hover:border-purple-600 transition-colors">
                 <ChevronRight size={18} />
               </span>

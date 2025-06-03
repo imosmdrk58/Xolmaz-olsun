@@ -219,7 +219,16 @@ const MangaList = () => {
   }
 
   return (
-    <div ref={showcaseRef} className="min-h-screen w-full bg-black/40 text-white">
+    <div ref={showcaseRef} className="relative bg-black/50 min-h-screen w-full text-white overflow-hidden">
+      {/* Background blobs and particles */}
+      <div className="absolute inset-0 pointer-events-none -z-10">
+        <div className="absolute inset-0 pointer-events-none -z-10">
+
+
+          {/* Grid Pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.07)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.07)_1px,transparent_1px)] bg-[size:72px_72px]"></div>
+        </div>
+      </div>
       <Suspense fallback={<LoadingSpinner text="Loading Mangas..." />}>
         <div className="w-full shadow-[5px_5px_50px_rgba(0,0,0,1)] shadow-black h-fit">
           <SliderComponent
@@ -228,7 +237,7 @@ const MangaList = () => {
           />
         </div>
         <div><LatestActivityComments /></div>
-        <div className="flex flex-col-reverse md:flex-row mt-6 md:mt-0 bg-gradient-to-t from-transparent via-black/30 to-black/10">
+        <div className="flex flex-col-reverse md:flex-row mt-6 md:mt-0 ">
           <div className="md:w-[70%]">
             <MangaCard
               handleMangaClicked={handleMangaClicked}

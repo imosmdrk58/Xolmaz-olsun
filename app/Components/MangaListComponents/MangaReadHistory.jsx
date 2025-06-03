@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useManga } from '../../providers/MangaContext';
-import { History, BookOpen, ChevronDown, ChevronUp, Clock, TrendingUp, Eye } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, Clock, TrendingUp, Eye } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 

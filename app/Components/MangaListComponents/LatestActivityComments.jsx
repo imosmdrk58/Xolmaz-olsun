@@ -4,7 +4,6 @@ import {
     Clock,
     ExternalLink,
     RefreshCw,
-    User,
     MessageCircle,
     Activity,
     Zap,
@@ -16,8 +15,9 @@ import {
     ThumbsUp,
     Heart,
     CircleFadingArrowUp,
-    Eye,
-    EyeOff,
+    Sparkles,
+    TrendingUp,
+    CornerDownRight,
 } from "lucide-react";
 
 const CACHE_KEY = "mangadex_latest_comments";
@@ -34,7 +34,7 @@ const LatestComments = () => {
     const [startX, setStartX] = useState(0);
     const [scrollLeft, setScrollLeft] = useState(0);
     const [showMore, setShowMore] = useState({});
-    const [visible, setVisible] = useState(true); // Toggle for entire component
+    const [visible, setVisible] = useState(true);
 
     const fetchComments = useCallback(
         async (force = false) => {
@@ -134,28 +134,62 @@ const LatestComments = () => {
         return () => clearInterval(interval);
     }, [fetchComments]);
 
+    const scrollContainerRef = React.useRef(null);
+
+    // Drag handlers
     const handleMouseDown = (e) => {
         setIsDragging(true);
         setStartX(e.pageX - e.currentTarget.offsetLeft);
         setScrollLeft(e.currentTarget.scrollLeft);
-    };
-
-    const handleMouseLeave = () => {
-        setIsDragging(false);
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.style.userSelect = "none";
+            scrollContainerRef.current.style.cursor = "grabbing";
+        }
     };
 
     const handleMouseUp = () => {
         setIsDragging(false);
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.style.userSelect = "auto";
+            scrollContainerRef.current.style.cursor = "grab";
+        }
+    };
+
+    const handleMouseLeave = () => {
+        setIsDragging(false);
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.style.userSelect = "auto";
+            scrollContainerRef.current.style.cursor = "grab";
+        }
     };
 
     const handleMouseMove = (e) => {
         if (!isDragging) return;
         e.preventDefault();
         const x = e.pageX - e.currentTarget.offsetLeft;
-        const walk = (x - startX) * 2; // Scroll speed
+        const walk = (x - startX) * 2; // scroll speed
         e.currentTarget.scrollLeft = scrollLeft - walk;
     };
 
+    // Native wheel listener to convert vertical scroll to horizontal and prevent vertical scroll
+    useEffect(() => {
+        const el = scrollContainerRef.current;
+        if (!el) return;
+
+        const onWheel = (e) => {
+            // Only intercept vertical scroll to convert to horizontal
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                el.scrollLeft += e.deltaY;
+            }
+        };
+
+        el.addEventListener("wheel", onWheel, { passive: false });
+
+        return () => {
+            el.removeEventListener("wheel", onWheel);
+        };
+    }, []);
     const truncateTitle = (title, maxLength = 25) => {
         if (!title) return "Unknown";
         return title.length > maxLength ? title.substring(0, maxLength) + "..." : title;
@@ -166,9 +200,9 @@ const LatestComments = () => {
             case "Funny":
                 return <Laugh className="w-5 h-5 text-yellow-400 fill-yellow-400/20" />;
             case "Strike":
-                return <CircleX className="w-5 h-5 text-red-400 fill-yellow-400/20" />;
+                return <CircleX className="w-5 h-5 text-red-400 fill-red-400/20" />;
             case "Like":
-                return <ThumbsUp className="w-5 h-5 text-blue-400 fill-blue-400/20" />;
+                return <ThumbsUp className="w-5 h-5 -mt-2 text-blue-400 fill-blue-400/20" />;
             case "Love":
                 return <Heart className="w-5 h-5 text-pink-400 fill-current" />;
             case "Replied":
@@ -178,65 +212,93 @@ const LatestComments = () => {
         }
     };
 
+    const getActionText = (reactionType) => {
+        switch (reactionType) {
+            case 'Like':
+            case 'Love':
+            case 'Funny':
+            case 'Strike':
+                return 'reacted to';
+            case 'Replied':
+                return 'replied to';
+            case 'Posted Thread':
+                return 'created';
+            case 'Reacted':
+                return 'reacted to';
+            default:
+                return 'interacted with';
+        }
+    };
+
     if (!visible) {
         return (
             <div className="p-6 max-w-[95%] mb-2 flex justify-end items-center mx-auto">
-                <hr className=" w-full border-[1px] border-white/20 " /> 
+                <hr className="w-full border-[1px] border-white/20" />
                 <button
                     onClick={() => setVisible((prev) => !prev)}
-                    className="px-5 py-3 bg-black/30 min-w-fit gap-2 flex flex-row justify-start items-center border-[1px] border-white/20   text-gray-300 rounded-xl font-semibold shadow-lg transition-transform duration-300 hover:scale-105"
+                    className="px-5 py-3 bg-black/30 min-w-fit gap-2 flex flex-row justify-start items-center border-[1px] border-white/20 text-gray-300 rounded-xl font-semibold shadow-lg transition-transform duration-300"
                     aria-label="Toggle comments visibility"
-                    title={visible ? "Hide Comments" : "Show Comments"}
+                    title="Show Comments"
                 >
-                    <div className={`w-8 h-4 rounded-full relative transition-colors duration-300 ${visible ? 'bg-purple-600/70' : 'bg-gray-600'}`}>
-                        <div
-                            className={`w-4 h-4 bg-white rounded-full absolute top-0 transition-transform duration-300 ${visible ? 'translate-x-4' : 'translate-x-0.5'}`}
-                        />
+                    <div className="w-8 h-4 rounded-full relative transition-colors duration-300 bg-gray-600">
+                        <div className="w-4 h-4 bg-white rounded-full absolute top-0 transition-transform duration-300 translate-x-0.5" />
                     </div>
-                    <span>{visible ? 'Hide Comments' : 'Show Comments'}</span>
+                    <span>Show Comments</span>
                 </button>
             </div>
         );
     }
-
-    if (loading && comments.length === 0) {
+    if (loading && comments.length == 0) {
         return (
-            <div className="min-h-screen mb-6 bg-gradient-to-br from-gray-950 via-purple-950/30 to-gray-950 scale-[0.85]">
-                <div className="p-6">
-                    <div className="max-w-7xl mx-auto">
+            <div className="min-h-fit relative overflow-hidden">
+
+                <div className="relative  -mr-4 mb-10 flex justify-center flex-col items-center">
+                    <div className="max-w-[94%]">
                         {/* Header Skeleton */}
-                        <div className="mb-8">
+                        <div className="mb-3">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-4">
-                                    <div className="w-12 h-12 bg-gradient-to-r from-purple-800/50 to-yellow-600/50 rounded-2xl animate-pulse"></div>
-                                    <div className="space-y-3">
-                                        <div className="h-6 w-44 bg-purple-800/30 rounded-lg animate-pulse"></div>
-                                        <div className="h-3 w-32 bg-purple-700/30 rounded animate-pulse"></div>
+                                    <div className="relative">
+                                        <div className="w-16 h-16 bg-gradient-to-br from-gray-600/30 to-gray-500/30 rounded-2xl animate-pulse backdrop-blur-xl border border-white/10"></div>
                                     </div>
+                                    <div className="space-y-3">
+                                        <div className="h-8 w-80 bg-slate-700/50 rounded-xl animate-pulse"></div>
+                                        <div className="h-4 w-60 bg-slate-800/50 rounded-lg animate-pulse"></div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                    <div className="h-12 w-16 bg-slate-700/50 rounded-xl animate-pulse"></div>
+                                    <div className="h-12 w-32 bg-slate-700/50 rounded-xl animate-pulse"></div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Horizontal Skeleton */}
-                        <div className="flex space-x-5 overflow-hidden">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <div
-                                    key={i}
-                                    className="flex-shrink-0 w-[272px] h-[204px] bg-gradient-to-br from-purple-900/40 to-purple-800/20 rounded-2xl p-5 animate-pulse"
-                                >
-                                    <div className="space-y-3">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-9 h-9 bg-purple-700/50 rounded-full"></div>
-                                            <div className="space-y-1.5">
-                                                <div className="h-3.5 w-20 bg-purple-700/50 rounded"></div>
-                                                <div className="h-2.5 w-14 bg-purple-600/30 rounded"></div>
+                        {/* Comment Cards Skeleton */}
+                        <div className="flex space-x-6 overflow-hidden">
+                            {[1, 2, 3, 4].map((i) => (
+                                <div key={i} className="flex-shrink-0 w-96">
+                                    <div className="relative group">
+                                        <div className="relative bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 space-y-4">
+                                            {/* Avatar and User */}
+                                            <div className="flex items-start space-x-4">
+                                                <div className="relative">
+                                                    <div className="w-16 h-16 bg-slate-700/50 rounded-full animate-pulse"></div>
+                                                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500/30 rounded-full animate-pulse"></div>
+                                                </div>
+                                                <div className="flex-1 space-y-2">
+                                                    <div className="h-5 bg-gradient-to-r from-slate-600/50 to-slate-700/50 rounded-lg w-2/3 animate-pulse"></div>
+                                                    <div className="h-3 bg-slate-700/50 rounded w-1/2 animate-pulse"></div>
+                                                </div>
+                                            </div>
+
+                                            {/* Content */}
+                                            <div className="space-y-3">
+                                                <div className="h-4 bg-slate-700/50 rounded w-full animate-pulse"></div>
+                                                <div className="h-4 bg-slate-700/50 rounded w-4/5 animate-pulse"></div>
+                                                <div className="h-16 bg-slate-800/50 rounded-xl animate-pulse"></div>
+                                                <div className="h-4 bg-slate-700/50 rounded w-3/4 animate-pulse"></div>
                                             </div>
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <div className="h-2.5 bg-purple-700/40 rounded"></div>
-                                            <div className="h-2.5 bg-purple-700/30 rounded w-3/4"></div>
-                                        </div>
-                                        <div className="h-14 bg-purple-800/30 rounded-xl"></div>
                                     </div>
                                 </div>
                             ))}
@@ -248,10 +310,10 @@ const LatestComments = () => {
     }
 
     return (
-        <div className="max-h-screen  mt-5 w-full">
-            <div className="p-6 w-full">
+        <div className="max-h-screen w-full relative overflow-hidden">
+            <div className="relative p-6 w-full">
                 <div className="max-w-[95%] mx-auto">
-                    {/* Header */}
+                    {/* Enhanced Header */}
                     <div className="mb-8 flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <div className="relative">
@@ -263,48 +325,45 @@ const LatestComments = () => {
                                 </div>
                             </div>
                             <div>
-                                <h1 className="text-2xl font-black text-white">COMMUNITY ACTIVITY</h1>
-                                <p className="text-gray-400 text-xs flex items-center font-medium">
+                                <h1 className="text-2xl font-black text-white">
+                                    COMMUNITY ACTIVITY
+                                </h1>
+                                <div className="text-gray-400 text-xs flex items-center font-medium">
                                     <Activity className="w-4 h-4 mr-2 text-yellow-400" />
-                                    Real-time community interactions
-                                </p>
+                                    Real-time community interactions&nbsp;
+                                    {lastUpdatedDisplay && (
+                                        <div>
+                                            (Last Updated At :- {lastUpdatedDisplay})
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
                         <div className="flex items-center space-x-3">
-                            {lastUpdatedDisplay && (
-                                <div
-                                    className="px-6 py-3 bg-black/20 min-w-fit gap-2 flex flex-row justify-start items-center border-[1px] border-white/20   text-gray-300 rounded-xl font-semibold shadow-lg transition-transform duration-300 hover:scale-105">
-                                    <Clock className="w-3 h-3 mr-1.5 text-white" />
-                                    {lastUpdatedDisplay}
-                                </div>
-                            )}
                             <button
                                 onClick={() => fetchComments(true)}
-                                className="px-5 py-3.5 bg-black/30 min-w-fit gap-2 flex flex-row justify-start items-center border-[1px] border-white/20   text-gray-300 rounded-xl font-semibold shadow-lg transition-transform duration-300 hover:scale-105"
+                                className="px-5 py-3.5 bg-black/30 min-w-fit gap-2 flex flex-row justify-start items-center border-[1px] border-white/20 text-gray-300 rounded-xl font-semibold shadow-lg transition-transform duration-300 hover:bg-black/40 hover:border-purple-400/40"
                                 disabled={loading}
                                 aria-label="Refresh comments"
                             >
                                 {loading ? (
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
                                 ) : (
-                                    <RefreshCw className="w-5 h-5" />
+                                    <RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
                                 )}
                             </button>
 
-                            {/* Toggle Button */}
                             <button
                                 onClick={() => setVisible((prev) => !prev)}
-                                className="px-5 py-3 bg-black/30 min-w-fit gap-2 flex flex-row justify-start items-center border-[1px] border-white/20   text-gray-300 rounded-xl font-semibold shadow-lg transition-transform duration-300 hover:scale-105"
+                                className="px-5 py-3 bg-black/30 min-w-fit gap-2 flex flex-row justify-start items-center border-[1px] border-white/20 text-gray-300 rounded-xl font-semibold shadow-lg transition-transform duration-300 hover:bg-black/40"
                                 aria-label="Toggle comments visibility"
-                                title={visible ? "Hide Comments" : "Show Comments"}
+                                title="Hide Comments"
                             >
-                                <div className={`w-8 h-4 rounded-full relative transition-colors duration-300 ${visible ? 'bg-purple-600/70' : 'bg-gray-600'}`}>
-                                    <div
-                                        className={`w-4 h-4 bg-white rounded-full absolute top-0 transition-transform duration-300 ${visible ? 'translate-x-4' : 'translate-x-0.5'}`}
-                                    />
+                                <div className="w-8 h-4 rounded-full relative transition-colors duration-300 bg-purple-600/70">
+                                    <div className="w-4 h-4 bg-white rounded-full absolute top-0 transition-transform duration-300 translate-x-4" />
                                 </div>
-                                <span>{visible ? 'Hide Comments' : 'Hide Comments'}</span>
+                                <span>Hide Comments</span>
                             </button>
                         </div>
                     </div>
@@ -312,21 +371,25 @@ const LatestComments = () => {
                     {/* Error State */}
                     {error && (
                         <div className="mb-6">
-                            <div className="bg-gradient-to-r from-red-900/30 to-purple-900/30 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm">
-                                <div className="flex items-center text-red-300 font-medium">
-                                    <span className="mr-3 text-xl select-none">⚡</span>
-                                    Connection failed: {error}
+                            <div className="relative group">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-red-600/50 to-purple-600/50 rounded-2xl blur opacity-70"></div>
+                                <div className="relative bg-gradient-to-r from-red-900/30 to-purple-900/30 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm">
+                                    <div className="flex items-center text-red-300 font-medium">
+                                        <span className="mr-3 text-xl select-none">⚡</span>
+                                        Connection failed: {error}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* Horizontal Scrolling Container */}
+                    {/* Enhanced Horizontal Scrolling Container */}
                     {comments.length > 0 ? (
                         <div className="relative">
                             <div
                                 id="comments-container"
-                                className="flex space-x-5 overflow-x-auto scrollbar-hide pb-4 cursor-grab active:cursor-grabbing"
+                                ref={scrollContainerRef}
+                                className="flex space-x-6 overflow-x-auto scrollbar-hide pb-4 cursor-grab active:cursor-grabbing"
                                 style={{
                                     scrollbarWidth: "none",
                                     msOverflowStyle: "none",
@@ -341,169 +404,261 @@ const LatestComments = () => {
                                 {comments.map((comment, index) => (
                                     <div
                                         key={comment.id || index}
-                                        className={`flex-shrink-0 ${showMore[comment.id] ? "h-auto" : "h-[230px]"
-                                            } w-64 bg-gray-800/10 mt-1  backdrop-blur-2xl border border-purple-500/20 rounded-2xl p-5 hover:border-purple-400/40 transition-all duration-300 hover:scale-[1.02] group relative`}
+                                        className="flex-shrink-0 w-80 relative group"
                                     >
-                                        {/* Header */}
-                                        <div className="flex items-center justify-between mb-3">
-                                            <div className="flex items-center space-x-3">
+
+                                        <div className={`relative ${showMore[comment.id] ? "h-auto" : "h-[290px]"} bg-gray-800/10 mt-1 backdrop-blur-2xl border border-purple-500/20 hover:border-purple-500/40 rounded-2xl p-5 pb-0 transition-all duration-300  shadow-xl `}>
+                                            {/* Enhanced Header */}
+                                            <div className="flex items-start space-x-4 mb-4">
                                                 <div className="relative">
+                                                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/80 to-cyan-500/80 rounded-full blur opacity-40"></div>
                                                     <img
                                                         src={comment.avatarUrl}
-                                                        alt={comment.username}
-                                                        className="w-9 h-9 rounded-full border-2 border-purple-400/50 object-cover"
+                                                        alt={`${comment.username}'s avatar`}
+                                                        className="relative w-14 h-14 rounded-full border-2 border-purple-500/30 group-hover:border-purple-400/60 transition-all duration-300 object-cover shadow-lg"
                                                         onError={(e) => {
-                                                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                                                comment.username
-                                                            )}&background=7c3aed&color=fff&size=40`;
+                                                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.username)}&background=8b5cf6&color=fff`;
                                                         }}
-                                                        loading="lazy"
                                                     />
-                                                    <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-gradient-to-r from-yellow-400 to-yellow-300 rounded-full border-2 border-gray-950"></div>
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-bold text-white text-xs">{comment.username}</h3>
-                                                    <div className="flex items-center space-x-1 text-[10px] text-purple-300">
-                                                        <Clock className="w-3 h-3" />
-                                                        <span>{comment.timeAgo}</span>
+                                                    <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-3 border-slate-900 rounded-full shadow-lg">
+                                                        <div className="w-full h-full bg-green-400 rounded-full animate-ping opacity-75"></div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div className="flex items-center space-x-2">{getReactionIcon(comment.reactionType)}</div>
-                                        </div>
-
-                                        {/* Comment Content */}
-                                        {comment.commentContent && (
-                                            <div className="bg-black/10 h-20 rounded-xl p-2.5 border border-yellow-500/10">
-                                                <p className="text-white/90 text-xs leading-relaxed line-clamp-3">
-                                                    {comment.commentContent}
-                                                </p>
-                                            </div>
-                                        )}
-
-                                        <button
-                                            onClick={() =>
-                                                setShowMore((prev) => {
-                                                    return { ...prev, [comment.id]: !prev[comment.id] };
-                                                })
-                                            }
-                                            className="w-full mb-1.5 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-400 hover:text-gray-300 hover:bg-gray-800/30 rounded-lg transition-all duration-200"
-                                        >
-                                            {showMore[comment.id] ? (
-                                                <>
-                                                    <ChevronUp className="w-3.5 h-3.5" />
-                                                    <span>Show less Info</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <ChevronDown className="w-3.5 h-3.5" />
-                                                    <span>Show more Info</span>
-                                                </>
-                                            )}
-                                        </button>
-
-                                        {/* Manga Info */}
-                                        {showMore[comment.id] && (
-                                            <div className={`bg-gray-900/20 backdrop-blur-sm rounded-2xl p-2.5 px-4 mb-4  border border-purple-700/50`}>
-                                                <div className={`flex items-center ${(comment.chapterNo || comment.volumeNo) ? "mb-2" : "mb-0"} space-x-3 `}>
-                                                    <BookOpen className="w-4 h-4 text-white-500 drop-shadow-[0_0_2px_rgba(255,204,0,0.7)]" />
-                                                    <h3
-                                                        className="text-yellow-400 text-xs truncate max-w-[calc(100%-3rem)] select-text"
-                                                        title={comment.mangaTitle}
-                                                    >
-                                                        {truncateTitle(comment.mangaTitle, 30)}
+                                                <div className="flex-1">
+                                                    <h3 className="font-bold text-white text-lg ">
+                                                        {comment.username}
                                                     </h3>
-                                                </div>
+                                                    <div className="flex items-center justify-between w-full  space-x-2 text-sm text-slate-400 mt-1">
 
-                                                <div className="flex flex-wrap justify-between items-center gap-2">
-                                                    <div className="flex flex-row w-full space-x-6 text-[10px] text-purple-300 font-semibold tracking-wide min-w-[140px]">
-                                                        {comment.volumeNo && (
-                                                            <div className="flex justify-start flex-row w-1/2 gap-1 items-center">
-                                                                <span className="uppercase text-purple-400 select-none">Volume :</span>
-                                                                <span className="text-yellow-400 text-xs">{comment.volumeNo}</span>
-                                                            </div>
+                                                        <span className=" flex flex-row items-center justify-start  gap-2"><Clock className="w-4 h-4 -mt-0.5 text-cyan-400" />{comment.timeAgo}</span>
+                                                        <div className="w-1 h-1 bg-slate-500/30 rounded-full"></div>
+                                                        <div className="w-1 h-1 bg-slate-500/50 rounded-full"></div>
+                                                        <div className="w-1 h-1 bg-slate-500/70 rounded-full"></div>
+                                                        <span className="text-xs">
+                                                            {getReactionIcon(comment.reactionType)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Action Info */}
+                                            <div className="mb-4">
+                                                <div className="flex items-center space-x-2 text-sm flex-wrap gap-2">
+                                                    <span className="text-slate-300 flex flex-row justify-start items-center">
+                                                        <CornerDownRight strokeWidth={3} className=" w-4 h-4 mx-2 text-slate-500" />{getActionText(comment.reactionType)}
+                                                        {comment.repliedTO && (
+                                                            <a
+                                                                href={`https://forums.mangadex.org${comment.postUrl}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="ml-1 text-cyan-400 hover:text-cyan-300 transition-colors duration-300 underline decoration-cyan-500/30 hover:decoration-cyan-400/60 line-clamp-1"
+                                                            >
+                                                                {comment.repliedTO}
+                                                            </a>
                                                         )}
-                                                        {comment.chapterNo && <div className="flex flex-row w-1/2 gap-1 items-center">
-                                                            <span className="uppercase text-purple-400 select-none">Chapter :</span>
-                                                            <span className="text-yellow-400 text-xs">{comment.chapterNo}</span>
-                                                        </div>}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {/* Comment Content */}
+                                            {comment.commentContent && (
+                                                <div className="mb-1">
+                                                    <div className="relative">
+                                                        <div className="absolute inset-0  rounded-xl blur-sm"></div>
+                                                        <div className="relative  rounded-xl p-5 py-4 border border-yellow-500/10 shadow-inner">
+                                                            <p className="text-white/90 text-[14px] leading-relaxed line-clamp-4">
+                                                                " {comment.commentContent}"
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <button
+                                                onClick={() =>
+                                                    setShowMore((prev) => {
+                                                        return { ...prev, [comment.id]: !prev[comment.id] };
+                                                    })
+                                                }
+                                                className={`w-full ${showMore[comment.id] ? "mb-1 relative" : "mb-1 absolute bottom-0 -ml-5"} flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-400 hover:text-gray-300  rounded-lg transition-all duration-200`}
+                                            >
+                                                {showMore[comment.id] ? (
+                                                    <>
+                                                        <ChevronUp className="w-3.5 h-3.5" />
+                                                        <span>Show less Info</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <ChevronDown className="w-3.5 h-3.5" />
+                                                        <span>Show more Info</span>
+                                                    </>
+                                                )}
+                                            </button>
+
+                                            {/* Enhanced Manga Info */}
+                                            {showMore[comment.id] && (
+                                                <div>
+                                                    <div className="relative  rounded-xl p-5 border border-yellow-500/10 shadow-inner">                                                        <div className={`flex items-center ${(comment.chapterNo || comment.volumeNo) ? "mb-2" : "mb-0"} space-x-3 `}>
+                                                        <BookOpen className="w-4 h-4 text-white-500 drop-shadow-[0_0_2px_rgba(255,204,0,0.7)]" />
+                                                        <h3
+                                                            className="text-yellow-400 text-xs truncate max-w-[calc(100%-3rem)] select-text"
+                                                            title={comment.mangaTitle}
+                                                        >
+                                                            {truncateTitle(comment.mangaTitle, 30)}
+                                                        </h3>
                                                     </div>
 
-                                                    {(comment.chapterTitle || comment.chapterNo) && (
-                                                        <p
-                                                            className="text-purple-300/90 flex flex-row text-xs gap-1 max-w-[60%] select-text"
-                                                            title={comment.chapterTitle || `Chapter ${comment.chapterNo}`}
-                                                        >
-                                                            <span className="uppercase font-semibold text-purple-400 select-none mr-2 text-[10px]">
-                                                                Title:
-                                                            </span>
-                                                            &quot;
-                                                            <span className="w-full flex justify-start items-center whitespace-nowrap italic">
-                                                                {truncateTitle(comment.chapterTitle || `Chapter ${comment.chapterNo}`, 20)}
-                                                            </span>
-                                                            &quot;
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )}
+                                                        <div className="flex flex-wrap justify-between items-center gap-2">
+                                                            <div className="flex flex-row w-full space-x-6 text-[10px] text-purple-300 font-semibold tracking-wide min-w-[140px]">
+                                                                {comment.volumeNo && (
+                                                                    <div className="flex justify-start flex-row w-1/2 gap-1 items-center">
+                                                                        <span className="uppercase text-purple-400 select-none">Volume :</span>
+                                                                        <span className="text-yellow-400 text-xs">{comment.volumeNo}</span>
+                                                                    </div>
+                                                                )}
+                                                                {comment.chapterNo && <div className="flex flex-row w-1/2 gap-1 items-center">
+                                                                    <span className="uppercase text-purple-400 select-none">Chapter :</span>
+                                                                    <span className="text-yellow-400 text-xs">{comment.chapterNo}</span>
+                                                                </div>}
+                                                            </div>
 
-                                        {/* Footer */}
-                                        <div className="h-4" />
-                                        <div className="flex absolute bottom-3 w-10/12 items-center justify-between">
-                                            <div className="px-2 flex flex-row gap-1 py-1.5 bg-gradient-to-r from-purple-600/30 to-purple-500/30 rounded-lg text-[10px] font-bold text-purple-200 border border-purple-400/30 line-clamp-1 text-ellipsis">
-                                                Reacted to{" "}
-                                                <a
-                                                    className="underline flex flex-row items-center gap-1 truncate max-w-[8rem]"
-                                                    target="_blank"
-                                                    href={`https://forums.mangadex.org${comment.postUrl}`}
-                                                    rel="noopener noreferrer"
-                                                    title={comment.repliedTO}
-                                                >
-                                                    {truncateTitle(comment.repliedTO.split("'s")[0], 7)}...'s post{" "}
-                                                    <ExternalLink className="h-3 w-3" />
-                                                </a>
-                                            </div>
-                                            {comment.threadUrl && comment.threadUrl !== "#" && (
-                                                <a
-                                                    href={comment.threadUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="p-1.5 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 rounded-lg transition-all duration-200 group-hover:scale-110 "
-                                                    aria-label="Open thread"
-                                                >
-                                                    <ExternalLink className="w-4 h-4 text-gray-900" />
-                                                </a>
+                                                            {(comment.chapterTitle || comment.chapterNo) && (
+                                                                <p
+                                                                    className="text-purple-300/90 flex flex-row text-xs gap-1 max-w-[60%] select-text"
+                                                                    title={comment.chapterTitle || `Chapter ${comment.chapterNo}`}
+                                                                >
+                                                                    <span className="uppercase font-semibold text-purple-400 select-none mr-2 text-[10px]">
+                                                                        Title:
+                                                                    </span>
+                                                                    &quot;
+                                                                    <span className="w-full flex justify-start items-center whitespace-nowrap italic">
+                                                                        {truncateTitle(comment.chapterTitle || `Chapter ${comment.chapterNo}`, 20)}
+                                                                    </span>
+                                                                    &quot;
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    {/* Enhanced Footer */}
+                                                    <div className="h-14" />
+                                                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-gray-900/80 to-transparent rounded-b-2xl">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center space-x-2">
+                                                                <div className="flex items-center space-x-1 text-[14px] text-gray-400">
+                                                                    <TrendingUp className="w-4 h-4 ml-2 text-green-400" />
+                                                                    <span>Activity</span>
+                                                                </div>
+                                                                <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                                                                <span className="text-[14px] text-gray-500">#{index + 1}</span>
+                                                            </div>
+
+                                                            <a
+                                                                href={`https://forums.mangadx.org${comment.postUrl}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="group/link flex items-center space-x-1 px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 hover:border-purple-400/60 rounded-lg transition-all duration-300 hover:scale-105"
+                                                                aria-label="View full post"
+                                                            >
+                                                                <span className="text-xs font-medium text-purple-300 group-hover/link:text-purple-200">View Post</span>
+                                                                <ExternalLink className="w-3 h-3 text-purple-400 group-hover/link:text-purple-300 group-hover/link:rotate-12 transition-transform duration-300" />
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                        </div>
-                    ) : (
+                        </div>) : (
                         !loading && (
-                            /* Empty State */
-                            <div className="bg-gradient-to-br from-purple-900/30 to-purple-800/20 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-12 text-center">
-                                <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-yellow-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-500/50">
-                                    <User className="w-10 h-10 text-white" />
+                            <div className="text-center py-16">
+                                <div className="relative group">
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/30 to-yellow-600/30 rounded-2xl blur opacity-50"></div>
+                                    <div className="relative bg-gray-800/20 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/20">
+                                        <div className="flex flex-col items-center space-y-4">
+                                            <div className="relative">
+                                                <MessageCircle className="w-16 h-16 text-purple-400/50" />
+                                                <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-500/80 rounded-full flex items-center justify-center">
+                                                    <Sparkles className="w-4 h-4 text-white" />
+                                                </div>
+                                            </div>
+                                            <h3 className="text-xl font-bold text-white/80">No Recent Activity</h3>
+                                            <p className="text-gray-400 text-sm max-w-sm">
+                                                The community seems quiet right now. Check back later for the latest discussions and reactions!
+                                            </p>
+                                            <button
+                                                onClick={() => fetchComments(true)}
+                                                className="mt-4 px-6 py-2 bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/30 hover:border-purple-400/60 text-purple-300 hover:text-purple-200 rounded-xl transition-all duration-300 text-sm font-medium"
+                                            >
+                                                Refresh Activity
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <h3 className="text-2xl font-black text-white mb-3">No Activity Yet</h3>
-                                <p className="text-purple-300/80 text-sm mb-6 max-w-md mx-auto">
-                                    The community is quiet right now. Check back soon for fresh discussions!
-                                </p>
-                                <button
-                                    onClick={() => fetchComments(true)}
-                                    className="px-8 py-4 bg-gradient-to-r from-purple-600 via-purple-500 to-yellow-500 hover:from-purple-700 hover:via-purple-600 hover:to-yellow-600 text-white rounded-xl transition-all duration-300 font-bold text-sm flex items-center mx-auto shadow-2xl shadow-purple-500/50 hover:scale-105"
-                                >
-                                    <RefreshCw className="w-5 h-5 mr-3" />
-                                    REFRESH FEED
-                                </button>
                             </div>
                         )
                     )}
                 </div>
             </div>
-        </div>
+
+            {/* Custom Styles */}
+            <style jsx>{`
+                @keyframes blob {
+                    0% { transform: translate(0px, 0px) scale(1); }
+                    33% { transform: translate(30px, -50px) scale(1.1); }
+                    66% { transform: translate(-20px, 20px) scale(0.9); }
+                    100% { transform: translate(0px, 0px) scale(1); }
+                }
+                
+                @keyframes float {
+                    0%, 100% { transform: translateY(0px); }
+                    50% { transform: translateY(-20px); }
+                }
+                
+                @keyframes tilt {
+                    0%, 50%, 100% { transform: rotate(0deg); }
+                    25% { transform: rotate(0.5deg); }
+                    75% { transform: rotate(-0.5deg); }
+                }
+                
+                .animate-blob {
+                    animation: blob 7s infinite;
+                }
+                
+                .animate-float {
+                    animation: float 6s ease-in-out infinite;
+                }
+                
+                .animate-tilt {
+                    animation: tilt 10s infinite linear;
+                }
+                
+                .animation-delay-2000 {
+                    animation-delay: 2s;
+                }
+                
+                .animation-delay-4000 {
+                    animation-delay: 4s;
+                }
+                
+                .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+                
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                
+                .line-clamp-3 {
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+            `}</style>
+        </div >
     );
 };
 

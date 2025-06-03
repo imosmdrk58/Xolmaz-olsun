@@ -8,7 +8,6 @@ import {
   Eye,
   MessageCircle,
   UserPlus,
-  TrendingUp
 } from "lucide-react";
 import Image from "next/image"
 function AsideComponent({
