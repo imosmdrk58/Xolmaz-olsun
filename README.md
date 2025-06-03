@@ -7,9 +7,12 @@
 
 
 > **Dive into a Universe of Manga, Manhwa, and Manhua!**  
-> AI Manga Reader is a sleek Next.js web app that transforms how you read manga. Powered by the MangaDex API, it gives you instant access to a huge collection of manga in multiple languages, with flexible reading modes like vertical, horizontal, single, or dual-panel views.
-What sets it apart is its AI-powered OCR translation (using ***easyocr-js*** package) that instantly translates text from manga images, making foreign-language titles easy to enjoy. Plus, the built-in text-to-speech (TTS) feature offers over 20 customizable voices so you can listen to your favorite manga anywhere, anytime.
-With trending searches, smart filters, and personalized settings that save your preferences, AI Manga Reader delivers a fast, smooth, and immersive experience on desktop, tablet, and mobile. Whether you’re new to manga or a longtime fan, this app makes reading more accessible and enjoyable than ever. 🚀
+> AI Manga Reader is a sleek Next.js web app that transforms how you read manga. Powered by the MangaDex API, it gives you instant access to a huge collection of manga in multiple languages, with flexible reading modes like vertical, horizontal, single, or dual-panel views.  
+> What sets it apart is its AI-powered OCR translation (using ***easyocr-js*** package) that instantly translates text from manga images, making foreign-language titles easy to enjoy. Plus, the built-in text-to-speech (TTS) feature offers over 20 customizable voices so you can listen to your favorite manga anywhere, anytime.  
+>  
+> **New!** The Manga List now features a **Latest Activity Feed** that surfaces recent community discussions and comments from MangaDex forums. Since MangaDex does not provide an API for this, the app uses web scraping of the [MangaDex Latest Activity page](https://forums.mangadex.org/whats-new/latest-activity) to extract manga title, chapter, volume, chapter title, comment author, original post author, and the forum thread where the discussion is happening. Stay connected with real-time fan conversations alongside your manga browsing experience.  
+>  
+> With trending searches, smart filters, and personalized settings that save your preferences, AI Manga Reader delivers a fast, smooth, and immersive experience on desktop, tablet, and mobile. Whether you’re new to manga or a longtime fan, this app makes reading more accessible and enjoyable than ever. 🚀
 ---
 
 ## 🌍 **Project Overview**
@@ -20,6 +23,7 @@ With trending searches, smart filters, and personalized settings that save your 
 - **MangaDex API**: No API key needed, just pure manga magic.
 - **OCR Translation**: Powered by `easyocr-js` and Google Translate API.
 - **TTS**: 20+ AI voices with customizable speed and language.
+- **Latest Activity Feed**: Real-time community discussions scraped from MangaDex forums to keep you updated on fan conversations.
 - **Responsive Design**: Flawless on desktop, tablet, or mobile.
 
 ---
@@ -83,6 +87,11 @@ A dazzling hub for browsing the latest manga updates.
 
 - **Manga Cards**: Sleek, clickable cards showcasing:
     - Latest manga with fresh chapter details.
+- **Latest Activity Feed**:  
+    - Displays recent community interactions from MangaDex forums.  
+    - Extracted via web scraping from [MangaDex Latest Activity](https://forums.mangadex.org/whats-new/latest-activity) since no official API exists.  
+    - Shows manga title, chapter, volume, chapter title, comment author, original post author, and the forum thread where the discussion is happening.  
+    - Keeps you connected with real-time fan discussions and insights.
 - **Sidebar**:
     - Random manga picks to spark curiosity.
 - **Aside Section**:
@@ -231,6 +240,7 @@ Built for speed, crafted for perfection.
 1. **Explore Manga**:
     - Start on the Landing Page or browse Manga List.
     - Check sidebars for random gems or curated lists.
+    - Stay updated with the **Latest Activity Feed** showing recent forum discussions scraped directly from MangaDex forums.
 
 2. **Read with Flair**:
     - Pick a manga, view details, and select a chapter.
@@ -305,6 +315,7 @@ Run `npm run lint` and add tests where possible. Check [CONTRIBUTING.md](./CONTR
 - **[Google Translate API](https://cloud.google.com/translate)**: For seamless translations.
 - **[Next.js](https://nextjs.org)**: The backbone of our app.
 - **Manga Fans**: You inspire us every day.
+- **MangaDex Forums**: For the vibrant community discussions that enrich the manga experience.
 
 ---
 
