@@ -1,20 +1,50 @@
 'use client';
 import Image from 'next/image';
-import React, { useCallback, lazy, useMemo } from 'react';
+import React, { useCallback,useState, useMemo, Suspense } from 'react';
 import { getRatingColor } from '../../constants/Flags';
-import { Star, MessageSquareText, Heart as HeartIcon, Dot, Rocket, Sparkles, Flame } from 'lucide-react';
-const StableFlag = React.memo(lazy(() => import('../StableFlag')));
+import { Star, MessageSquareText, Heart as HeartIcon, Dot, Flame } from 'lucide-react';
+import MangaCardSkeleton from '../Skeletons/MangaList/MangaCardSkeleton';
+import { useMangaFetch } from '../../hooks/useMangaFetch';
+import MangaCardPagination from '../../Components/MangaListComponents/MangaCardPagination';
+import StableFlag from '../StableFlag'; 
 
-const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadMoreMangas, totalPages, currentPage }) => {
+const MangaCard = React.memo(({ handleMangaClicked }) => {
+    const { data, isLoading, isError, error } = useMangaFetch('latest', 1);
+const [currentPage, setCurrentPage] = useState(1)
+    const ITEMS_PER_PAGE = 12;
+    const processedLatestMangas = data?.data || [];
+    const totalPages = Math.ceil(processedLatestMangas.length / ITEMS_PER_PAGE);
+
     const stableHandleMangaClicked = useCallback(handleMangaClicked, []);
-    const MemoMangas = useMemo(() => {
-        return processedLatestMangas;
-    }, [processedLatestMangas]);
 
+const loadMoreMangas = useCallback(() => {
+    setPage((prevPage) => prevPage + 1);
+    setCurrentPage(1); // Reset to first page when loading more data
+  }, []);
+
+  const currentMangas = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return processedLatestMangas.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [processedLatestMangas, currentPage, ITEMS_PER_PAGE]);
+
+  const goToPage = useCallback((page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+  }, [totalPages]);
+
+
+    if (isLoading) {
+        return (<MangaCardSkeleton />); // Replace with your skeleton
+    }
+
+    if (isError) {
+        return <div className="text-red-500">Error: {error.message}</div>;
+    }
     return (
-        MemoMangas && (
+        <Suspense fallback={<MangaCardSkeleton />}>
             <div className="w-full flex flex-col">
-                <div className="flex mx-1 sm:mx-5 xl:mx-16 mb-7 sm:mb-8 items-center gap-3">
+                <div className="flex mx-2 sm:mx-5 xl:mx-16 mb-7 sm:mb-8 items-center gap-3">
                     <div className="bg-white/10 p-3 rounded-lg">
                         <Flame className="w-6 h-6 text-yellow-400 drop-shadow-md" />
                     </div>
@@ -28,19 +58,19 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadM
                     </div>
                 </div>
                 <div className="grid w-[95%] sm:gap-y-4 mx-auto md:mx-5 xl:ml-16 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                    {MemoMangas.map((manga, index) => (
+                    {currentMangas.map((manga, index) => (
                         <div
                             key={manga.id}
                             onClick={() => stableHandleMangaClicked(manga)}
                             className="manga-card cursor-pointer w-full flex justify-center items-start"
                         >
                             <div className="w-full sm:w-[250px] overflow-hidden min-h-[290px] sm:min-h-[400px] rounded-lg bg-[#0c0221]/50 p-[5px] shadow-slate-600 shadow-[0_0_4px_rgba(0,0,0,1)] transition-transform duration-300 ease-out hover:scale-[102%] will-change-transform">
-                                <div className="relative flex h-[155px] sm:h-[250px] flex-col rounded-[5px] bg-gradient-to-tr from-[#049fbb] to-[#50f6ff]">
+                                <div className="relative flex h-[155px] sm:h-[250px] flex-col rounded-[5px] bg-gradient-to-tr from-gray-800 to-gray-700">
                                     <Image
                                         src={manga.coverImageUrl || '/placeholder.jpg'}
                                         alt={manga.title}
                                         fill
-                                        className="object-fill relative -mt-[1px] flex h-[155px] sm:h-[250px] flex-col rounded-[5px] rounded-tl-[20px] bg-gradient-to-tr from-[#1f2020] to-[#000d0e]"
+                                        className="object-cover md:object-fill relative -mt-[1px] flex h-[155px] sm:h-[250px] flex-col rounded-[5px] rounded-tl-[20px] bg-gradient-to-tr from-[#1f2020] to-[#000d0e]"
                                         placeholder="blur"
                                         blurDataURL="/placeholder.jpg"
                                     />
@@ -54,7 +84,7 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadM
                                     <div className="absolute left-0 top-6 sm:top-[34px] h-[55px] w-[125px] before:absolute before:h-full before:w-1/2 sm:before:w-full before:rounded-tl-[15px] before:shadow-[-5px_-5px_0_2px_#0c0221]" />
                                     <div className="absolute top-0 flex h-[30px] w-full justify-between">
                                         <div className="h-full flex flex-row justify-center items-center aspect-square">
-                                            <span className="absolute -ml-2 sm:-ml-3 lg:-ml-0 -mt-[7px] sm:-mt-[8px] top-0 left-0 z-30 text-[9px] sm:text-[11px] sm:tracking-widest rounded-full  pr-2  sm:min-w-24 flex items-center justify-start font-bold">
+                                            <span className="absolute gap-2 md:gap-0 -ml-1 sm:-ml-3 lg:-ml-0 -mt-[7px] sm:-mt-[8px] top-0 left-0 z-30 text-[9px] sm:text-[11px] sm:tracking-widest rounded-full  pr-2  sm:min-w-24 flex items-center justify-start font-bold">
                                                 <Dot className={` size-8 sm:size-12 ${manga.status === 'completed'
                                                     ? 'text-[#00c9f5]'
                                                     : manga.status === 'ongoing'
@@ -139,7 +169,17 @@ const MangaCard = React.memo(({ processedLatestMangas, handleMangaClicked, loadM
                     </button>
                 )}
             </div>
-        )
+            <div className=' h-28'/>
+            <div className="absolute bottom-0 inset-x-0 w-screen flex justify-center mb-8">
+                <MangaCardPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={goToPage}
+                    loadMoreMangas={loadMoreMangas}
+                    onLoadMore={loadMoreMangas}
+                />
+            </div>
+        </Suspense>
     );
 });
 
