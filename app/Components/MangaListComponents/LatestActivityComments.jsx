@@ -314,32 +314,24 @@ const LatestComments = () => {
             <div className="relative p-6 w-full">
                 <div className="max-w-[95%] mx-auto">
                     {/* Enhanced Header */}
-                    <div className="mb-8 flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                            <div className="relative">
-                                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                                    <MessageCircle className="w-6 h-6 text-white" />
-                                </div>
-                                <div className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full border-2 border-gray-950 flex items-center justify-center animate-pulse">
+                    <div className="flex  mb-7 items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-white/10 p-3 rounded-lg relative"><MessageCircle className="w-7 h-7 text-sky-300 drop-shadow-md" /> <div className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full border-2 border-gray-950 flex items-center justify-center animate-pulse">
                                     <Zap className="w-3 h-3 text-white fill-white" />
-                                </div>
-                            </div>
+                                </div></div>
                             <div>
-                                <h1 className="text-2xl font-black text-white">
-                                    COMMUNITY ACTIVITY
-                                </h1>
-                                <div className="text-gray-400 text-xs flex items-center font-medium">
-                                    <Activity className="w-4 h-4 mr-2 text-yellow-400" />
+                                <h2 className="text-xl md:text-2xl font-bold text-white uppercase tracking-wide">
+                                    LATEST COMMUNITY ACTIVITY
+                                </h2>
+                                <p className="text-xs text-gray-400 uppercase tracking-wide flex flex-row w-full"><Activity className="w-4 h-4 mr-2 text-yellow-300" />
                                     Real-time community interactions&nbsp;
                                     {lastUpdatedDisplay && (
-                                        <div>
-                                            (Last Updated At :- {lastUpdatedDisplay})
-                                        </div>
-                                    )}
-                                </div>
+                                        <span>
+                                            (Last Updated At : {lastUpdatedDisplay})
+                                        </span>
+                                    )}</p>
                             </div>
                         </div>
-
                         <div className="flex items-center space-x-3">
                             <button
                                 onClick={() => fetchComments(true)}
@@ -415,7 +407,7 @@ const LatestComments = () => {
                                                     <img
                                                         src={comment.avatarUrl}
                                                         alt={`${comment.username}'s avatar`}
-                                                        className="relative w-14 h-14 rounded-full border-2 border-purple-500/30 group-hover:border-purple-400/60 transition-all duration-300 object-cover shadow-lg"
+                                                        className="relative min-w-14 w-14 h-14 rounded-full border-2 border-purple-500/30 group-hover:border-purple-400/60 transition-all duration-300 object-cover shadow-lg"
                                                         onError={(e) => {
                                                             e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.username)}&background=8b5cf6&color=fff`;
                                                         }}
@@ -424,8 +416,8 @@ const LatestComments = () => {
                                                         <div className="w-full h-full bg-green-400 rounded-full animate-ping opacity-75"></div>
                                                     </div>
                                                 </div>
-                                                <div className="flex-1">
-                                                    <h3 className="font-bold text-white text-lg ">
+                                                <div className="flex-1 w-2/3">
+                                                    <h3 className="font-bold  text-white text-lg line-clamp-1 break-words flex-wrap text-ellipsis">
                                                         {comment.username}
                                                     </h3>
                                                     <div className="flex items-center justify-between w-full  space-x-2 text-sm text-slate-400 mt-1">
@@ -601,63 +593,6 @@ const LatestComments = () => {
                     )}
                 </div>
             </div>
-
-            {/* Custom Styles */}
-            <style jsx>{`
-                @keyframes blob {
-                    0% { transform: translate(0px, 0px) scale(1); }
-                    33% { transform: translate(30px, -50px) scale(1.1); }
-                    66% { transform: translate(-20px, 20px) scale(0.9); }
-                    100% { transform: translate(0px, 0px) scale(1); }
-                }
-                
-                @keyframes float {
-                    0%, 100% { transform: translateY(0px); }
-                    50% { transform: translateY(-20px); }
-                }
-                
-                @keyframes tilt {
-                    0%, 50%, 100% { transform: rotate(0deg); }
-                    25% { transform: rotate(0.5deg); }
-                    75% { transform: rotate(-0.5deg); }
-                }
-                
-                .animate-blob {
-                    animation: blob 7s infinite;
-                }
-                
-                .animate-float {
-                    animation: float 6s ease-in-out infinite;
-                }
-                
-                .animate-tilt {
-                    animation: tilt 10s infinite linear;
-                }
-                
-                .animation-delay-2000 {
-                    animation-delay: 2s;
-                }
-                
-                .animation-delay-4000 {
-                    animation-delay: 4s;
-                }
-                
-                .scrollbar-hide {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-                
-                .scrollbar-hide::-webkit-scrollbar {
-                    display: none;
-                }
-                
-                .line-clamp-3 {
-                    display: -webkit-box;
-                    -webkit-line-clamp: 3;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
-                }
-            `}</style>
         </div >
     );
 };

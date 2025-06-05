@@ -1,37 +1,37 @@
 'use client';
 import Image from 'next/image';
-import React, { useCallback,useState, useMemo, Suspense } from 'react';
+import React, { useCallback, useState, useMemo, Suspense } from 'react';
 import { getRatingColor } from '../../constants/Flags';
 import { Star, MessageSquareText, Heart as HeartIcon, Dot, Flame } from 'lucide-react';
 import MangaCardSkeleton from '../Skeletons/MangaList/MangaCardSkeleton';
 import { useMangaFetch } from '../../hooks/useMangaFetch';
 import MangaCardPagination from '../../Components/MangaListComponents/MangaCardPagination';
-import StableFlag from '../StableFlag'; 
+import StableFlag from '../StableFlag';
 
 const MangaCard = React.memo(({ handleMangaClicked }) => {
     const { data, isLoading, isError, error } = useMangaFetch('latest', 1);
-const [currentPage, setCurrentPage] = useState(1)
+    const [currentPage, setCurrentPage] = useState(1)
     const ITEMS_PER_PAGE = 12;
     const processedLatestMangas = data?.data || [];
     const totalPages = Math.ceil(processedLatestMangas.length / ITEMS_PER_PAGE);
 
     const stableHandleMangaClicked = useCallback(handleMangaClicked, []);
 
-const loadMoreMangas = useCallback(() => {
-    setPage((prevPage) => prevPage + 1);
-    setCurrentPage(1); // Reset to first page when loading more data
-  }, []);
+    const loadMoreMangas = useCallback(() => {
+        setPage((prevPage) => prevPage + 1);
+        setCurrentPage(1); // Reset to first page when loading more data
+    }, []);
 
-  const currentMangas = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return processedLatestMangas.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [processedLatestMangas, currentPage, ITEMS_PER_PAGE]);
+    const currentMangas = useMemo(() => {
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        return processedLatestMangas.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    }, [processedLatestMangas, currentPage, ITEMS_PER_PAGE]);
 
-  const goToPage = useCallback((page) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
-    window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-  }, [totalPages]);
+    const goToPage = useCallback((page) => {
+        if (page < 1 || page > totalPages) return;
+        setCurrentPage(page);
+        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+    }, [totalPages]);
 
 
     if (isLoading) {
@@ -46,7 +46,7 @@ const loadMoreMangas = useCallback(() => {
             <div className="w-full flex flex-col">
                 <div className="flex mx-2 sm:mx-5 xl:mx-16 mb-7 sm:mb-8 items-center gap-3">
                     <div className="bg-white/10 p-3 rounded-lg">
-                        <Flame className="w-6 h-6 text-yellow-400 drop-shadow-md" />
+                        <Flame className="w-6 h-6  md:w-7 md:h-7 text-yellow-300 drop-shadow-md" />
                     </div>
                     <div>
                         <h2 className="text-xl md:text-2xl font-bold text-white uppercase tracking-wide">
@@ -141,9 +141,9 @@ const loadMoreMangas = useCallback(() => {
                                             {manga.flatTags.slice(0, 4).map((tag) => (
                                                 <span
                                                     key={tag}
-                                                    className="bg-[#070920] backdrop-blur-md sm:min-w-16 shadow-lg px-2 sm:px-3 py-1 sm:py-1.5 border border-gray-700 transition-colors hover:bg-gray-800 text-center flex flex-row font-bold items-start justify-center text-[9px] sm:text-[10px] sm:tracking-[1.5px] text-white"
+                                                    className="bg-[#070920] backdrop-blur-md sm:min-w-16 shadow-lg px-2 sm:px-3 py-1 sm:py-1.5 border border-gray-700 transition-colors hover:bg-gray-800 text-center flex flex-row font-bold items-start justify-center text-[9px] sm:text-[10px] sm:tracking-[1px] text-white"
                                                 >
-                                                    {tag}
+                                                    {tag.length > 12 ? tag.slice(0, 12) + "..." : tag}
                                                 </span>
                                             ))}
                                         </div>
@@ -169,7 +169,7 @@ const loadMoreMangas = useCallback(() => {
                     </button>
                 )}
             </div>
-            <div className=' h-28'/>
+            <div className=' h-28' />
             <div className="absolute bottom-0 inset-x-0 w-screen flex justify-center mb-8">
                 <MangaCardPagination
                     currentPage={currentPage}
@@ -185,4 +185,4 @@ const loadMoreMangas = useCallback(() => {
 
 MangaCard.displayName = 'MangaCard';
 
-export default React.memo(MangaCard);
+export default MangaCard;

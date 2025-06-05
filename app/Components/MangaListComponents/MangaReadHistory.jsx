@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useManga } from '../../providers/MangaContext';
-import { BookOpen, ChevronDown, ChevronUp, Clock, TrendingUp, Eye } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, Clock, TrendingUp, Eye, BookOpenCheck } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
@@ -61,7 +61,7 @@ function MangaReadHistory() {
             {/* Header */}
             <div className="flex mb-7 items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="bg-white/10 p-3 rounded-lg">< BookOpen className={`w-6 h-6 text-violet-500 drop-shadow-md`} /></div>
+                    <div className="bg-white/10 p-3 rounded-lg">< BookOpenCheck className={`w-6 h-6 text-cyan-300 drop-shadow-md`} /></div>
                     <div className='leading-5 sm:leading-normal mt-1 sm:mt-0'>
                         <h2 className="text-[18px] md:text-lg font-semibold text-white">READ HISTORY</h2>
                         {readHistory.length > 0 && (<p className="text-[11px] md:text-xs text-gray-400 uppercase tracking-wide">{readHistory.length} Mangas in your history</p>)}
@@ -293,4 +293,4 @@ function MangaReadHistory() {
     );
 }
 
-export default MangaReadHistory;
+export default React.memo(MangaReadHistory);

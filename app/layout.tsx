@@ -44,7 +44,11 @@ export default function RootLayout({
           <MangaProvider>
             <Suspense fallback={<LoadingSpinner text="Please Wait..." />}>
               {isClient && (window.location.pathname === '/' ? null : <TopNavBar />)}
-              {isClient &&<div className="mt-20">{children}</div>}
+              {isClient && <div className="mt-20 text-white bg-black/50">
+                <div className="fixed inset-0 pointer-events-none -z-10">
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.07)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.07)_1px,transparent_1px)] bg-[size:72px_72px]"></div>
+                </div>
+                {children}</div>}
             </Suspense>
           </MangaProvider>
         </TanstackProvider>
