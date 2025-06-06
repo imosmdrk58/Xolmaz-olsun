@@ -7,10 +7,10 @@ import { useManga } from '../../../../providers/MangaContext';
 
 // Lazy load components
 const AboutManga = React.memo(
-  lazy(() => import('../../../../Components/ChaptersListComponents/AboutManga'))
+  lazy(() => import('../../../../Components/MangaChaptersComponents/AboutManga'))
 );
 const ChapterList = React.memo(
-  lazy(() => import('../../../../Components/ChaptersListComponents/ChapterList'))
+  lazy(() => import('../../../../Components/MangaChaptersComponents/ChapterList'))
 );
 
 const getAvailableStorage = async () => {
@@ -32,7 +32,7 @@ const getAvailableStorage = async () => {
 export default function MangaChapters() {
   const { mangaId } = useParams();
   const router = useRouter();
-  const { selectedManga, setChapterListForManga,addToReadHistory } = useManga();
+  const { selectedManga, setChapterListForManga, addToReadHistory } = useManga();
 
   // Use selectedManga only if it matches mangaId, else null
   const manga = useMemo(() => (selectedManga && selectedManga.id === mangaId ? selectedManga : null), []);
@@ -68,22 +68,12 @@ export default function MangaChapters() {
 
         const data = await res.json();
 
-        const sortedChapters = data.chapters
-          .filter((chapter) => chapter.pageCount !== 'Unknown')
-          .sort((a, b) => {
-            const chapterA = parseFloat(a.chapter);
-            const chapterB = parseFloat(b.chapter);
-            if (isNaN(chapterA)) return 1;
-            if (isNaN(chapterB)) return -1;
-            return chapterA - chapterB;
-          });
-
         const availableStorage = await getAvailableStorage();
-        const chaptersSize = new Blob([JSON.stringify(sortedChapters)]).size;
+        const chaptersSize = new Blob([JSON.stringify(data.chapters)]).size;
 
         if (availableStorage > chaptersSize) {
           try {
-            localStorage.setItem(`chapters-${mangaId}`, JSON.stringify(sortedChapters));
+            localStorage.setItem(`chapters-${mangaId}`, JSON.stringify(data.chapters));
           } catch (storageError) {
             console.warn(`Failed to cache chapters for ${mangaId}:`, storageError.message);
           }
@@ -91,7 +81,7 @@ export default function MangaChapters() {
           console.warn(`Storage quota too low for chapters-${mangaId}. Skipping cache.`);
         }
 
-        if (isMounted) setChapters(sortedChapters);
+        if (isMounted) setChapters(data.chapters);
       } catch (err) {
         if (isMounted) {
           setError(err instanceof Error ? err.message : 'An error occurred while fetching chapters');
@@ -112,14 +102,13 @@ export default function MangaChapters() {
     (chapter) => {
       console.log('handleChapterClick - mangaId:', mangaId, 'chapters:', chapters);
       setChapterListForManga(mangaId, chapters);
-      addToReadHistory(manga,chapter,chapters)
+      addToReadHistory(manga, chapter, chapters)
       router.push(`/manga/${mangaId}/chapter/${chapter.id}/read`);
     },
     [mangaId, router, chapters] // Added chapters to dependencies
   );
 
   console.log('Current chapters state:', chapters);
-
   if (error) {
     return (
       <div className="flex justify-center items-center w-full h-screen bg-[#070920] backdrop-blur-md text-white">
@@ -141,8 +130,8 @@ export default function MangaChapters() {
 
   return (
     <div className="w-full min-h-screen overflow-hidden bg-transparent text-white py-10 px-2 sm:px-12">
+      <AboutManga last={chapters[chapters.length - 1]} manga={manga} handleChapterClick={handleChapterClick} />
       <Suspense fallback={<LoadingSpinner text="Loading Manga Info..." />}>
-        <AboutManga last={chapters[chapters.length - 1]} manga={manga} handleChapterClick={handleChapterClick} />
         {loading ? (
           <LoadingSpinner className=' relative bg-transparent md:inset-y-7 md:inset-x-28' text="Loading chapters..." />
         ) : (

@@ -20,7 +20,7 @@ uploads
 OldStructure/
 scripts/ocr.py
 ai-manga-reader\app\api\manga\getAuthor
-/app/Components/ChaptersListComponents/Temp.jsx
+/app/Components/MangaChaptersComponents/Temp.jsx
 Audiotest.jsx
 TranslatorTest.jsx
 AIAudio/
