@@ -10,6 +10,7 @@ import { MoveRight } from "lucide-react";
 const LandingContent = React.memo(
   lazy(() => import('./Components/HomeComponents/LandingContent'))
 );
+
 // Storage helpers (memoized outside component)
 const getFromStorage = (key) => {
   try {
@@ -45,7 +46,7 @@ const Home = () => {
   // Debounce function memoized
   const debounce = useCallback((func, wait) => {
     let timeout;
-    return function executedFunction( ...args) {
+    return function executedFunction(...args) {
       const later = () => {
         clearTimeout(timeout);
         func.apply(this, args);
@@ -71,6 +72,9 @@ const Home = () => {
 
   // Fetch TopManga list on mount
   useEffect(() => {
+    const controller = new AbortController(); // Create AbortController
+    const signal = controller.signal;
+
     const fetchTopMangaList = async () => {
       try {
         const cached = getFromStorage("topMangaList");
@@ -80,7 +84,8 @@ const Home = () => {
         }
 
         const listResponse = await fetch(
-          "https://api.mangadex.org/user/0dd9b63a-f561-4632-b739-84397cb60ca7/list?limit=10"
+          "https://api.mangadex.org/user/0dd9b63a-f561-4632-b739-84397cb60ca7/list?limit=10",
+          { signal } // Pass the signal to the fetch call
         );
         if (!listResponse.ok) throw new Error(`Failed to fetch lists: ${listResponse.status}`);
 
@@ -101,7 +106,7 @@ const Home = () => {
         if (mangaIds.length === 0) throw new Error("No manga IDs found");
 
         // Use your new API endpoint
-        const mangaResponse = await fetch(`/api/manga/${mangaIds.join(',')}`);
+        const mangaResponse = await fetch(`/api/manga/${mangaIds.join(',')}`, { signal }); // Pass the signal
         if (!mangaResponse.ok) {
           throw new Error(`Failed to fetch manga details: ${mangaResponse.status}`);
         }
@@ -120,6 +125,10 @@ const Home = () => {
           throw new Error("No valid manga found");
         }
       } catch (err) {
+        if (err.name === 'AbortError') {
+          console.log("Fetch aborted");
+          return; // Exit early if fetch was aborted
+        }
         setError("Failed to load TopManga list. Showing default titles.");
         console.error(err);
         setTopSearches(TopFavouriteMangas);
@@ -128,6 +137,11 @@ const Home = () => {
     };
 
     fetchTopMangaList();
+
+    // Cleanup: Abort fetch on unmount
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   const handleSearch = useCallback(
@@ -185,7 +199,7 @@ const Home = () => {
       >
         <div className="container mt-16 md:mt-0 mx-auto px-4 py-6">
           {/* Logo */}
-         <LOGO/>
+          <LOGO/>
 
           {/* Search Bar */}
           <div className="mb-8 max-w-2xl mx-auto">
@@ -219,7 +233,7 @@ const Home = () => {
           </div>
 
           {/* Go To Homepage Button */}
-         <GOTOHomeButton/>
+          <GOTOHomeButton/>
         </div>
       </div>
 
@@ -230,40 +244,41 @@ const Home = () => {
 
 export default React.memo(Home);
 
-
-const GOTOHomeButton = React.memo( ()=>( <div className="mt-16 flex justify-center">
-  <Link
-    href="/manga-list"
-    style={{ background: "linear-gradient(#3b235a, #24143f)" }}
-    className="relative brightness-150 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 inline-flex items-center justify-start py-3 pl-4 pr-12 overflow-hidden font-semibold text-white transition-all duration-150 ease-in-out rounded hover:pl-10 hover:pr-6 group"
-  >
-    <span
+const GOTOHomeButton = React.memo(() => (
+  <div className="mt-16 flex justify-center">
+    <Link
+      href="/manga-list"
       style={{ background: "linear-gradient(#3b235a, #24143f)" }}
-      className="absolute bottom-0 left-0 w-full h-1 transition-all duration-150 ease-in-out brightness-150 group-hover:h-full"
-    ></span>
-    <span className="absolute right-0 pr-4 duration-200 ease-out group-hover:translate-x-12">
-      <MoveRight className=" w-5 h-5 -mt-0.5"/>
-    </span>
-    <span className="absolute left-0 pl-2.5 -translate-x-12 group-hover:translate-x-0 ease-out duration-200">
-    <MoveRight className=" w-5 h-5 -mt-0.5 group-hover:-mt-0"/>
-    </span>
-    <span className="relative w-full transform -translate-y-1 group-hover:-translate-y-0  text-left transition-colors duration-200 ease-in-out group-hover:text-white">
-      Go To Homepage
-    </span>
-  </Link>
-</div>))
+      className="relative brightness-150 shadow-[0_0_7px_rgba(0,0,0,1)] shadow-purple-500 inline-flex items-center justify-start py-3 pl-4 pr-12 overflow-hidden font-semibold text-white transition-all duration-150 ease-in-out rounded hover:pl-10 hover:pr-6 group"
+    >
+      <span
+        style={{ background: "linear-gradient(#3b235a, #24143f)" }}
+        className="absolute bottom-0 left-0 w-full h-1 transition-all duration-150 ease-in-out brightness-150 group-hover:h-full"
+      ></span>
+      <span className="absolute right-0 pr-4 duration-200 ease-out group-hover:translate-x-12">
+        <MoveRight className=" w-5 h-5 -mt-0.5"/>
+      </span>
+      <span className="absolute left-0 pl-2.5 -translate-x-12 group-hover:translate-x-0 ease-out duration-200">
+        <MoveRight className=" w-5 h-5 -mt-0.5 group-hover:-mt-0"/>
+      </span>
+      <span className="relative w-full transform -translate-y-1 group-hover:-translate-y-0  text-left transition-colors duration-200 ease-in-out group-hover:text-white">
+        Go To Homepage
+      </span>
+    </Link>
+  </div>
+));
 
-const LOGO = React.memo(()=>(
+const LOGO = React.memo(() => (
   <div className="flex justify-center mb-10">
-  <Link href="/" className="inline-block">
-    <Image
-      src="/logo.svg"
-      width={260}
-      height={260}
-      alt="AI_Manga_Reader"
-      className="h-40 w-auto"
-      priority
-    />
-  </Link>
-</div>
-))
+    <Link href="/" className="inline-block">
+      <Image
+        src="/logo.svg"
+        width={260}
+        height={260}
+        alt="AI_Manga_Reader"
+        className="h-40 w-auto"
+        priority
+      />
+    </Link>
+  </div>
+));

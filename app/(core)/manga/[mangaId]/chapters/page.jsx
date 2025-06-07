@@ -129,15 +129,9 @@ export default function MangaChapters() {
   }
 
   return (
-    <div className="w-full min-h-screen overflow-hidden bg-transparent text-white py-10 px-2 sm:px-12">
+    <div className="w-full min-h-screen overflow-hidden bg-transparent text-white pt-10 px-2 sm:px-12">
       <AboutManga last={chapters[chapters.length - 1]} manga={manga} handleChapterClick={handleChapterClick} />
-      <Suspense fallback={<LoadingSpinner text="Loading Manga Info..." />}>
-        {loading ? (
-          <LoadingSpinner className=' relative bg-transparent md:inset-y-7 md:inset-x-28' text="Loading chapters..." />
-        ) : (
           <ChapterList manga={manga} chapters={chapters} handleChapterClick={handleChapterClick} />
-        )}
-      </Suspense>
     </div>
   );
 }
