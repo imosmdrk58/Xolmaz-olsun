@@ -92,7 +92,7 @@ function AsideComponent({
     { key: "New", label: "New", icon: Flame, accent: "text-cyan-400" },
   ];
 
-
+console.log(processedFavouriteMangas)
   const StatIcon = statConfig[selectedCategory].icon;
   const TitleIcon = statConfig[selectedCategory].titleIcon
   return (

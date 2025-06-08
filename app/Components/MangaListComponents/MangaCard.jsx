@@ -41,6 +41,7 @@ const MangaCard = React.memo(({ handleMangaClicked }) => {
     if (isError) {
         return <div className="text-red-500">Error: {error.message}</div>;
     }
+    console.log(processedLatestMangas)
     return (
         <Suspense fallback={<MangaCardSkeleton />}>
             <div className="w-full flex flex-col">

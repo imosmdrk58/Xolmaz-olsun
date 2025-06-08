@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState, Suspense, lazy, useMemo } from 'react';
 import LoadingSpinner from '../../../../Components/LoadingSpinner';
 import { useManga } from '../../../../providers/MangaContext';
+import CommentsOnManga from '../../../../Components/MangaChaptersComponents/CommentsOnManga';
 
 // Lazy load components
 const AboutManga = React.memo(
@@ -132,6 +133,7 @@ export default function MangaChapters() {
     <div className="w-full min-h-screen overflow-hidden bg-transparent text-white pt-10 px-2 sm:px-12">
       <AboutManga last={chapters[chapters.length - 1]} manga={manga} handleChapterClick={handleChapterClick} />
           <ChapterList manga={manga} chapters={chapters} handleChapterClick={handleChapterClick} />
+    <CommentsOnManga manga={manga}/>
     </div>
   );
 }

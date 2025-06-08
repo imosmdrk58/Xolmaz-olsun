@@ -458,7 +458,7 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
                     scrollbarWidth: 'none',
                     scrollbarColor: 'rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)',
                   }}
-                  className={`gap-x-2.5 ${showGrid ? 'grid grid-cols-2' : 'flex flex-col gap-2 md:gap-3'} h-[280px] md:h-[450px] overflow-y-scroll md:pr-2`}
+                  className={`gap-x-2.5 ${showGrid ? 'grid grid-cols-2' : 'flex flex-col gap-2 md:gap-3'} max-h-[280px]  md:max-h-[480px] overflow-y-scroll md:pr-2`}
                 >
                   {processedChapters.map((group) => {
                     const hasReadTranslations = group.translations.some((t) =>

@@ -1,333 +1,205 @@
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// import axios from 'axios';
-// import * as cheerio from 'cheerio';
-// import { NextResponse } from 'next/server';
-// import https from 'https';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import * as cheerio from 'cheerio';
+import { NextRequest, NextResponse } from 'next/server';
+import puppeteer, { Browser } from 'puppeteer';
 
-// // Cookie jar to maintain session
-// let sessionCookies = '';
+let browserPromise: Promise<Browser> | null = null;
 
-// export async function GET() {
-//   const forumUrl = 'https://forums.mangadex.org/whats-new/latest-activity';
-//   const maxComments = 10;
+// Initialize browser singleton
+async function getBrowser() {
+    if (!browserPromise) {
+        browserPromise = puppeteer.launch({
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+            ],
+            timeout: 60000,
+        });
+    }
+    return browserPromise;
+}
 
-//   try {
-//     // Create axios instance with comprehensive configuration
-//     const axiosInstance = axios.create({
-//       httpsAgent: new https.Agent({  
-//         rejectUnauthorized: false,
-//         keepAlive: true,
-//         keepAliveMsecs: 1000,
-//         maxSockets: 5,
-//         timeout: 30000,
-//       }),
-//       timeout: 30000,
-//       maxRedirects: 10,
-//       validateStatus: (status) => status < 400, // Accept redirects
-//     });
+// Cleanup browser on process exit
+process.on('SIGINT', async () => {
+    if (browserPromise) {
+        const browser = await browserPromise;
+        await browser.close();
+        browserPromise = null;
+    }
+    process.exit();
+});
 
-//     // Comprehensive headers that exactly match a real browser request
-//     const baseHeaders = {
-//       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-//       'Accept-Encoding': 'gzip, deflate, br, zstd',
-//       'Accept-Language': 'en-US,en;q=0.9',
-//       'Cache-Control': 'max-age=0',
-//       'Connection': 'keep-alive',
-//       'DNT': '1',
-//       'Host': 'forums.mangadx.org',
-//       'Referer': 'https://forums.mangadx.org/',
-//       'Sec-Fetch-Dest': 'document',
-//       'Sec-Fetch-Mode': 'navigate',
-//       'Sec-Fetch-Site': 'same-origin',
-//       'Sec-Fetch-User': '?1',
-//       'Upgrade-Insecure-Requests': '1',
-//       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-//       'sec-ch-ua': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-//       'sec-ch-ua-mobile': '?0',
-//       'sec-ch-ua-platform': '"Windows"',
-//     };
+export async function GET(req: NextRequest) {
+    const { searchParams } = new URL(req.url);
+    const thread = searchParams.get('thread');
+    const repliesCount = parseInt(searchParams.get('repliesCount') || '0', 10);
 
-//     console.log('Step 1: Establishing session with main page...');
-    
-//     // Step 1: Visit main page to establish session and get cookies
-//     try {
-//       const mainPageResponse = await axiosInstance.get('https://forums.mangadx.org/', {
-//         headers: {
-//           ...baseHeaders,
-//           'Sec-Fetch-Site': 'none', // First visit
-//           'Referer': undefined, // No referer for first visit
-//         }
-//       });
+    if (!thread || isNaN(repliesCount)) {
+        return NextResponse.json(
+            {
+                data: [],
+                total: 0,
+                timestamp: new Date().toISOString(),
+                source: 'MangaDex Forums',
+                error: 'Missing or invalid thread or repliesCount parameters',
+            },
+            { status: 400 }
+        );
+    }
+    console.log(`page-${Math.max(1, Math.ceil(repliesCount / 20))}`);
 
-//       // Extract cookies from response
-//       const setCookieHeaders = mainPageResponse.headers['set-cookie'];
-//       console.log(mainPageResponse)
-//       if (setCookieHeaders) {
-//         sessionCookies = setCookieHeaders
-//           .map(cookie => cookie.split(';')[0])
-//           .join('; ');
-//         console.log('Session cookies established:', sessionCookies.substring(0, 100) + '...');
-//       }
-//     } catch (mainPageError) {
-//       console.log('Main page visit failed, continuing without session:', mainPageError.message);
-//     }
+    const forumUrl = `https://forums.mangadex.org/threads/${thread}/page-${Math.max(1, Math.ceil(repliesCount / 20))}`;
+    const maxComments = 20;
+    const maxRetries = 2;
 
-//     // Step 2: Wait to mimic human behavior
-//     await new Promise(resolve => setTimeout(resolve, 2000));
+    let browser;
+    let page;
+    let attempt = 0;
 
-//     console.log('Step 2: Fetching target page...');
-    
-//     // Step 3: Now fetch the actual target page with session
-//     const targetHeaders = {
-//       ...baseHeaders,
-//       ...(sessionCookies && { 'Cookie': sessionCookies }),
-//     };
+    while (attempt < maxRetries) {
+        try {
+            browser = await getBrowser();
+            page = await browser.newPage();
 
-//     const response = await axiosInstance.get(forumUrl, {
-//       headers: targetHeaders
-//     });
-// console.log(response)
-//     if (response.status !== 200) {
-//       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-//     }
+            await page.setUserAgent(
+                'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36'
+            );
+            await page.setExtraHTTPHeaders({
+                accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'accept-encoding': 'gzip, deflate, br, zstd',
+                'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+                'cache-control': 'max-age=0',
+                dnt: '1',
+                'if-modified-since': 'Sun, 01 Jun 2025 10:23:30 GMT',
+                priority: 'u=0, i',
+                referer: 'https://forums.mangadex.org/',
+                'sec-ch-ua': '"Chromium";v="136", "Google Chrome";v="136", "Not.A/Brand";v="99"',
+                'sec-ch-ua-mobile': '?1',
+                'sec-ch-ua-platform': '"Android"',
+                'sec-fetch-dest': 'document',
+                'sec-fetch-mode': 'navigate',
+                'sec-fetch-site': 'same-origin',
+                'upgrade-insecure-requests': '1',
+            });
 
-//     console.log('Successfully fetched forum page, parsing content...');
-//     const $ = cheerio.load(response.data);
-//     const comments: any[] = [];
+            await page.setRequestInterception(true);
+            page.on('request', (request: { resourceType: () => any; abort: () => void; continue: () => void; }) => {
+                const resourceType = request.resourceType();
+                if (['image', 'stylesheet', 'font', 'media', 'script', 'xhr', 'fetch'].includes(resourceType)) {
+                    request.abort();
+                } else {
+                    request.continue();
+                }
+            });
 
-//     // Debug: Log page structure
-//     console.log('Page title:', $('title').text());
-//     console.log('Block rows found:', $('.block-row').length);
-    
-//     // If no block-rows found, try alternative selectors
-//     let activityElements = $('.block-row');
-//     if (activityElements.length === 0) {
-//       console.log('No .block-row found, trying alternative selectors...');
-//       activityElements = $('.structItem, .node-row, .activity-item, [data-user-id]');
-//       console.log('Alternative elements found:', activityElements.length);
-//     }
+            const response = await page.goto(forumUrl, {
+                waitUntil: 'domcontentloaded',
+                timeout: 15000,
+            });
 
-//     // Parse activity elements
-//     activityElements.each((index: number, element: any) => {
-//       if (comments.length >= maxComments) return false;
+            if (!response || response.status() !== 200) {
+                throw new Error(`Failed to load page: ${response ? response.status() : 'No response'}`);
+            }
 
-//       try {
-//         const $element = $(element);
-        
-//         // Multiple strategies for username extraction
-//         let username = '';
-//         const usernameSelectors = [
-//           '.username',
-//           '[data-user-id]',
-//           'a[href*="/members/"]',
-//           '.structItem-title a',
-//           '.node-title a',
-//           '.contentRow-title a[href*="/members/"]'
-//         ];
-        
-//         for (const selector of usernameSelectors) {
-//           username = $element.find(selector).first().text().trim();
-//           if (username) break;
-//         }
-        
-//         if (!username) {
-//           console.log(`Row ${index}: No username found, skipping`);
-//           return;
-//         }
+            await page.waitForSelector('article.message.message--post', { timeout: 5000 }).catch(() => {
+                console.warn('Selector not found, proceeding with available content');
+            });
 
-//         // Extract avatar
-//         let avatarUrl = null;
-//         const avatarSelectors = ['.avatar img', '.structItem-iconContainer img', '.node-icon img'];
-//         for (const selector of avatarSelectors) {
-//           const src = $element.find(selector).attr('src');
-//           if (src) {
-//             avatarUrl = src.startsWith('/') ? `https://forums.mangadx.org${src}` : src;
-//             break;
-//           }
-//         }
+            const htmlContent = await page.content();
+            const $ = cheerio.load(htmlContent);
+            const comments = [];
 
-//         // Extract activity title/content
-//         let activityTitle = '';
-//         const titleSelectors = [
-//           '.contentRow-title',
-//           '.structItem-title', 
-//           '.node-title',
-//           '.activity-title'
-//         ];
-        
-//         for (const selector of titleSelectors) {
-//           activityTitle = $element.find(selector).text().trim();
-//           if (activityTitle) break;
-//         }
+            const elements = $('article.message.message--post').toArray();
+            for (const element of elements) {
+                if (comments.length >= maxComments) break;
 
-//         // Extract manga/thread title
-//         let mangaTitle = '';
-//         const threadLink = $element.find('a[href*="/threads/"]').last();
-//         if (threadLink.length) {
-//           mangaTitle = threadLink.text().trim();
-//         }
+                const $element = $(element);
 
-//         // Extract comment content
-//         const contentSelectors = ['.contentRow-snippet', '.structItem-snippet', '.node-snippet'];
-//         let commentContent = '';
-//         for (const selector of contentSelectors) {
-//           commentContent = $element.find(selector).text().trim();
-//           if (commentContent) break;
-//         }
+                const username = $element.find('.message-name a.username').text().trim();
+                if (!username) continue;
 
-//         // Extract timestamp
-//         let timeAgo = '';
-//         const timeSelectors = ['time', '.u-dt', '.structItem-date'];
-//         for (const selector of timeSelectors) {
-//           const timeEl = $element.find(selector);
-//           timeAgo = timeEl.text().trim() || timeEl.attr('title') || timeEl.attr('datetime') || '';
-//           if (timeAgo) break;
-//         }
+                let avatarUrl = $element.find('.message-avatar img').attr('src');
+                if (avatarUrl && avatarUrl.startsWith('/')) {
+                    avatarUrl = `https://forums.mangadex.org${avatarUrl}`;
+                }
 
-//         // Determine reaction type
-//         let reactionType = 'Comment';
-//         const activityLower = activityTitle.toLowerCase();
-//         if (activityLower.includes('reacted') || activityLower.includes('liked')) {
-//           reactionType = 'Like';
-//         } else if (activityLower.includes('replied')) {
-//           reactionType = 'Reply';
-//         } else if (activityLower.includes('posted') || activityLower.includes('created')) {
-//           reactionType = 'New Thread';
-//         }
+                const userTitle = $element.find('.message-userBanner').first().text().trim() || 'User';
+                const joinedDate = $element.find('.message-userExtras .pairs--justified:contains("Joined") dd').text().trim() || 'Unknown';
+                const messageCount = $element.find('.message-userExtras .pairs--justified:contains("Messages") dd').text().trim() || '0';
 
-//         // Extract thread URL
-//         let threadUrl = '';
-//         const threadLinkEl = $element.find('a[href*="/threads/"]').first();
-//         if (threadLinkEl.length) {
-//           threadUrl = threadLinkEl.attr('href') || '';
-//           if (threadUrl.startsWith('/')) {
-//             threadUrl = `https://forums.mangadx.org${threadUrl}`;
-//           }
-//         }
+                const postId: any = $element.attr('id')?.replace('js-post-', '') || `post_${comments.length + 1}`;
+                const timestamp = $element.find('time.u-dt').attr('datetime') || new Date().toISOString();
+                const timeAgo = $element.find('time.u-dt').text().trim() || 'A moment ago';
+                const postUrl = $element.find('.message-attribution-main a[href*="/post-"]').attr('href') || '#';
+                const fullPostUrl = postUrl.startsWith('/') ? `https://forums.mangadex.org${postUrl}` : postUrl;
 
-//         // Add comment if we have essential data
-//         if (username && (mangaTitle || activityTitle)) {
-//           comments.push({
-//             id: `activity_${Date.now()}_${index}`,
-//             username,
-//             avatarUrl,
-//             mangaTitle: mangaTitle || extractTitleFromActivity(activityTitle),
-//             reactionType,
-//             commentContent,
-//             timeAgo,
-//             threadUrl,
-//             activityType: determineActivityType(activityTitle),
-//             rawActivity: activityTitle,
-//             debug: {
-//               elementHtml: $element.html()?.substring(0, 200) + '...',
-//               selectors: {
-//                 username: usernameSelectors.find(s => $element.find(s).length > 0),
-//                 title: titleSelectors.find(s => $element.find(s).length > 0)
-//               }
-//             }
-//           });
-          
-//           console.log(`Parsed comment ${comments.length}: ${username} - ${mangaTitle || activityTitle}`);
-//         }
-//       } catch (elementError) {
-//         console.error(`Error processing element ${index}:`, elementError);
-//       }
-//     });
+                const commentContent = $element.find('.message-body .bbWrapper').text().trim();
+                if (!commentContent) continue;
 
-//     console.log(`Successfully parsed ${comments.length} comments from ${activityElements.length} elements`);
+                const reactionType = $element.find('.reactionsBar .reaction-sprite').attr('alt') || 'Like';
+                const reactionUsers = $element.find('.reactionsBar-link bdi').text().trim() || 'None';
 
-//     // If no comments found, provide debug info
-//     if (comments.length === 0) {
-//       console.log('DEBUG: Page content sample:', response.data.substring(0, 1000));
-//       console.log('DEBUG: All potential elements:', $('div[class*="row"], div[class*="item"], div[class*="activity"]').length);
-//     }
+                comments.push({
+                    id: postId,
+                    username,
+                    avatarUrl: avatarUrl || `https://forums.mangadex.org/community/avatars/s/0/${Math.floor(Math.random() * 100)}.jpg?1673176662`,
+                    userTitle,
+                    joinedDate,
+                    messageCount,
+                    commentContent,
+                    timestamp,
+                    timeAgo,
+                    postUrl: fullPostUrl,
+                    reactionType,
+                    reactionUsers,
+                    threadUrl: forumUrl,
+                });
+            }
 
-//     return NextResponse.json({
-//       data: comments,
-//       total: comments.length,
-//       timestamp: new Date().toISOString(),
-//       source: 'MangaDX Forums Latest Activity - Live Data',
-//       debug: {
-//         pageSize: response.data.length,
-//         pageTitle: $('title').text(),
-//         elementsFound: activityElements.length,
-//         hasCookies: !!sessionCookies,
-//         responseHeaders: Object.keys(response.headers)
-//       }
-//     });
+            await page.close();
 
-//   } catch (error: any) {
-//     console.error('Scraping failed:', error.message);
-//     console.error('Error details:', {
-//       status: error.response?.status,
-//       statusText: error.response?.statusText,
-//       url: error.config?.url,
-//       method: error.config?.method,
-//       responseData: error.response?.data?.substring(0, 500)
-//     });
-    
-//     return NextResponse.json({
-//       error: `Scraping failed: ${error.message}`,
-//       errorDetails: {
-//         status: error.response?.status || 'unknown',
-//         statusText: error.response?.statusText || 'unknown',
-//         type: error.code || error.name || 'unknown',
-//         url: error.config?.url
-//       },
-//       data: [],
-//       total: 0,
-//       timestamp: new Date().toISOString(),
-//       troubleshooting: {
-//         step1: 'Check if the URL is accessible',
-//         step2: 'Verify the site structure hasn\'t changed',
-//         step3: 'Consider implementing CAPTCHA handling',
-//         step4: 'Try using a residential proxy'
-//       }
-//     }, { status: 500 });
-//   }
-// }
+            if (comments.length === 0) {
+                throw new Error('No comments found in the HTML');
+            }
 
-// // Helper functions remain the same
-// function extractTitleFromActivity(activityText: string): string {
-//   let title = activityText
-//     .replace(/^.*?(reacted to|replied to|posted the thread|created)\s+/i, '')
-//     .replace(/\s+with.*$/, '')
-//     .replace(/\s+in the.*$/, '')
-//     .trim();
-  
-//   if (!title || title.length < 3) {
-//     const patterns = [
-//       /thread\s+"([^"]+)"/,
-//       /in\s+(.+?)(?:\s+with|\s*$)/,
-//       /"([^"]+)"/,
-//       /topic\s+(.+?)(?:\s+with|\s*$)/
-//     ];
-    
-//     for (const pattern of patterns) {
-//       const match = activityText.match(pattern);
-//       if (match && match[1]) {
-//         title = match[1].trim();
-//         break;
-//       }
-//     }
-//   }
-  
-//   return title || 'Unknown Thread';
-// }
+            return NextResponse.json({
+                data: comments.slice(0, maxComments),
+                total: comments.length,
+                timestamp: new Date().toISOString(),
+                source: 'MangaDex Forums Thread Comments',
+            });
+        } catch (error: any) {
+            attempt++;
+            if (page) await page.close();
+            console.error(`Attempt ${attempt} failed: ${error.message}`);
+            if (attempt >= maxRetries) {
+                console.error('Error scraping forum comments:', error.message);
+                return NextResponse.json(
+                    {
+                        data: [],
+                        total: 0,
+                        timestamp: new Date().toISOString(),
+                        source: 'MangaDex Forums Thread Comments',
+                        error: `Failed to scrape data after ${maxRetries} attempts: ${error.message}`,
+                    },
+                    { status: error.response?.status || 500 }
+                );
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+    }
 
-// function determineActivityType(activityText: string): string {
-//   const lower = activityText.toLowerCase();
-//   const patterns = [
-//     { pattern: /reacted|liked/, type: 'reaction' },
-//     { pattern: /replied|responded/, type: 'reply' },
-//     { pattern: /posted|created|started/, type: 'new_thread' },
-//     { pattern: /watching|following/, type: 'watch' },
-//     { pattern: /commented/, type: 'comment' }
-//   ];
-  
-//   for (const { pattern, type } of patterns) {
-//     if (pattern.test(lower)) return type;
-//   }
-  
-//   return 'unknown';
-// }
+    return NextResponse.json(
+        {
+            data: [],
+            total: 0,
+            timestamp: new Date().toISOString(),
+            source: 'MangaDex Forums Thread Comments',
+            error: 'Unexpected error: retries exhausted',
+        },
+        { status: 500 }
+    );
+}
