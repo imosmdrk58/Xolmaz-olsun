@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   MessageCircle,
   ChevronDown,
-  ChevronRight,
   Eye,
   EyeOff,
   ExternalLink,
@@ -11,10 +10,7 @@ import {
   Heart,
   ArrowUpCircle,
   MessageSquare,
-  Zap,
-  ArrowUp,
   TrendingUp,
-  ChevronLeft,
   ChevronUp,
   Loader2,
   Users,
@@ -28,10 +24,8 @@ const CommentsOnManga = ({ manga }) => {
   const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutes
   const COMMENTS_PER_PAGE = 20;
 
-  const [thread, setThread] = useState(manga?.rating?.comments?.threadId || null);
-  const [repliesCount, setRepliesCount] = useState(
-    manga?.rating?.comments?.repliesCount || 0
-  );
+  const thread = useMemo(() => manga?.rating?.comments?.threadId || null);
+  const repliesCount = useMemo(() => manga?.rating?.comments?.repliesCount || 0);
   const [comments, setComments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -41,7 +35,6 @@ const CommentsOnManga = ({ manga }) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [expandedTexts, setExpandedTexts] = useState({});
   const [expandedSpoilers, setExpandedSpoilers] = useState({});
-  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Calculate total pages based on replies count
   useEffect(() => {
@@ -49,15 +42,6 @@ const CommentsOnManga = ({ manga }) => {
       setTotalPages(Math.ceil(repliesCount / COMMENTS_PER_PAGE));
     }
   }, [repliesCount]);
-
-  // Handle scroll to show/hide scroll to top button
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 400);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const fetchComments = useCallback(async (page = 1) => {
     if (!thread || !repliesCount) {
@@ -161,10 +145,6 @@ const CommentsOnManga = ({ manga }) => {
     }
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const parseCommentContent = (content) => {
     if (!content) return { parts: [] };
 
@@ -215,43 +195,27 @@ const CommentsOnManga = ({ manga }) => {
     setExpandedSpoilers((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  console.log(comments);
+
   if (loading) {
     return (
-      <div className="w-full bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 min-h-screen">
+      <div className="w-full  min-h-screen">
         <div className="w-full px-6 py-8">
-          {/* Animated Header Skeleton */}
+          {/* Simple Header */}
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-10 h-10 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-xl animate-pulse"></div>
-            <div className="w-40 h-8 bg-gradient-to-r from-zinc-800 to-zinc-700 rounded-lg animate-pulse"></div>
+            <div className="w-10 h-10 bg-purple-400/20 rounded-lg animate-pulse"></div>
+            <div className="w-40 h-8 bg-zinc-800 rounded-lg animate-pulse"></div>
             <div className="w-20 h-6 bg-zinc-800 rounded-full animate-pulse ml-auto"></div>
           </div>
-          
-          {/* Loading Animation */}
+
+          {/* Loading Spinner Only */}
           <div className="flex items-center justify-center py-16">
             <div className="relative">
-              <div className="w-16 h-16 border-4 border-purple-500/20 rounded-full animate-spin border-t-purple-500"></div>
+              <div className="w-16 h-16 border-4 border-zinc-800 rounded-full animate-spin border-t-purple-400"></div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <MessageCircle className="w-6 h-6 text-purple-400 animate-pulse" />
               </div>
             </div>
-          </div>
-          
-          {/* Skeleton Comments */}
-          <div className="grid gap-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-gradient-to-r from-zinc-900/50 to-zinc-800/30 rounded-2xl p-6 border border-zinc-800/50 animate-pulse">
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-xl"></div>
-                  <div className="flex-1 space-y-3">
-                    <div className="w-32 h-5 bg-zinc-700 rounded-lg"></div>
-                    <div className="space-y-2">
-                      <div className="w-full h-4 bg-zinc-700 rounded"></div>
-                      <div className="w-3/4 h-4 bg-zinc-700 rounded"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </div>
@@ -259,33 +223,35 @@ const CommentsOnManga = ({ manga }) => {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 min-h-screen">
+    <div className="w-full  min-h-screen">
       <div className="w-full px-6 py-8">
-        {/* Enhanced Header */}
-        <div className="flex items-center justify-between mb-8 p-6 bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-2xl border border-purple-500/20 backdrop-blur-sm">
-          <div className="flex items-center gap-4">
-            <div className="relative p-3 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl shadow-lg">
-              <MessageCircle className="w-6 h-6 text-white" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            </div>
+        {/* Clean Header */}
+        <div className="flex  mb-7 items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-purple-400/10 rounded-lg relative border border-purple-400/20">
+              <MessageCircle className="w-7 h-7 text-purple-400" />
+            <div className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full border-2 border-gray-950 flex items-center justify-center animate-pulse">
+            </div> </div>
             <div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
+              <h2 className="text-xl md:text-2xl font-bold text-white uppercase tracking-wide">
                 Comments
               </h2>
-              <p className="text-zinc-400 text-sm">Join the discussion</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide flex flex-row w-full"><Activity className="w-4 h-4 mr-2 text-yellow-300" />
+                Join the discussion
+                </p>
             </div>
           </div>
-          
-          <div className="flex items-center gap-4">
+          <div className="flex items-center space-x-3">
             {total > 0 && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/50 border border-zinc-700 rounded-full backdrop-blur-sm">
+              <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-full">
                 <Users className="w-4 h-4 text-purple-400" />
                 <span className="text-zinc-300 font-medium">{total.toLocaleString()}</span>
               </div>
             )}
+
             {totalPages > 1 && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/50 border border-zinc-700 rounded-full backdrop-blur-sm">
-                <Activity className="w-4 h-4 text-blue-400" />
+              <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-full">
+                <Activity className="w-4 h-4 text-yellow-400" />
                 <span className="text-zinc-300 text-sm">
                   Page {currentPage} of {totalPages}
                 </span>
@@ -294,8 +260,9 @@ const CommentsOnManga = ({ manga }) => {
           </div>
         </div>
 
+
         {error && (
-          <div className="mb-6 p-4 bg-gradient-to-r from-red-950/50 to-red-900/30 border border-red-500/30 rounded-xl backdrop-blur-sm">
+          <div className="mb-6 p-4 bg-red-950/50 border border-red-800 rounded-xl">
             <div className="flex items-center gap-3">
               <div className="w-5 h-5 border-2 border-red-400 rounded-full flex items-center justify-center">
                 <div className="w-2 h-2 bg-red-400 rounded-full"></div>
@@ -306,8 +273,8 @@ const CommentsOnManga = ({ manga }) => {
         )}
 
         {comments.length === 0 && !loading ? (
-          <div className="text-center py-20 bg-gradient-to-br from-zinc-900/30 to-zinc-800/20 rounded-2xl border border-zinc-800/50">
-            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center">
+          <div className="text-center py-20 bg-zinc-900/50 rounded-xl border border-zinc-800">
+            <div className="w-20 h-20 mx-auto mb-6 bg-zinc-800 rounded-2xl flex items-center justify-center">
               <MessageCircle className="w-10 h-10 text-purple-400" />
             </div>
             <h3 className="text-2xl font-bold text-zinc-300 mb-3">No comments yet</h3>
@@ -316,7 +283,7 @@ const CommentsOnManga = ({ manga }) => {
         ) : (
           <>
             {/* Comments Grid */}
-            <div className="grid gap-6">
+            <div className="grid grid-cols-2 gap-6">
               {comments.map((comment, index) => {
                 const commentId = comment.id || index;
                 const { parts } = parseCommentContent(comment.commentContent);
@@ -324,34 +291,39 @@ const CommentsOnManga = ({ manga }) => {
                 return (
                   <article
                     key={commentId}
-                    className="group bg-gradient-to-br from-zinc-900/70 to-zinc-800/30 rounded-2xl border border-zinc-800/50 hover:border-purple-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 backdrop-blur-sm"
+                    className="group bg-white/5 backdrop-blur-md rounded-xl border border-zinc-800 hover:border-purple-400/30 transition-all duration-300 hover:shadow-lg hover:shadow-purple-400/5"
                   >
                     <div className="p-6">
-                      {/* Enhanced User Header */}
+                      {/* User Header */}
                       <div className="flex items-start gap-4 mb-6">
                         <div className="flex-shrink-0 relative">
                           {comment.avatarUrl ? (
                             <img
                               src={comment.avatarUrl}
                               alt={`${comment.username || "Anonymous"} avatar`}
-                              className="w-12 h-12 rounded-xl object-cover border-2 border-zinc-700 group-hover:border-purple-500/50 transition-colors"
+                              className="w-12 h-12 rounded-lg object-cover border-2 border-zinc-700 group-hover:border-purple-400/50 transition-colors"
                               loading="lazy"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
                             />
-                          ) : (
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border-2 border-zinc-700 group-hover:border-purple-500/50 transition-colors">
-                              <User2 className="w-6 h-6 text-zinc-400" />
-                            </div>
-                          )}
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-zinc-900"></div>
+                          ) : null}
+                          <div
+                            className={`w-12 h-12 rounded-lg bg-zinc-800 flex items-center justify-center border-2 border-zinc-700 group-hover:border-purple-400/50 transition-colors ${comment.avatarUrl ? 'hidden' : 'flex'}`}
+                            style={{ display: comment.avatarUrl ? 'none' : 'flex' }}
+                          >
+                            <User2 className="w-6 h-6 text-zinc-400" />
+                          </div>
                         </div>
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-semibold text-white text-lg truncate group-hover:text-purple-300 transition-colors">
+                            <h3 className="font-semibold text-white text-lg truncate group-hover:text-purple-400 transition-colors">
                               {comment.username || "Anonymous"}
                             </h3>
                             {comment.userTitle && (
-                              <span className="px-3 py-1 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 rounded-full text-xs text-purple-300 font-medium">
+                              <span className="px-3 py-1 bg-purple-400/10 border border-purple-400/20 rounded-full text-xs text-purple-400 font-medium">
                                 {comment.userTitle}
                               </span>
                             )}
@@ -382,7 +354,7 @@ const CommentsOnManga = ({ manga }) => {
                         </div>
                       </div>
 
-                      {/* Enhanced Comment Content */}
+                      {/* Comment Content */}
                       <div className="space-y-4 text-zinc-300 leading-relaxed">
                         {parts.map((part, partIndex) => {
                           const key = `${commentId}-${partIndex}`;
@@ -391,13 +363,13 @@ const CommentsOnManga = ({ manga }) => {
                             return (
                               <div
                                 key={key}
-                                className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300"
+                                className="flex items-center gap-3 p-4 bg-purple-400/5 rounded-lg border border-purple-400/20 hover:border-purple-400/40 transition-all duration-300"
                               >
                                 <TrendingUp className="w-5 h-5 text-purple-400" />
                                 <span className="text-zinc-300 font-medium">{part.content.split(" ")[0]}</span>
-                                <div className="ml-auto flex items-center gap-2 px-3 py-1 bg-purple-500/10 rounded-full">
+                                <div className="ml-auto flex items-center gap-2 px-3 py-1 bg-purple-400/10 rounded-full">
                                   <ArrowUpCircle className="w-4 h-4 text-purple-400" />
-                                  <span className="text-xs text-purple-300">Upvote</span>
+                                  <span className="text-xs text-purple-400">Upvote</span>
                                 </div>
                               </div>
                             );
@@ -423,15 +395,15 @@ const CommentsOnManga = ({ manga }) => {
                                     <div className="blur-sm select-none">
                                       <p className="text-zinc-400">{part.content}</p>
                                     </div>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-zinc-900/40 to-zinc-800/20 group-hover/expand:from-zinc-900/20 group-hover/expand:to-zinc-800/10 transition-all duration-300 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                                      <div className="px-4 py-2 bg-gradient-to-r from-zinc-800 to-zinc-700 flex items-center gap-2 rounded-xl text-sm text-zinc-300 border border-zinc-600 group-hover/expand:border-purple-500/50 transition-all duration-300">
+                                    <div className="absolute inset-0 bg-zinc-900/60 group-hover/expand:bg-zinc-900/40 transition-all duration-300 rounded-lg flex items-center justify-center">
+                                      <div className="px-4 py-2 bg-zinc-800 flex items-center gap-2 rounded-lg text-sm text-zinc-300 border border-zinc-600 group-hover/expand:border-purple-400/50 transition-all duration-300">
                                         <Eye className="w-4 h-4" />
                                         <span>Click to view</span>
                                       </div>
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="space-y-4 p-4 bg-zinc-800/30 rounded-xl border border-zinc-700">
+                                  <div className="space-y-4 p-4 bg-zinc-800/50 rounded-lg border border-zinc-700">
                                     <p className="text-zinc-300">{part.content}</p>
                                     <button
                                       onClick={() => toggleExpandText(key)}
@@ -449,10 +421,10 @@ const CommentsOnManga = ({ manga }) => {
                           if (part.type === "spoiler") {
                             const isExpanded = expandedSpoilers[key];
                             return (
-                              <div key={key} className="border border-yellow-500/30 rounded-xl bg-gradient-to-r from-yellow-500/5 to-orange-500/5 overflow-hidden">
+                              <div key={key} className="border border-yellow-400/30 rounded-lg bg-yellow-400/5 overflow-hidden">
                                 <button
                                   onClick={() => toggleSpoiler(key)}
-                                  className="w-full p-4 flex items-center justify-between hover:bg-yellow-500/10 transition-all duration-300"
+                                  className="w-full p-4 flex items-center justify-between hover:bg-yellow-400/10 transition-all duration-300"
                                 >
                                   <div className="flex items-center gap-3">
                                     <span className="text-xl">⚠️</span>
@@ -461,7 +433,7 @@ const CommentsOnManga = ({ manga }) => {
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-2">
-                                    <span className="text-xs text-yellow-500 px-2 py-1 bg-yellow-500/20 rounded-full">
+                                    <span className="text-xs text-yellow-400 px-2 py-1 bg-yellow-400/20 rounded-full">
                                       {isExpanded ? 'Click to hide' : 'Click to reveal'}
                                     </span>
                                     {isExpanded ? (
@@ -472,7 +444,7 @@ const CommentsOnManga = ({ manga }) => {
                                   </div>
                                 </button>
                                 {isExpanded && (
-                                  <div className="p-4 border-t border-yellow-500/20 bg-gradient-to-r from-zinc-900/50 to-zinc-800/30 animate-in slide-in-from-top-2 duration-300">
+                                  <div className="p-4 border-t border-yellow-400/20 bg-zinc-900/50 animate-in slide-in-from-top-2 duration-300">
                                     <p className="text-zinc-300 whitespace-pre-wrap leading-relaxed">
                                       {part.content}
                                     </p>
@@ -486,13 +458,13 @@ const CommentsOnManga = ({ manga }) => {
                         })}
                       </div>
 
-                      {/* Enhanced Footer */}
+                      {/* Footer */}
                       <div className="flex items-center justify-between mt-6 pt-4 border-t border-zinc-800">
                         <div className="flex items-center gap-3">
                           {comment.reactionType && comment.reactionUsers !== "None" && (
-                            <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/20 rounded-full hover:border-red-500/40 transition-all duration-300">
+                            <div className="flex items-center gap-2 px-3 py-2 bg-red-400/10 border border-red-400/20 rounded-full hover:border-red-400/40 transition-all duration-300">
                               <Heart className="w-4 h-4 text-red-400" />
-                              <span className="text-sm text-red-300 font-medium">{comment.reactionUsers}</span>
+                              <span className="text-sm text-red-400 font-medium">{comment.reactionUsers}</span>
                             </div>
                           )}
                         </div>
@@ -503,7 +475,7 @@ const CommentsOnManga = ({ manga }) => {
                               href={comment.postUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-2 text-zinc-500 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all duration-300"
+                              className="p-2 text-zinc-500 hover:text-purple-400 hover:bg-purple-400/10 rounded-lg transition-all duration-300"
                               aria-label="Open post in new tab"
                             >
                               <ExternalLink className="w-4 h-4" />
@@ -517,13 +489,13 @@ const CommentsOnManga = ({ manga }) => {
               })}
             </div>
 
-            {/* Enhanced Load More Section */}
+            {/* Clean Load More Button */}
             {currentPage < totalPages && (
               <div className="mt-8 text-center">
                 <button
                   onClick={loadMoreComments}
                   disabled={loadingMore}
-                  className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-zinc-700 disabled:to-zinc-600 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                  className="group relative px-8 py-4 bg-purple-900 hover:bg-purple-900 disabled:bg-zinc-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-xl disabled:text-zinc-400"
                 >
                   <div className="flex items-center gap-3">
                     {loadingMore ? (
@@ -542,24 +514,13 @@ const CommentsOnManga = ({ manga }) => {
                     )}
                   </div>
                 </button>
-                
+
                 <div className="mt-4 text-zinc-500 text-sm">
                   Showing {comments.length} of {total} comments
                 </div>
               </div>
             )}
           </>
-        )}
-
-        {/* Scroll to Top Button */}
-        {showScrollTop && (
-          <button
-            onClick={scrollToTop}
-            className="fixed bottom-8 right-8 p-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 z-50"
-            aria-label="Scroll to top"
-          >
-            <ChevronUp className="w-6 h-6" />
-          </button>
         )}
       </div>
     </div>
