@@ -72,10 +72,10 @@ export default function RootLayout({
                   {/* Scroll to Top Button */}
                   {showScrollTop && (
                     <button
-                      className="tracking-wider z-50 cursor-pointer fixed bottom-4 right-8 w-16 h-16 rounded-full border-4 border-violet-200 bg-black flex items-center justify-center duration-300 hover:rounded-[50px] hover:w-24 group/button overflow-hidden active:scale-90"
+                      className="tracking-wider z-50 cursor-pointer fixed bottom-4 right-8 w-12 h-12 md:w-16 md:h-16 rounded-full border-4 border-violet-200 bg-black flex items-center justify-center duration-300 hover:rounded-[50px] hover:w-16 md:hover:w-24 group/button overflow-hidden active:scale-90"
                       onClick={scrollToTop}
                     >
-                      <ArrowUp className="tracking-wider w-5 fill-white delay-50 duration-200 group-hover/button:-translate-y-12" />
+                      <ArrowUp className="tracking-wider w-3 md:w-5 fill-white delay-50 duration-200 group-hover/button:-translate-y-12" />
                       <span className="tracking-wider absolute text-white text-xs opacity-0 group-hover/button:opacity-100 transition-opacity duration-200">
                         Top
                       </span>

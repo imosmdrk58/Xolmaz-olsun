@@ -10,12 +10,13 @@ import {
   Heart,
   ArrowUpCircle,
   MessageSquare,
-  TrendingUp,
   ChevronUp,
   Loader2,
   Users,
   Calendar,
-  Activity,
+  Flame,
+  Star,
+  CircleFadingArrowUp,
 } from "lucide-react";
 
 const CommentsOnManga = ({ manga }) => {
@@ -36,102 +37,101 @@ const CommentsOnManga = ({ manga }) => {
   const [expandedTexts, setExpandedTexts] = useState({});
   const [expandedSpoilers, setExpandedSpoilers] = useState({});
 
-  // Calculate total pages based on replies count
   useEffect(() => {
     if (repliesCount > 0) {
       setTotalPages(Math.ceil(repliesCount / COMMENTS_PER_PAGE));
     }
   }, [repliesCount]);
 
-  const fetchComments = useCallback(async (page = 1) => {
-    if (!thread || !repliesCount) {
-      console.warn("No thread or repliesCount, skipping fetch");
-      return;
-    }
+  const fetchComments = useCallback(
+    async (page = 1) => {
+      if (!thread || !repliesCount) {
+        console.warn("No thread or repliesCount, skipping fetch");
+        return;
+      }
 
-    const isFirstPage = page === 1;
-    if (isFirstPage) {
-      setLoading(true);
-    } else {
-      setLoadingMore(true);
-    }
-    setError("");
+      const isFirstPage = page === 1;
+      if (isFirstPage) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+      setError("");
 
-    const now = Date.now();
-    const cacheKey = `${CACHE_KEY}_page_${page}`;
-    const timestampKey = `${LAST_FETCH_TIMESTAMP_KEY}_page_${page}`;
-    const cachedTimestamp = Number(localStorage.getItem(timestampKey)) || 0;
+      const now = Date.now();
+      const cacheKey = `${CACHE_KEY}_page_${page}`;
+      const timestampKey = `${LAST_FETCH_TIMESTAMP_KEY}_page_${page}`;
+      const cachedTimestamp = Number(localStorage.getItem(timestampKey)) || 0;
 
-    // Check cached data for this specific page
-    if (now - cachedTimestamp < CACHE_DURATION_MS) {
-      try {
-        const cachedData = localStorage.getItem(cacheKey);
-        if (cachedData) {
-          const parsedData = JSON.parse(cachedData);
-          if (parsedData?.data && parsedData?.total) {
-            if (isFirstPage) {
-              setComments(parsedData.data);
-            } else {
-              setComments(prev => [...prev, ...parsedData.data]);
+      if (now - cachedTimestamp < CACHE_DURATION_MS) {
+        try {
+          const cachedData = localStorage.getItem(cacheKey);
+          if (cachedData) {
+            const parsedData = JSON.parse(cachedData);
+            if (parsedData?.data && parsedData?.total) {
+              if (isFirstPage) {
+                setComments(parsedData.data);
+              } else {
+                setComments((prev) => [...prev, ...parsedData.data]);
+              }
+              setTotal(parsedData.total);
+              setLoading(false);
+              setLoadingMore(false);
+              console.log(`Loaded page ${page} comments from cache`);
+              return;
             }
-            setTotal(parsedData.total);
-            setLoading(false);
-            setLoadingMore(false);
-            console.log(`Loaded page ${page} comments from cache`);
-            return;
+          }
+        } catch (e) {
+          console.error("Error parsing cached comments:", e);
+        }
+      }
+
+      const skip = (page - 1) * COMMENTS_PER_PAGE;
+      const adjustedRepliesCount = Math.max(0, repliesCount - skip);
+
+      try {
+        const url = new URL("/api/comments", window.location.origin);
+        url.searchParams.append("thread", thread);
+        url.searchParams.append("repliesCount", adjustedRepliesCount.toString());
+        url.searchParams.append("page", page.toString());
+        url.searchParams.append("limit", COMMENTS_PER_PAGE.toString());
+
+        const response = await fetch(url);
+        const responseData = await response.json();
+
+        const { data, total, error: apiError } = responseData;
+        if (apiError) {
+          setError(apiError);
+        } else {
+          if (isFirstPage) {
+            setComments(data || []);
+          } else {
+            setComments((prev) => [...prev, ...(data || [])]);
+          }
+          setTotal(total || 0);
+          const newTimestamp = Date.now();
+
+          try {
+            localStorage.setItem(
+              cacheKey,
+              JSON.stringify({ data, total, timestamp: newTimestamp })
+            );
+            localStorage.setItem(timestampKey, newTimestamp.toString());
+            console.log(`Cached page ${page} comments successfully`);
+          } catch (e) {
+            console.error("Error saving to localStorage:", e);
           }
         }
-      } catch (e) {
-        console.error("Error parsing cached comments:", e);
+      } catch (err) {
+        setError("Failed to load comments: " + err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
       }
-    }
-
-    // Calculate skip count based on page
-    const skip = (page - 1) * COMMENTS_PER_PAGE;
-    const adjustedRepliesCount = Math.max(0, repliesCount - skip);
-
-    try {
-      const url = new URL("/api/comments", window.location.origin);
-      url.searchParams.append("thread", thread);
-      url.searchParams.append("repliesCount", adjustedRepliesCount.toString());
-      url.searchParams.append("page", page.toString());
-      url.searchParams.append("limit", COMMENTS_PER_PAGE.toString());
-
-      const response = await fetch(url);
-      const responseData = await response.json();
-
-      const { data, total, error: apiError } = responseData;
-      if (apiError) {
-        setError(apiError);
-      } else {
-        if (isFirstPage) {
-          setComments(data || []);
-        } else {
-          setComments(prev => [...prev, ...(data || [])]);
-        }
-        setTotal(total || 0);
-        const newTimestamp = Date.now();
-
-        // Store in localStorage
-        try {
-          localStorage.setItem(
-            cacheKey,
-            JSON.stringify({ data, total, timestamp: newTimestamp })
-          );
-          localStorage.setItem(timestampKey, newTimestamp.toString());
-          console.log(`Cached page ${page} comments successfully`);
-        } catch (e) {
-          console.error("Error saving to localStorage:", e);
-        }
-      }
-    } catch (err) {
-      setError("Failed to load comments: " + err.message);
-      console.error("Fetch error:", err);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  }, [thread, repliesCount, CACHE_KEY, LAST_FETCH_TIMESTAMP_KEY]);
+    },
+    [thread, repliesCount, CACHE_KEY, LAST_FETCH_TIMESTAMP_KEY]
+  );
 
   useEffect(() => {
     fetchComments(1);
@@ -195,25 +195,28 @@ const CommentsOnManga = ({ manga }) => {
     setExpandedSpoilers((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  console.log(comments);
-
   if (loading) {
     return (
-      <div className="w-full  min-h-screen">
-        <div className="w-full px-6 py-8">
-          {/* Simple Header */}
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-10 h-10 bg-purple-400/20 rounded-lg animate-pulse"></div>
-            <div className="w-40 h-8 bg-zinc-800 rounded-lg animate-pulse"></div>
-            <div className="w-20 h-6 bg-zinc-800 rounded-full animate-pulse ml-auto"></div>
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-8">
+        {/* Animated Header Skeleton */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gray-800 rounded-xl animate-pulse"></div>
+              <div className="space-y-2">
+                <div className="w-20 h-4 sm:w-32 sm:h-6 bg-gray-700 rounded-md animate-pulse"></div>
+                <div className="w-16 h-2 sm:w-24 sm:h-3 bg-gray-700 rounded animate-pulse"></div>
+              </div>
+            </div>
+            <div className="w-12 h-6 sm:w-16 sm:h-8 bg-gray-700 rounded-full animate-pulse"></div>
           </div>
 
-          {/* Loading Spinner Only */}
-          <div className="flex items-center justify-center py-16">
+          {/* Loading Animation */}
+          <div className="flex items-center justify-center py-12">
             <div className="relative">
-              <div className="w-16 h-16 border-4 border-zinc-800 rounded-full animate-spin border-t-purple-400"></div>
+              <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-gray-700 rounded-full animate-spin border-t-gray-500"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-purple-400 animate-pulse" />
+                <MessageCircle className="w-4 h-4 sm:w-6 sm:h-6 text-gray-500 animate-pulse" />
               </div>
             </div>
           </div>
@@ -223,67 +226,87 @@ const CommentsOnManga = ({ manga }) => {
   }
 
   return (
-    <div className="w-full  min-h-screen">
-      <div className="w-full px-6 py-8">
-        {/* Clean Header */}
-        <div className="flex  mb-7 items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-purple-400/10 rounded-lg relative border border-purple-400/20">
-              <MessageCircle className="w-7 h-7 text-purple-400" />
-            <div className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full border-2 border-gray-950 flex items-center justify-center animate-pulse">
-            </div> </div>
-            <div>
-              <h2 className="text-xl md:text-2xl font-bold text-white uppercase tracking-wide">
-                Comments
-              </h2>
-              <p className="text-xs text-gray-400 uppercase tracking-wide flex flex-row w-full"><Activity className="w-4 h-4 mr-2 text-yellow-300" />
-                Join the discussion
-                </p>
+    <div className="w-full pt-6 sm:pt-8">
+      {/* Comments container */}
+      <div className="py-4  sm:py-6 rounded-3xl" aria-label="Comments container">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <div className="flex items-center space-x-3 sm:space-x-4">
+            <div className="relative">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gray-800 rounded-lg flex items-center justify-center shadow-md shadow-black/50">
+                <MessageCircle className="w-7 h-7 sm:w-8 sm:h-8 text-gray-300" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-600 rounded-full border-2 border-gray-900 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <h1 className="text-xl sm:text-2xl font-extrabold text-gray-100">COMMUNITY</h1>
+              <div className="flex items-center space-x-1.5 sm:space-x-2 text-white text-xs uppercase tracking-wider">
+                <Flame className="w-3 h-3 md:w-4 md:h-4 text-amber-500" />
+                <span className="text-[10px] sm:text-xs">Join the discussion</span>
+              </div>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
+
+          <div className="flex items-center w-fit flex-col md:flex-row space-x-1 space-y-1 sm:space-x-3 text-gray-300 text-xs sm:text-sm">
             {total > 0 && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-full">
-                <Users className="w-4 h-4 text-purple-400" />
-                <span className="text-zinc-300 font-medium">{total.toLocaleString()}</span>
+              <div className="flex items-center w-full space-x-2 px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-md border border-gray-700 rounded-lg">
+                <Users className="w-3 h-3 sm:w-5 sm:h-5 text-purple-300" />
+                <span className="font-semibold">{total.toLocaleString()}</span>
+                <span className="text-white hidden md:block text-[11px] sm:text-xs">voices</span>
               </div>
             )}
 
             {totalPages > 1 && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-full">
-                <Activity className="w-4 h-4 text-yellow-400" />
-                <span className="text-zinc-300 text-sm">
-                  Page {currentPage} of {totalPages}
-                </span>
+              <div className="hidden md:flex items-center  w-full space-x-2 px-3 py-0.5 sm:px-4 sm:py-2 bg-white/10 backdrop-blur-md border border-gray-700 rounded-lg">
+                {/* <BookOpenText className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300" /> */}
+                 <span className="font-semibold ">Page </span>
+                <span className="font-semibold">{currentPage}</span>
+                <span className="text-white">/</span>
+                <span className="text-white">{totalPages}</span>
               </div>
             )}
           </div>
         </div>
 
-
+        {/* Error Display */}
         {error && (
-          <div className="mb-6 p-4 bg-red-950/50 border border-red-800 rounded-xl">
-            <div className="flex items-center gap-3">
-              <div className="w-5 h-5 border-2 border-red-400 rounded-full flex items-center justify-center">
-                <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+          <div className="mb-6 p-3 sm:p-4 bg-rose-900 border border-rose-700 rounded-2xl text-xs sm:text-sm text-rose-400">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-rose-800 rounded-full flex items-center justify-center">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-rose-600 rounded-full flex items-center justify-center">
+                  <div className="w-2 h-2 bg-rose-600 rounded-full"></div>
+                </div>
               </div>
-              <p className="text-red-300">{error}</p>
+              <div>
+                <h3 className="font-semibold mb-1 text-sm sm:text-base">Error Loading Comments</h3>
+                <p className="text-xs sm:text-sm">{error}</p>
+              </div>
             </div>
           </div>
         )}
 
+        {/* Empty State */}
         {comments.length === 0 && !loading ? (
-          <div className="text-center py-20 bg-zinc-900/50 rounded-xl border border-zinc-800">
-            <div className="w-20 h-20 mx-auto mb-6 bg-zinc-800 rounded-2xl flex items-center justify-center">
-              <MessageCircle className="w-10 h-10 text-purple-400" />
+          <div className="text-center py-12 sm:py-16 text-white">
+            <div className="max-w-sm mx-auto">
+              <div className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 bg-gray-800 rounded-2xl flex items-center justify-center shadow-md">
+                <MessageCircle className="w-8 h-8 sm:w-12 sm:h-12" />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-2 sm:mb-3">Start the Conversation</h3>
+              <p className="mb-4 sm:mb-6 text-sm sm:text-base">Be the first to share your thoughts about this manga!</p>
+              <div className="inline-flex items-center space-x-2 px-4 py-1.5 sm:px-5 sm:py-2 bg-purple-700 rounded-xl text-white font-semibold hover:shadow-lg transition-all duration-300 text-xs sm:text-sm">
+                <Star className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>Join Discussion</span>
+              </div>
             </div>
-            <h3 className="text-2xl font-bold text-zinc-300 mb-3">No comments yet</h3>
-            <p className="text-zinc-500 text-lg">Be the first to share your thoughts!</p>
           </div>
         ) : (
           <>
-            {/* Comments Grid */}
-            <div className="grid grid-cols-2 gap-6">
+            {/* Comments Timeline */}
+            <div className="space-y-4 sm:space-y-6">
               {comments.map((comment, index) => {
                 const commentId = comment.id || index;
                 const { parts } = parseCommentContent(comment.commentContent);
@@ -291,63 +314,102 @@ const CommentsOnManga = ({ manga }) => {
                 return (
                   <article
                     key={commentId}
-                    className="group bg-white/5 backdrop-blur-md rounded-xl border border-zinc-800 hover:border-purple-400/30 transition-all duration-300 hover:shadow-lg hover:shadow-purple-400/5"
+                    className="group relative bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-600/20 transform hover:-translate-y-0.5"
                   >
-                    <div className="p-6">
-                      {/* User Header */}
-                      <div className="flex items-start gap-4 mb-6">
-                        <div className="flex-shrink-0 relative">
+                    <div className="flex absolute right-2 sm:right-3 top-2 sm:top-3 w-fit items-center space-x-1 sm:space-x-2">
+                      {comment.reactionType && comment.reactionUsers !== "None" && (
+                        <div className="flex items-center w-full space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-2 bg-rose-800/10 border border-rose-700 rounded-xl hover:border-rose-600 transition-all duration-300 text-xs sm:text-sm">
+                          <Heart className="w-3 h-3 sm:w-4 sm:h-4 text-rose-600 fill-rose-500" />
+                          <span className="text-white font-semibold w-full text-[10px] sm:text-xs">{comment.reactionUsers} Likes</span>
+                        </div>
+                      )}
+                      {parts.map((part, partIndex) => {
+                        const key = `${commentId}-${partIndex}`;
+
+                        if (part.type === "reaction") {
+                          return (
+                            <div
+                              key={key}
+                              className="hidden md:flex w-full min-w-fit items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-2 bg-green-800/10 border border-green-700 rounded-xl hover:border-green-600 transition-all duration-300 text-xs sm:text-sm"
+                            >
+                              <CircleFadingArrowUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
+                              <span className="text-white font-semibold w-full text-[10px] sm:text-xs">{part.content.split(" ")[0]} Upvotes</span>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })}
+                    </div>
+
+                    <div className="absolute -bottom-2 sm:-bottom-3 right-2 sm:right-3">
+                      {comment.postUrl && (
+                        <a
+                          href={comment.postUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 sm:p-2 text-white hover:text-purple-500 hover:bg-purple-900/30 rounded-xl transition-all duration-300 group"
+                          aria-label="Open post in new tab"
+                        >
+                          <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 group-hover:rotate-12 transition-transform duration-300" />
+                        </a>
+                      )}
+                    </div>
+                    <div className="p-4 sm:p-6 relative">
+                      {/* User Profile Header */}
+                      <div className="flex items-start space-x-3 sm:space-x-4 mb-4 sm:mb-5">
+                        <div className="relative flex-shrink-0">
                           {comment.avatarUrl ? (
                             <img
                               src={comment.avatarUrl}
                               alt={`${comment.username || "Anonymous"} avatar`}
-                              className="w-12 h-12 rounded-lg object-cover border-2 border-zinc-700 group-hover:border-purple-400/50 transition-colors"
+                              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover border-2 border-gray-700 transition-all duration-300 shadow-md"
                               loading="lazy"
                               onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
+                                e.target.style.display = "none";
+                                e.target.nextSibling.style.display = "flex";
                               }}
                             />
                           ) : null}
                           <div
-                            className={`w-12 h-12 rounded-lg bg-zinc-800 flex items-center justify-center border-2 border-zinc-700 group-hover:border-purple-400/50 transition-colors ${comment.avatarUrl ? 'hidden' : 'flex'}`}
-                            style={{ display: comment.avatarUrl ? 'none' : 'flex' }}
+                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-800 flex items-center justify-center border-2 border-gray-700 transition-all duration-300 shadow-md ${
+                              comment.avatarUrl ? "hidden" : "flex"
+                            }`}
                           >
-                            <User2 className="w-6 h-6 text-zinc-400" />
+                            <User2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                           </div>
+                          {/* Online Indicator */}
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-600 rounded-full border-2 border-gray-900 flex items-center justify-center animate-pulse"></div>
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-semibold text-white text-lg truncate group-hover:text-purple-400 transition-colors">
+                          <div className="flex items-center space-x-2 sm:space-x-3 mb-1 sm:mb-2">
+                            <h3 className="text-base sm:text-lg font-bold text-gray-100 transition-colors truncate">
                               {comment.username || "Anonymous"}
                             </h3>
                             {comment.userTitle && (
-                              <span className="px-3 py-1 bg-purple-400/10 border border-purple-400/20 rounded-full text-xs text-purple-400 font-medium">
+                              <span className="px-2 py-0.5 bg-purple-700/30 border border-purple-700 rounded-full text-[10px] sm:text-xs text-purple-400 font-medium">
                                 {comment.userTitle}
                               </span>
                             )}
                           </div>
 
-                          <div className="flex items-center gap-4 text-sm text-zinc-500">
+                          <div className="flex items-center space-x-3 sm:space-x-4 text-[10px] sm:text-xs text-white">
                             {comment.timeAgo && (
-                              <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4" />
-                                <time dateTime={comment.postDateTime || undefined} className="hover:text-zinc-400 transition-colors">
-                                  {comment.timeAgo}
-                                </time>
+                              <div className="flex items-center space-x-1 hover:text-gray-300 transition-colors">
+                                <Clock className="w-3 h-3" />
+                                <time dateTime={comment.postDateTime || undefined}>{comment.timeAgo}</time>
                               </div>
                             )}
                             {comment.joinedDate && (
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4" />
-                                <span>Joined {new Date(comment.joinedDate).toLocaleDateString()}</span>
+                              <div className="flex items-center space-x-1">
+                                <Calendar className="w-3 h-3" />
+                                <span>Member since {new Date(comment.joinedDate).getFullYear()}</span>
                               </div>
                             )}
                             {comment.messageCount && (
-                              <div className="flex items-center gap-2">
-                                <MessageSquare className="w-4 h-4" />
-                                <span>{comment.messageCount.toLocaleString()} messages</span>
+                              <div className="flex items-center space-x-1">
+                                <MessageSquare className="w-3 h-3" />
+                                <span>{comment.messageCount.toLocaleString()} posts</span>
                               </div>
                             )}
                           </div>
@@ -355,29 +417,13 @@ const CommentsOnManga = ({ manga }) => {
                       </div>
 
                       {/* Comment Content */}
-                      <div className="space-y-4 text-zinc-300 leading-relaxed">
+                      <div className="space-y-3 sm:space-y-4 text-gray-300 leading-snug ml-12 sm:ml-16 text-xs sm:text-sm">
                         {parts.map((part, partIndex) => {
                           const key = `${commentId}-${partIndex}`;
 
-                          if (part.type === "reaction") {
-                            return (
-                              <div
-                                key={key}
-                                className="flex items-center gap-3 p-4 bg-purple-400/5 rounded-lg border border-purple-400/20 hover:border-purple-400/40 transition-all duration-300"
-                              >
-                                <TrendingUp className="w-5 h-5 text-purple-400" />
-                                <span className="text-zinc-300 font-medium">{part.content.split(" ")[0]}</span>
-                                <div className="ml-auto flex items-center gap-2 px-3 py-1 bg-purple-400/10 rounded-full">
-                                  <ArrowUpCircle className="w-4 h-4 text-purple-400" />
-                                  <span className="text-xs text-purple-400">Upvote</span>
-                                </div>
-                              </div>
-                            );
-                          }
-
                           if (part.type === "normal") {
                             return (
-                              <p key={key} className="text-zinc-300 text-base leading-relaxed">
+                              <p key={key} className="text-gray-400 text-xs sm:text-sm leading-relaxed">
                                 {part.content}
                               </p>
                             );
@@ -389,28 +435,28 @@ const CommentsOnManga = ({ manga }) => {
                               <div key={key} className="relative">
                                 {!isExpanded ? (
                                   <div
-                                    className="relative cursor-pointer group/expand"
+                                    className="relative cursor-pointer group/expand rounded-xl overflow-hidden"
                                     onClick={() => toggleExpandText(key)}
                                   >
-                                    <div className="blur-sm select-none">
-                                      <p className="text-zinc-400">{part.content}</p>
+                                    <div className="blur-[2px] select-none p-3 sm:p-4">
+                                      <p className="text-white text-xs sm:text-sm">{part.content}</p>
                                     </div>
-                                    <div className="absolute inset-0 bg-zinc-900/60 group-hover/expand:bg-zinc-900/40 transition-all duration-300 rounded-lg flex items-center justify-center">
-                                      <div className="px-4 py-2 bg-zinc-800 flex items-center gap-2 rounded-lg text-sm text-zinc-300 border border-zinc-600 group-hover/expand:border-purple-400/50 transition-all duration-300">
-                                        <Eye className="w-4 h-4" />
-                                        <span>Click to view</span>
+                                    <div className="absolute inset-0 bg-gray-900/90 group-hover/expand:bg-gray-900/80 transition-all duration-300 flex items-center justify-center">
+                                      <div className="px-4 sm:px-6 py-1.5 sm:py-2 bg-gray-800 flex items-center space-x-2 rounded-xl text-white font-semibold shadow-md transform group-hover/expand:scale-105 transition-all duration-300 text-xs sm:text-sm">
+                                        <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                                        <span>Click to expand</span>
                                       </div>
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="space-y-4 p-4 bg-zinc-800/50 rounded-lg border border-zinc-700">
-                                    <p className="text-zinc-300">{part.content}</p>
+                                  <div className="space-y-2 sm:space-y-3 p-3 sm:p-4 bg-gray-900 rounded-xl border border-gray-700">
+                                    <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">{part.content}</p>
                                     <button
                                       onClick={() => toggleExpandText(key)}
-                                      className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-400 transition-colors"
+                                      className="flex items-center space-x-1 text-white hover:text-gray-300 transition-colors text-xs"
                                     >
-                                      <EyeOff className="w-4 h-4" />
-                                      Hide content
+                                      <EyeOff className="w-3 h-3" />
+                                      <span>Collapse content</span>
                                     </button>
                                   </div>
                                 )}
@@ -421,31 +467,37 @@ const CommentsOnManga = ({ manga }) => {
                           if (part.type === "spoiler") {
                             const isExpanded = expandedSpoilers[key];
                             return (
-                              <div key={key} className="border border-yellow-400/30 rounded-lg bg-yellow-400/5 overflow-hidden">
+                              <div
+                                key={key}
+                                className="border border-yellow-700 rounded-xl bg-gray-900 overflow-hidden backdrop-blur-sm"
+                              >
                                 <button
                                   onClick={() => toggleSpoiler(key)}
-                                  className="w-full p-4 flex items-center justify-between hover:bg-yellow-400/10 transition-all duration-300"
+                                  className="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-yellow-900/30 transition-all duration-300 text-sm text-yellow-400"
                                 >
-                                  <div className="flex items-center gap-3">
-                                    <span className="text-xl">⚠️</span>
-                                    <span className="text-yellow-400 font-semibold">
-                                      Spoiler: {part.title}
-                                    </span>
+                                  <div className="flex items-center space-x-3">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-700 rounded-lg flex items-center justify-center text-xl">
+                                      ⚠️
+                                    </div>
+                                    <div className="text-left">
+                                      <span className="font-bold block text-xs sm:text-sm">Spoiler Alert</span>
+                                      <span className="text-yellow-500 text-[10px] sm:text-xs">{part.title}</span>
+                                    </div>
                                   </div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xs text-yellow-400 px-2 py-1 bg-yellow-400/20 rounded-full">
-                                      {isExpanded ? 'Click to hide' : 'Click to reveal'}
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-xs px-3 py-1 bg-yellow-700 rounded-full font-medium">
+                                      {isExpanded ? "Hide spoiler" : "Reveal spoiler"}
                                     </span>
                                     {isExpanded ? (
-                                      <ChevronUp className="w-5 h-5 text-yellow-400 transition-transform duration-300" />
+                                      <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 transition-transform duration-300" />
                                     ) : (
-                                      <ChevronDown className="w-5 h-5 text-yellow-400 transition-transform duration-300" />
+                                      <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 transition-transform duration-300" />
                                     )}
                                   </div>
                                 </button>
                                 {isExpanded && (
-                                  <div className="p-4 border-t border-yellow-400/20 bg-zinc-900/50 animate-in slide-in-from-top-2 duration-300">
-                                    <p className="text-zinc-300 whitespace-pre-wrap leading-relaxed">
+                                  <div className="px-3 sm:px-4 pb-3 sm:pb-4 border-t border-yellow-700 bg-gray-900 animate-in slide-in-from-top-2 duration-300">
+                                    <p className="text-gray-300 whitespace-pre-wrap leading-relaxed text-xs sm:text-sm">
                                       {part.content}
                                     </p>
                                   </div>
@@ -457,66 +509,54 @@ const CommentsOnManga = ({ manga }) => {
                           return null;
                         })}
                       </div>
-
-                      {/* Footer */}
-                      <div className="flex items-center justify-between mt-6 pt-4 border-t border-zinc-800">
-                        <div className="flex items-center gap-3">
-                          {comment.reactionType && comment.reactionUsers !== "None" && (
-                            <div className="flex items-center gap-2 px-3 py-2 bg-red-400/10 border border-red-400/20 rounded-full hover:border-red-400/40 transition-all duration-300">
-                              <Heart className="w-4 h-4 text-red-400" />
-                              <span className="text-sm text-red-400 font-medium">{comment.reactionUsers}</span>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          {comment.postUrl && (
-                            <a
-                              href={comment.postUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-2 text-zinc-500 hover:text-purple-400 hover:bg-purple-400/10 rounded-lg transition-all duration-300"
-                              aria-label="Open post in new tab"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          )}
-                        </div>
-                      </div>
                     </div>
                   </article>
                 );
               })}
             </div>
 
-            {/* Clean Load More Button */}
+            {/* Load More Section */}
             {currentPage < totalPages && (
-              <div className="mt-8 text-center">
+              <div className="mt-8 sm:mt-12 text-center">
                 <button
                   onClick={loadMoreComments}
                   disabled={loadingMore}
-                  className="group relative px-8 py-4 bg-purple-900 hover:bg-purple-900 disabled:bg-zinc-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-xl disabled:text-zinc-400"
+                  className="group relative px-8 sm:px-10 py-3 sm:py-4 bg-white/5 backdrop-blur-md border border-white/10 disabled:bg-gray-700 text-white font-semibold text-xs sm:text-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 disabled:hover:scale-100 disabled:hover:translate-y-0 disabled:cursor-not-allowed overflow-hidden"
                 >
-                  <div className="flex items-center gap-3">
+                  {/* Animated Background */}
+                  <div className="absolute inset-0 bg-purple-900/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+
+                  <div className="relative flex items-center justify-center space-x-2 sm:space-x-3">
                     {loadingMore ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        <span>Loading more comments...</span>
+                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                        <span>Loading more discussions...</span>
                       </>
                     ) : (
                       <>
-                        <MessageCircle className="w-5 h-5 group-hover:animate-bounce" />
-                        <span>Load more comments</span>
-                        <span className="px-2 py-1 bg-white/20 rounded-full text-xs">
-                          {Math.min(COMMENTS_PER_PAGE, repliesCount - (currentPage * COMMENTS_PER_PAGE))} more
-                        </span>
+                        <ArrowUpCircle className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform duration-300" />
+                        <span>Load More Comments</span>
+                        <div className="px-1.5 py-0.5 bg-white/20 rounded-full text-xs font-semibold">
+                          {totalPages - currentPage} more pages
+                        </div>
                       </>
                     )}
                   </div>
                 </button>
+              </div>
+            )}
 
-                <div className="mt-4 text-zinc-500 text-sm">
-                  Showing {comments.length} of {total} comments
+            {/* End of Comments Indicator */}
+            {currentPage >= totalPages && total > 0 && (
+              <div className="mt-8 sm:mt-12 text-center">
+                <div className="max-w-lg mx-auto">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-100 mb-2">
+                    You've reached the end!
+                  </h3>
+
+                  <p className="text-green-400 mb-4 text-xs sm:text-sm">
+                    You've seen all {total.toLocaleString()} comments in this discussion.
+                  </p>
                 </div>
               </div>
             )}

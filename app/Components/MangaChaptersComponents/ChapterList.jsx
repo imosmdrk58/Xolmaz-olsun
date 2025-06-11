@@ -3,15 +3,11 @@ import {
   Eye,
   ChevronDown,
   Search,
-  RotateCcw,
   ArrowUpDown,
   History,
   CheckCircle,
   Languages,
-  BookOpen,
-  BarChart2,
   Clock,
-  Flag,
   Bookmark,
   List,
   X,
@@ -169,7 +165,7 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
 
   return (
     <Suspense fallback={<ChapterListSkeleton />}>
-      <div className="min-h-fit md:mt-5 flex gap-3 pl-0   md:flex-row-reverse text-gray-100 font-sans py-6 w-full">
+      <div className="min-h-fit md:mt-5 flex gap-3 pl-0  md:flex-row-reverse text-gray-100 font-sans pt-6 w-fit">
         <div className="w-full flex flex-col">
           {/* Header */}
           <header className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
@@ -183,7 +179,7 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
                   {totalChapters}
                 </span>
               </div>
-              <div className="max-w-sm md:max-w-3xl min-w-0 flex flex-col">
+              <div className="max-w-sm md:max-w-2xl min-w-0 flex flex-col">
                 <h1
                   className="text-base md:text-3xl font-extrabold text-wrap line-clamp-1  text-white truncate"
                   title={manga?.title || 'Chapter Vault'}
@@ -458,7 +454,7 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
                     scrollbarWidth: 'none',
                     scrollbarColor: 'rgba(155, 89, 182, 0.6) rgba(0, 0, 0, 0.1)',
                   }}
-                  className={`gap-x-2.5 ${showGrid ? 'grid grid-cols-2' : 'flex flex-col gap-2 md:gap-3'} max-h-[280px]  md:max-h-[480px] overflow-y-scroll md:pr-2`}
+                  className={`gap-x-2.5 ${showGrid ? 'grid grid-cols-2' : 'flex flex-col gap-2 md:gap-3'} max-h-[280px]  md:max-h-[460px] overflow-y-scroll md:pr-2`}
                 >
                   {processedChapters.map((group) => {
                     const hasReadTranslations = group.translations.some((t) =>
@@ -629,7 +625,7 @@ const ChapterList = ({ chapters, handleChapterClick, manga }) => {
           </div>
         </div>
 
-        <div className="hidden md:flex flex-col w-full max-w-[320px] ml-3">
+        <div className="hidden md:flex flex-col w-full max-w-[320px]">
           {/* Filters Panel */}
           <section className="p-4 pb-6 mb-2 backdrop-blur-md bg-white/5 bg-gray-850 w-full rounded-xl border border-gray-700 shadow-lg">
             <div className="relative"></div>

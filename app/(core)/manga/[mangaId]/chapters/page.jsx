@@ -132,8 +132,10 @@ export default function MangaChapters() {
   return (
     <div className="w-full min-h-screen overflow-hidden bg-transparent text-white pt-10 px-2 sm:px-12">
       <AboutManga last={chapters[chapters.length - 1]} manga={manga} handleChapterClick={handleChapterClick} />
-          <ChapterList manga={manga} chapters={chapters} handleChapterClick={handleChapterClick} />
-    <CommentsOnManga manga={manga}/>
+      <div className=' w-full md:pl-60 md:pr-3'>
+        <ChapterList manga={manga} chapters={chapters} handleChapterClick={handleChapterClick} />
+        <CommentsOnManga manga={manga} />
+      </div>
     </div>
   );
 }
