@@ -6,6 +6,8 @@ export const langToCountry = {
     en: "US", // English → United States
     zh: "CN", // Chinese (Simplified) → China
     fr: "FR", // French → France
+    "ja-ro":"JP",
+    
     "pt-br": "BR", // Portuguese (Brazilian) → Brazil
     id: "ID", // Indonesian → Indonesia
     vi: "VN", // Vietnamese → Vietnam

@@ -1,10 +1,10 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useState, Suspense, lazy, useMemo } from 'react';
-import LoadingSpinner from '../../../../Components/LoadingSpinner';
+import React, { useCallback, useEffect, useState, lazy, useMemo } from 'react';
 import { useManga } from '../../../../providers/MangaContext';
 import CommentsOnManga from '../../../../Components/MangaChaptersComponents/CommentsOnManga';
+import TabsAndSections from '../../../../Components/MangaChaptersComponents/TabsAndSections';
 
 // Lazy load components
 const AboutManga = React.memo(
@@ -128,12 +128,12 @@ export default function MangaChapters() {
       </div>
     );
   }
-
+console.log(chapters)
   return (
-    <div className="w-full min-h-screen overflow-hidden bg-transparent text-white pt-10 px-2 sm:px-12">
-      <AboutManga last={chapters[chapters.length - 1]} manga={manga} handleChapterClick={handleChapterClick} />
+    <div className="w-full min-h-screen md:-mt-20  overflow-hidden bg-transparent flex flex-col gap-12  text-white">
+      <AboutManga chapters={chapters} manga={manga} handleChapterClick={handleChapterClick} />
+      <TabsAndSections chapters={chapters} manga={manga} handleChapterClick={handleChapterClick}/>
       <div className=' w-full md:pl-60 md:pr-3'>
-        <ChapterList manga={manga} chapters={chapters} handleChapterClick={handleChapterClick} />
         <CommentsOnManga manga={manga} />
       </div>
     </div>
