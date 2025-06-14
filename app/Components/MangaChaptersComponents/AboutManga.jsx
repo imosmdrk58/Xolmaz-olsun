@@ -19,7 +19,7 @@ import {
   List,
   UserPlus
 } from 'lucide-react';
-
+import { getRatingColor } from "../../constants/Flags"
 const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
 
   const handleAddToLibrary = () => {
@@ -76,7 +76,7 @@ const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
                     {manga.authorName.map(author => author.attributes.name).join(', ')}
                   </p>
                 </div>
-                <div className="flex gap-4 mb-8">
+                <div className="flex gap-4 mb-5">
                   <Button onClick={handleAddToLibrary} variant="primary" size="large">
                     Add To Library
                   </Button>
@@ -90,8 +90,8 @@ const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
                   </Button>
                   <div className="flex items-center gap-6 ">
                     <div className="flex items-center">
-                      <Star className="w-4 h-4 mr-1 text-orange-500" />
-                      <span className="text-[#ff6740] text-base">{manga.rating.rating.bayesian.toFixed(2)}</span>
+                      <Star className="w-4 h-4 mr-1 text-yellow-400" />
+                      <span className="text-yellow-400 text-base">{manga.rating.rating.bayesian.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center">
                       <UserPlus className="w-4 h-4 mr-1 text-white" />
@@ -111,9 +111,9 @@ const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
                 </div>
 
                 <div className="flex flex-wrap gap-2 mb-6">
-                  <Tag variant='primary'> {manga.contentRating}</Tag>
+                  <Tag variant={manga.contentRating.trim()}> {manga.contentRating}</Tag>
                   {manga.flatTags.map((tag, index) => (
-                    <Tag key={index} variant={'secondary'}>
+                    <Tag key={index}>
                       {tag}
                     </Tag>
                   ))}
@@ -153,15 +153,15 @@ const Button = ({
   const baseClasses = 'font-medium rounded transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center';
 
   const variants = {
-    primary: 'bg-[#ff6740] text-white hover:bg-[#e55a39] disabled:bg-gray-400',
-    secondary: 'bg-[#4f4f4f] text-white hover:bg-[#666666] disabled:bg-gray-400',
+    primary: 'bg-purple-900/70 text-white hover:bg-purple-950 disabled:bg-gray-400',
+    secondary: 'bg-gray-600/30 text-white hover:bg-[#666666] disabled:bg-gray-400',
     outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:border-gray-200 disabled:text-gray-400',
   };
 
   const sizes = {
     small: 'px-3 py-1 text-sm h-8',
     medium: 'px-4 py-2 text-base h-10',
-    large: 'px-6 py-3 text-lg h-12',
+    large: 'px-6 py-3 text-base h-12',
   };
 
   const buttonClasses = `${baseClasses} ${variants[variant]} ${sizes[size]} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${className}`;
@@ -182,19 +182,13 @@ const Button = ({
 
 const Tag = ({
   children,
-  variant = 'default',
+  variant,
   size = 'small',
   onClick,
   className = '',
   ...props
 }) => {
-  const baseClasses = 'inline-flex items-center font-bold uppercase rounded transition-colors duration-200';
-
-  const variants = {
-    primary: 'bg-[#ff6740] text-white',
-    secondary: 'bg-[#2c2c2c] text-white',
-    default: 'bg-[#2c2c2c] text-white',
-  };
+  const baseClasses = 'inline-flex bg-gray-600/30 text-white items-center font-bold uppercase rounded transition-colors duration-200';
 
   const sizes = {
     small: 'px-2 py-1 text-xs',
@@ -202,8 +196,8 @@ const Tag = ({
     large: 'px-4 py-2 text-base',
   };
 
-  const tagClasses = `${baseClasses} ${variants[variant]} ${sizes[size]} ${onClick ? 'cursor-pointer hover:opacity-80' : ''} ${className}`;
-
+  const tagClasses = `${baseClasses} ${getRatingColor(variant)} ${sizes[size]} ${onClick ? 'cursor-pointer hover:opacity-80' : ''} ${className}`;
+  console.log(getRatingColor(variant))
   return (
     <span
       onClick={onClick}

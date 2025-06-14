@@ -104,7 +104,7 @@ function MangaReadHistory() {
                                     const progress = calculateProgress(item);
                                     return (
                                         <div
-                                            key={item.manga.id}
+                                            key={index}
                                             className="group relative rounded-xl border border-white/10 backdrop-blur-sm overflow-hidden"
                                             style={{
                                                 animationDelay: `${index * 100}ms`,
@@ -151,9 +151,9 @@ function MangaReadHistory() {
                                                             {/* Chapter Action Button */}
                                                             <div className="flex-shrink-0">
                                                                 {/* Last Read Chapter */}
-                                                                {item.chapters?.slice(0, 1).map((chapter) => (
+                                                                {item.chapters?.slice(0, 1).map((chapter,index) => (
                                                                     <div
-                                                                        key={chapter.id}
+                                                                        key={index}
                                                                         onClick={() =>
                                                                             handleChapterClicked(item.manga, chapter, item.allChaptersList)
                                                                         }
@@ -197,9 +197,9 @@ function MangaReadHistory() {
                                                             </div>
                                                         </div>
                                                         <div className="relative w-fit flex justify-end h-full">
-                                                            {item.chapters?.slice(0, 1).map((chapter) => (
+                                                            {item.chapters?.slice(0, 1).map((chapter,index) => (
                                                                 <button
-                                                                    key={chapter.id}
+                                                                    key={index}
                                                                     onClick={() =>
                                                                         handleChapterClicked(item.manga, chapter, item.allChaptersList)
                                                                     }
@@ -242,9 +242,9 @@ function MangaReadHistory() {
                         <div className="flex sm:hidden gap-2 overflow-x-auto pb-4">
                             {readHistory
                                 .sort((item1, item2) => new Date(item2.lastReadAT) - new Date(item1.lastReadAT))
-                                .map((item) => (
+                                .map((item,index) => (
                                     <div
-                                        key={item.manga.id}
+                                        key={index}
                                         className="flex-shrink-0 w-24 cursor-pointer"
                                         onClick={() => handleMangaCoverImageClicked(item.manga)}
                                     >

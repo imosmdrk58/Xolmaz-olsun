@@ -133,9 +133,6 @@ console.log(chapters)
     <div className="w-full min-h-screen md:-mt-20  overflow-hidden bg-transparent flex flex-col gap-12  text-white">
       <AboutManga chapters={chapters} manga={manga} handleChapterClick={handleChapterClick} />
       <TabsAndSections chapters={chapters} manga={manga} handleChapterClick={handleChapterClick}/>
-      <div className=' w-full md:pl-60 md:pr-3'>
-        <CommentsOnManga manga={manga} />
-      </div>
     </div>
   );
 }

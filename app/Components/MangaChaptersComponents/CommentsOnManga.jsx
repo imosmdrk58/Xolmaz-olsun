@@ -197,7 +197,7 @@ const CommentsOnManga = ({ manga }) => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 pb-8">
         {/* Animated Header Skeleton */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
@@ -226,9 +226,9 @@ const CommentsOnManga = ({ manga }) => {
   }
 
   return (
-    <div className="w-full pt-6 sm:pt-8">
+    <div className="w-full">
       {/* Comments container */}
-      <div className="py-4  sm:py-6 rounded-3xl" aria-label="Comments container">
+      <div className="pb-4  sm:pb-6 rounded-3xl" aria-label="Comments container">
         {/* Header */}
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div className="flex items-center space-x-3 sm:space-x-4">
@@ -250,7 +250,7 @@ const CommentsOnManga = ({ manga }) => {
             </div>
           </div>
 
-          <div className="flex items-center w-fit flex-col md:flex-row space-x-1 space-y-1 sm:space-x-3 text-gray-300 text-xs sm:text-sm">
+          <div className="flex items-center w-fit flex-col md:flex-row space-x-1 space-y-1 md:space-y-0 sm:space-x-3 text-gray-300 text-xs sm:text-sm">
             {total > 0 && (
               <div className="flex items-center w-full space-x-2 px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-md border border-gray-700 rounded-lg">
                 <Users className="w-3 h-3 sm:w-5 sm:h-5 text-purple-300" />
@@ -306,7 +306,9 @@ const CommentsOnManga = ({ manga }) => {
         ) : (
           <>
             {/* Comments Timeline */}
-            <div className="space-y-4 sm:space-y-6">
+            <div 
+            style={{scrollbarWidth:"none"}}
+            className="space-y-4 max-h-[900px] overflow-auto sm:space-y-6">
               {comments.map((comment, index) => {
                 const commentId = comment.id || index;
                 const { parts } = parseCommentContent(comment.commentContent);
