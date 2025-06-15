@@ -24,7 +24,7 @@ ai-manga-reader\app\api\manga\getAuthor
 Audiotest.jsx
 TranslatorTest.jsx
 AIAudio/
-
+CoverArts.jsx
 # testing
 /coverage
 apiVersion.ts

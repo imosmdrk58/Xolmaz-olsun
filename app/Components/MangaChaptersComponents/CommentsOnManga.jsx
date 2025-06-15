@@ -262,7 +262,7 @@ const CommentsOnManga = ({ manga }) => {
             {totalPages > 1 && (
               <div className="hidden md:flex items-center  w-full space-x-2 px-3 py-0.5 sm:px-4 sm:py-2 bg-white/10 backdrop-blur-md border border-gray-700 rounded-lg">
                 {/* <BookOpenText className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300" /> */}
-                 <span className="font-semibold ">Page </span>
+                <span className="font-semibold ">Page </span>
                 <span className="font-semibold">{currentPage}</span>
                 <span className="text-white">/</span>
                 <span className="text-white">{totalPages}</span>
@@ -306,9 +306,13 @@ const CommentsOnManga = ({ manga }) => {
         ) : (
           <>
             {/* Comments Timeline */}
-            <div 
-            style={{scrollbarWidth:"none"}}
-            className="space-y-4 max-h-[900px] overflow-auto sm:space-y-6">
+            <div
+              // style={{scrollbarWidth:"none"}}
+              className="space-y-4 max-h-[900px] overflow-y-auto
+  [&::-webkit-scrollbar]:w-1
+  [&::-webkit-scrollbar-track]:bg-transparent
+  [&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:
+ overflow-auto sm:space-y-6 pr-2">
               {comments.map((comment, index) => {
                 const commentId = comment.id || index;
                 const { parts } = parseCommentContent(comment.commentContent);
@@ -373,9 +377,8 @@ const CommentsOnManga = ({ manga }) => {
                             />
                           ) : null}
                           <div
-                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-800 flex items-center justify-center border-2 border-gray-700 transition-all duration-300 shadow-md ${
-                              comment.avatarUrl ? "hidden" : "flex"
-                            }`}
+                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-800 flex items-center justify-center border-2 border-gray-700 transition-all duration-300 shadow-md ${comment.avatarUrl ? "hidden" : "flex"
+                              }`}
                           >
                             <User2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                           </div>
