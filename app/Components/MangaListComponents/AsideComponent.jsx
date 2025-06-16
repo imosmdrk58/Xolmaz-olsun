@@ -10,7 +10,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import Image from "next/image"
-import AsideComponentSkeleton from "../Skeletons/MangaList/AsideComponenetSkeleton";
+import AsideComponentSkeleton from "../Skeletons/MangaList/AsideComponentSkeleton";
 import { useMangaFetch } from "../../hooks/useMangaFetch";
 
 function AsideComponent({
@@ -33,12 +33,12 @@ function AsideComponent({
     return num.toString();
   };
 
-  if (ratingLoading || favouriteLoading) {
+  if (ratingLoading || favouriteLoading || latestArrivalsLoading) {
     return <AsideComponentSkeleton />; // Replace with your skeleton
   }
 
-  if (ratingError || favouriteError) {
-    return <div className="text-red-500">Error: {ratingErrorMsg?.message || favouriteErrorMsg?.message}</div>;
+  if (ratingError || favouriteError || latestArrivalsError) {
+    return <div className="text-red-500">Error: {ratingErrorMsg?.message || favouriteErrorMsg?.message || latestArrivalsErrorMsg?.message}</div>;
   }
 
   // Select manga list based on category

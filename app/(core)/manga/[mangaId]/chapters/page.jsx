@@ -105,7 +105,7 @@ export default function MangaChapters() {
     [mangaId, router, chapters] // Added chapters to dependencies
   );
 
-  console.log('Current chapters state:', chapters);
+  // console.log('Current chapters state:', chapters);
   if (error) {
     return (
       <div className="flex justify-center items-center w-full h-screen bg-[#070920] backdrop-blur-md text-white">

@@ -98,12 +98,13 @@ interface Chapter {
   [key: string]: any;
 }
 
-// Define ReadHistoryEntry type with allChaptersList
+// Define ReadHistoryEntry type
 interface ReadHistoryEntry {
   manga: Manga;
   chapters: Chapter[];
   lastChapterRead: Chapter | null;
   allChaptersList: Chapter[];
+  lastReadAT: Date;
 }
 
 // Define Favorite type
@@ -112,7 +113,13 @@ interface Favorite {
   chapterInfo: Chapter[];
 }
 
-// Update MangaContextType to reflect the new readHistory structure
+// Define BookMark type
+interface BookMark {
+  manga: Manga;
+  bookmarkedAt: Date;
+}
+
+// Update MangaContextType to include BookMarkedMangas
 interface MangaContextType {
   selectedManga: Manga | null;
   setSelectedManga: (manga: Manga | null) => void;
@@ -125,6 +132,9 @@ interface MangaContextType {
   getChapterListForManga: (mangaId: string) => Chapter[];
   addToFavorite: (manga: Manga, chapter?: Chapter) => void;
   getAllFavorites: () => { [mangaId: string]: Favorite };
+  addToBookMarks: (manga: Manga) => void;
+  removeFromBookMarks: (mangaId: string) => void;
+  getAllBookMarks: () => BookMark[];
 }
 
 const MangaContext = createContext<MangaContextType | undefined>(undefined);
@@ -136,6 +146,7 @@ const STORAGE_KEYS = {
   CHAPTER_LIST: 'chapterList',
   SELECTED_MANGA: 'selectedManga',
   FAVORITES: 'favorites',
+  BOOKMARKS: 'bookMarks',
 };
 
 export function MangaProvider({ children }: { children: ReactNode }) {
@@ -144,6 +155,7 @@ export function MangaProvider({ children }: { children: ReactNode }) {
   const [favoriteChapters, setFavoriteChapters] = useState<Chapter[]>([]);
   const [chapterLists, setChapterLists] = useState<{ [mangaId: string]: Chapter[] }>({});
   const [favorites, setFavorites] = useState<{ [mangaId: string]: Favorite }>({});
+  const [bookMarks, setBookMarks] = useState<BookMark[]>([]);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -157,7 +169,14 @@ export function MangaProvider({ children }: { children: ReactNode }) {
       // Load Read History
       const storedReadHistory = localStorage.getItem(STORAGE_KEYS.READ_HISTORY);
       if (storedReadHistory) {
-        setReadHistory(JSON.parse(storedReadHistory));
+        const parsedHistory = JSON.parse(storedReadHistory);
+        // Parse lastReadAT as Date
+        setReadHistory(
+          parsedHistory.map((entry: any) => ({
+            ...entry,
+            lastReadAT: new Date(entry.lastReadAT),
+          }))
+        );
       }
 
       // Load Favorite Chapters
@@ -176,6 +195,19 @@ export function MangaProvider({ children }: { children: ReactNode }) {
       const storedFavorites = localStorage.getItem(STORAGE_KEYS.FAVORITES);
       if (storedFavorites) {
         setFavorites(JSON.parse(storedFavorites));
+      }
+
+      // Load Bookmarks
+      const storedBookMarks = localStorage.getItem(STORAGE_KEYS.BOOKMARKS);
+      if (storedBookMarks) {
+        const parsedBookMarks = JSON.parse(storedBookMarks);
+        // Parse bookmarkedAt as Date
+        setBookMarks(
+          parsedBookMarks.map((bookmark: any) => ({
+            ...bookmark,
+            bookmarkedAt: new Date(bookmark.bookmarkedAt),
+          }))
+        );
       }
     } catch (error) {
       console.error('Error loading data from localStorage:', error);
@@ -207,7 +239,6 @@ export function MangaProvider({ children }: { children: ReactNode }) {
       let updatedHistory: ReadHistoryEntry[];
 
       if (existingEntry) {
-        // Update existing entry
         const updatedChapters = chapter
           ? [chapter, ...existingEntry.chapters.filter((ch) => ch.id !== chapter.id)]
           : existingEntry.chapters;
@@ -218,22 +249,21 @@ export function MangaProvider({ children }: { children: ReactNode }) {
                 chapters: updatedChapters,
                 lastChapterRead: chapter || existingEntry.lastChapterRead,
                 allChaptersList: allChaptersList || existingEntry.allChaptersList,
-                lastReadAT:new Date()
+                lastReadAT: new Date(),
               }
             : entry
         );
       } else {
-        // Add new entry
         updatedHistory = [
           {
             manga,
             chapters: chapter ? [chapter] : [],
             lastChapterRead: chapter || null,
             allChaptersList: allChaptersList || [],
-            lastReadAT:new Date()
+            lastReadAT: new Date(),
           },
           ...prev,
-        ].slice(0, 50); // Limit history to 50 entries
+        ].slice(0, 50);
       }
 
       try {
@@ -292,18 +322,15 @@ export function MangaProvider({ children }: { children: ReactNode }) {
       const updatedFavorites = { ...prev };
       const mangaId = manga.id;
 
-      // Initialize favorite entry if it doesn't exist
       if (!updatedFavorites[mangaId]) {
         updatedFavorites[mangaId] = {
           mangaInfo: manga,
           chapterInfo: [],
         };
       } else {
-        // Update mangaInfo in case it has changed
         updatedFavorites[mangaId].mangaInfo = manga;
       }
 
-      // Add chapter if provided and not already in favorites
       if (chapter) {
         const existingChapters = updatedFavorites[mangaId].chapterInfo;
         if (!existingChapters.some((ch) => ch.id === chapter.id)) {
@@ -325,6 +352,52 @@ export function MangaProvider({ children }: { children: ReactNode }) {
     return favorites;
   };
 
+  // Bookmarks Methods
+  const addToBookMarks = (manga: Manga) => {
+    setBookMarks((prev) => {
+      const existingBookmark = prev.find((bookmark) => bookmark.manga.id === manga.id);
+      let updatedBookMarks: BookMark[];
+
+      if (existingBookmark) {
+        // Update existing bookmark
+        updatedBookMarks = prev.map((bookmark) =>
+          bookmark.manga.id === manga.id
+            ? { manga, bookmarkedAt: new Date() }
+            : bookmark
+        );
+      } else {
+        // Add new bookmark
+        updatedBookMarks = [
+          { manga, bookmarkedAt: new Date() },
+          ...prev,
+        ].slice(0, 50); // Limit to 50 bookmarks
+      }
+
+      try {
+        localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(updatedBookMarks));
+      } catch (error) {
+        console.error('Error saving bookMarks to localStorage:', error);
+      }
+      return updatedBookMarks;
+    });
+  };
+
+  const removeFromBookMarks = (mangaId: string) => {
+    setBookMarks((prev) => {
+      const updatedBookMarks = prev.filter((bookmark) => bookmark.manga.id !== mangaId);
+      try {
+        localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(updatedBookMarks));
+      } catch (error) {
+        console.error('Error saving bookMarks to localStorage:', error);
+      }
+      return updatedBookMarks;
+    });
+  };
+
+  const getAllBookMarks = () => {
+    return bookMarks;
+  };
+
   return (
     <MangaContext.Provider
       value={{
@@ -339,6 +412,9 @@ export function MangaProvider({ children }: { children: ReactNode }) {
         getChapterListForManga,
         addToFavorite,
         getAllFavorites,
+        addToBookMarks,
+        removeFromBookMarks,
+        getAllBookMarks,
       }}
     >
       {children}
