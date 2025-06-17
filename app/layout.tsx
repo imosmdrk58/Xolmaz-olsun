@@ -18,7 +18,6 @@ export default function RootLayout({
   const [isClient, setIsClient] = useState(false);
   const [showNavbar, setShowNavbar] = useState(false);
   const pathname = usePathname(); // Get current pathname
-  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Update showNavbar based on the current pathname
   useEffect(() => {
@@ -26,14 +25,6 @@ export default function RootLayout({
     setShowNavbar(pathname !== '/'); // Show navbar for all routes except '/'
   }, [pathname]); // Re-run when pathname changes
 
-  // Handle scroll to show/hide scroll to top button
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 200);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -70,7 +61,7 @@ export default function RootLayout({
                   </div>
                   {children}
                   {/* Scroll to Top Button */}
-                  {showScrollTop && (
+
                     <button
                       className="tracking-wider z-50 cursor-pointer fixed bottom-4 right-8 w-12 h-12 md:w-16 md:h-16 rounded-full border-4 border-violet-200 bg-black flex items-center justify-center duration-300 hover:rounded-[50px] hover:w-16 md:hover:w-24 group/button overflow-hidden active:scale-90"
                       onClick={scrollToTop}
@@ -80,8 +71,6 @@ export default function RootLayout({
                         Top
                       </span>
                     </button>
-
-                  )}
                 </div>
               )}
             </Suspense>

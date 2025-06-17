@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, memo, lazy } from "react";
 import { useRouter } from 'next/navigation';
 import { Star } from "lucide-react";
-import { useManga } from "../../../components/providers/MangaContext";
+import { useManga } from "../../providers/MangaContext";
 
 const SearchMangaCard = memo(
   lazy(() => import("./SearchMangaCardWith2ViewModeModules/SearchMangaCard"))

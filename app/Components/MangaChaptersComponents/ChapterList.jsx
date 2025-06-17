@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { langFullNames } from '../../constants/Flags';
 import { useManga } from '../../providers/MangaContext';
+import ChapterListSkeleton from '../Skeletons/MangaChapters/ChapterListSkeleton';
 
 const StableFlag = lazy(() => import('../StableFlag'));
 
@@ -219,6 +220,8 @@ const ChapterListWithFilters = ({ chapters, manga, handleChapterClick }) => {
     });
   }, [uniqueVolumes, chaptersByVolume]);
 
+
+  if(chapters.length<=0 || !manga) return  <ChapterListSkeleton/>
   return (
     <div className="flex flex-col w-full gap-2 sm:gap-4 lg:flex-row text-white font-sans">
       {/* Main content */}

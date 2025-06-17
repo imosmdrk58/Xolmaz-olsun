@@ -14,7 +14,6 @@ import {
   ShoppingCart,
   BookMarked,
   Bookmark,
-  BookmarkCheck,
 } from 'lucide-react';
 import { getRatingColor } from "../../constants/Flags"
 import StableFlag from "../StableFlag";
@@ -28,6 +27,8 @@ const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
     alert('Added to library!');
     addToBookMarks(manga)
   };
+
+  const LastChapter = useMemo(()=>chapters.sort((a,b)=>a.chapter-b.chapter)[chapters.length-1],[chapters])
 
   const websiteNames = {
     al: "AniList",
@@ -129,7 +130,7 @@ const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
                 {/* Mobile Action Button */}
                 <div className="mb-6  w-full">
                   <Button
-                    onClick={() => { handleChapterClick(chapters[chapters.length - 1]) }}
+                    onClick={() => { handleChapterClick(LastChapter) }}
                     variant="primary"
                     Icon={BookOpen}
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-6 rounded-lg shadow-lg"
@@ -364,7 +365,7 @@ const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
                     {isBookMarked?"Added To Library":"Add To Library"}
                   </Button>
                   <Button
-                    onClick={() => { handleChapterClick(chapters[chapters.length - 1]) }}
+                    onClick={() => { handleChapterClick(LastChapter) }}
                     variant="secondary"
                     size="large"
                     Icon={BookOpen}
