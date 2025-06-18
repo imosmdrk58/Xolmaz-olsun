@@ -46,7 +46,7 @@ function MangaReadHistory() {
         }
 
         const totalChapters = item.allChaptersList.length;
-        const currentChapter = item.chapters[0]?.chapter || 0;
+        const currentChapter = item.allChaptersList.findIndex(i => i.id === item.chapters[0].id) || 0;
         const percentage = Math.min((currentChapter / totalChapters) * 100, 100);
 
         return {
@@ -151,7 +151,7 @@ function MangaReadHistory() {
                                                             {/* Chapter Action Button */}
                                                             <div className="flex-shrink-0">
                                                                 {/* Last Read Chapter */}
-                                                                {item.chapters?.slice(0, 1).map((chapter,index) => (
+                                                                {item.chapters?.slice(0, 1).map((chapter, index) => (
                                                                     <div
                                                                         key={index}
                                                                         onClick={() =>
@@ -197,7 +197,7 @@ function MangaReadHistory() {
                                                             </div>
                                                         </div>
                                                         <div className="relative w-fit flex justify-end h-full">
-                                                            {item.chapters?.slice(0, 1).map((chapter,index) => (
+                                                            {item.chapters?.slice(0, 1).map((chapter, index) => (
                                                                 <button
                                                                     key={index}
                                                                     onClick={() =>
@@ -242,7 +242,7 @@ function MangaReadHistory() {
                         <div className="flex sm:hidden gap-2 overflow-x-auto pb-4">
                             {readHistory
                                 .sort((item1, item2) => new Date(item2.lastReadAT) - new Date(item1.lastReadAT))
-                                .map((item,index) => (
+                                .map((item, index) => (
                                     <div
                                         key={index}
                                         className="flex-shrink-0 w-24 cursor-pointer"
