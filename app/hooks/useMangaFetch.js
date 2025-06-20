@@ -11,13 +11,17 @@ export const fetchMangaType = async (type, page) => {
   }
 
   console.log(`Fetching fresh data for ${type} page ${page}`);
-  const response = await fetch(`/api/manga/${type}?page=${page}`);
+  const response = await fetch(`/api/manga/${type}?page=${page}`, {
+    next: { revalidate: 3600 },
+    cache: 'force-cache', // cache on server // Cache server-side for 1 hour
+  });
   if (!response.ok) throw new Error(`Failed to fetch ${type} mangas`);
 
   const data = await response.json();
   saveToStorage(cacheKey, data);
   return data;
 };
+
 
 // hooks/useMangaFetch.js
 export const useMangaFetch = (type, page) => {

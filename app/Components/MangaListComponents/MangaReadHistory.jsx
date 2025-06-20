@@ -1,8 +1,10 @@
+"use client"
 import React, { useState, useEffect, useCallback } from 'react';
 import { useManga } from '../../providers/MangaContext';
 import { BookOpen, ChevronDown, ChevronUp, Clock, TrendingUp, Eye, BookOpenCheck } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import MangaReadHistorySkeleton from '../Skeletons/MangaList/MangaReadHistorySkeleton';
 
 function MangaReadHistory() {
     const { getAllFromReadHistory, addToReadHistory, setChapterListForManga } = useManga();
@@ -56,6 +58,7 @@ function MangaReadHistory() {
         };
     };
 
+    if(readHistory.length<=0) return <MangaReadHistorySkeleton/>
     return (
         <div className="w-[100% -12px] mx-2 md:ml-2 md:px-6 mb-6">
             {/* Header */}
