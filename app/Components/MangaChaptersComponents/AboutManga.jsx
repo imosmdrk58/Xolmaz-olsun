@@ -18,16 +18,26 @@ import {
 import { getRatingColor } from "../../constants/Flags"
 import StableFlag from "../StableFlag";
 import { useManga } from '../../providers/MangaContext';
+import AboutMangaSkeleton from '../Skeletons/MangaChapters/AboutMangaSkeleton';
 const MemoStableFlag = React.memo(StableFlag);
-const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
+const AboutManga = ({ manga, handleChapterClick, chapters }) => {
+   const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!manga && isClient) return <AboutMangaSkeleton/>
   const [showFullDescription, setShowFullDescription] = useState(false);
   const { addToBookMarks,getAllBookMarks } = useManga()
-  const isBookMarked= useMemo(()=>getAllBookMarks().some((m)=>m.manga.id==manga.id),[])
+  
   const handleAddToLibrary = () => {
-    alert('Added to library!');
     addToBookMarks(manga)
   };
-
+const isBookMarked = useMemo(() => {
+    if (!isClient) return false; // Consistent server-side value
+    return getAllBookMarks().some((m) => m.manga.id === manga.id);
+  }, [isClient, manga,handleAddToLibrary]);
   const LastChapter = useMemo(()=>chapters.sort((a,b)=>a.chapter-b.chapter)[chapters.length-1],[chapters])
 
   const websiteNames = {
@@ -68,7 +78,7 @@ const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
     mal: <Library className="w-4 h-4 mr-2 text-white" />,
   };
   return (
-    <div className="min-h-full  w-full">
+    <div suppressHydrationWarning className="min-h-full  w-full">
       <div className="relative ">
         {/* Background Image */}
         <div
@@ -144,15 +154,15 @@ const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
               <div className="flex justify-center items-center gap-6 mb-6 px-4">
                 <div className="flex items-center">
                   <Star className="w-4 h-4 mr-1 text-yellow-400" />
-                  <span className="text-yellow-400 text-sm font-semibold">{manga.rating.rating.bayesian.toFixed(2)}</span>
+                  <span className="text-yellow-400 text-sm font-semibold">{manga?.rating?.rating?.bayesian?.toFixed(2)}</span>
                 </div>
                 <div className="flex items-center">
                   <Eye className="w-4 h-4 mr-1 text-white/70" />
-                  <span className="text-white text-sm">{manga.rating.comments.repliesCount}</span>
+                  <span className="text-white text-sm">{manga?.rating?.comments?.repliesCount}</span>
                 </div>
                 <div className="flex items-center">
                   <Users className="w-4 h-4 mr-1 text-pink-400" />
-                  <span className="text-pink-400 text-sm font-semibold">{manga.rating.follows}</span>
+                  <span className="text-pink-400 text-sm font-semibold">{manga?.rating?.follows}</span>
                 </div>
               </div>
 
@@ -379,11 +389,11 @@ const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
                     </div>
                     <div className="flex items-center">
                       <UserPlus className="w-4 h-4 mr-1 text-white" />
-                      <span className="text-white text-base">{manga.rating.follows}</span>
+                      <span className="text-white text-base">{manga?.rating?.follows || 0}</span>
                     </div>
                     <div className="flex items-center">
                       <Library className="w-4 h-4 mr-1 text-white" />
-                      <span className="text-white text-base">{manga.rating.comments.repliesCount}</span>
+                      <span className="text-white text-base">{manga?.rating?.comments?.repliesCount || 0}</span>
                     </div>
                     <div className="flex items-center ml-2">
                       <Book className="w-4 h-4 mr-2 text-white" />
@@ -421,7 +431,7 @@ const MangaDetail = ({ manga, handleChapterClick, chapters }) => {
   );
 };
 
-export default MangaDetail;
+export default AboutManga;
 
 const Button = ({
   children,

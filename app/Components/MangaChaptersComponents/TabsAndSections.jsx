@@ -9,6 +9,7 @@ import {
 import StableFlag from "../StableFlag";
 import ChapterList from './ChapterList';
 import CommentsOnManga from './CommentsOnManga';
+import TabsAndSectionsSkeleton from '../Skeletons/MangaChapters/TabsAndSectionsSkeleton';
 // import CoverArts from './CoverArts';
 
 // Move static data outside component to prevent recreation
@@ -42,6 +43,7 @@ const iconMap = {
 const MemoStableFlag = React.memo(StableFlag);
 
 function TabsAndSections({ manga, chapters, handleChapterClick }) {
+  if(chapters.length==0 || !manga) return <TabsAndSectionsSkeleton/>
   const [sortOrder, setSortOrder] = useState('descending');
   const [activeTab, setActiveTab] = useState(0);
 
@@ -64,7 +66,7 @@ function TabsAndSections({ manga, chapters, handleChapterClick }) {
       kt: `https://mangadex.org/title/${memoManga.id}/${link}`,
       al: `https://anilist.co/manga/${link}`,
     }[key] || link),
-    [memoManga.id]
+    [memoManga]
   );
 
   // Memoize uniqueVolumes to compute only when chapters or sortOrder change
@@ -90,7 +92,7 @@ function TabsAndSections({ manga, chapters, handleChapterClick }) {
         ),
       },
       {
-        label: `Comments (${memoManga.rating.comments.repliesCount})`,
+        label: `Comments (${memoManga?.rating?.comments?.repliesCount || 0})`,
         content: <CommentsOnManga manga={memoManga} />,
       },
     //   {

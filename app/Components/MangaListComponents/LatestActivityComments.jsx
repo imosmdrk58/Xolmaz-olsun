@@ -23,7 +23,7 @@ import LatestActivityCommentsSkeleton from "../Skeletons/MangaList/LatestActivit
 
 const CACHE_KEY = "mangadex_latest_comments";
 const LAST_FETCH_TIMESTAMP_KEY = "mangadx_latest_comments_last_fetch";
-const CACHE_DURATION_MS = 15 * 60 * 1000;
+const CACHE_DURATION_MS = 30 * 60 * 1000;
 
 const LatestComments = () => {
     const [comments, setComments] = useState([]);

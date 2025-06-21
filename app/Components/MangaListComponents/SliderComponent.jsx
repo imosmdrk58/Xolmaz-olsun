@@ -5,6 +5,8 @@ import StableFlag from '../StableFlag';
 import Image from 'next/image';
 import { useMangaFetch } from '../../hooks/useMangaFetch';
 import SliderComponentSkeleton from '../Skeletons/MangaList/SliderComponentSkeleton';
+import { useRouter } from 'next/navigation';
+import { useManga } from '../../providers/MangaContext';
 
 // Memoized thumbnail component
 const MangaThumbnail = React.memo(
@@ -48,7 +50,7 @@ const MangaThumbnail = React.memo(
 
 MangaThumbnail.displayName = 'MangaThumbnail';
 
-const SliderComponent = React.memo(({ handleMangaClicked }) => {
+const SliderComponent = React.memo(() => {
   const { data, isLoading, isError, error } = useMangaFetch('random', 1);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -61,6 +63,12 @@ const SliderComponent = React.memo(({ handleMangaClicked }) => {
   const mangas = useMemo(() => data && data.data.slice(0, 8) || [], [data])
   // Cache the current manga
   const activeManga = useMemo(() => (mangas.length > 0 ? mangas[activeIndex] : null), [mangas, activeIndex]);
+  const router = useRouter();
+  const { setSelectedManga } = useManga();
+  const handleMangaClicked = useCallback((manga) => {
+    setSelectedManga(manga);
+    router.push(`/manga/${manga.id}/chapters`);
+  }, [router, setSelectedManga]);
 
   // Clear timer on unmount
   useEffect(() => {

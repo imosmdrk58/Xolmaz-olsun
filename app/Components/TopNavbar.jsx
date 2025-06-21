@@ -2,16 +2,17 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Search, Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const TopNavbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState(false);
-
-useEffect(()=>{
-  setCurrentPath(window.location.pathname)
-},[])
+  const pathname = usePathname();
+  useEffect(() => {
+    setCurrentPath(window.location.pathname)
+  }, [])
 
   const handleSearch = useCallback(
     (e) => {
@@ -25,9 +26,9 @@ useEffect(()=>{
 
   const toggleSearch = () => setIsSearchOpen(!isSearchOpen);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
- 
+
   return (
-    <header suppressHydrationWarning className="fixed top-0 w-full z-[9999] bg-gradient-to-b from-purple-900/30 to-gray-950/60 bg-opacity-90 backdrop-blur-md flex items-center justify-between h-16 sm:h-20 px-4 sm:px-20">
+    <> {pathname !== '/' && <header suppressHydrationWarning className="fixed top-0 w-full z-[9999] bg-gradient-to-b from-purple-900/30 to-gray-950/60 bg-opacity-90 backdrop-blur-md flex items-center justify-between h-16 sm:h-20 px-4 sm:px-20">
       {/* Left Section - Logo and Navigation */}
       <div className="flex items-center">
         <a href="/" className="flex items-center mr-4">
@@ -43,9 +44,9 @@ useEffect(()=>{
 
         {/* Navigation Links - Desktop */}
         <div className="hidden lg:flex space-x-7 text-gray-400">
-          <a href="/manga-list" className={`${currentPath=="/manga-list"?"font-bold text-white":""}  hover:text-white`}>Home</a>
-          <a href="/search" className={`${currentPath=="/search"?"font-bold text-white":""} hover:text-white`}>Search</a>
-          <a href="/library" className={`${currentPath=="/library"?"font-bold text-white":""} hover:text-white`}>Library</a>
+          <a href="/manga-list" className={`${currentPath == "/manga-list" ? "font-bold text-white" : ""}  hover:text-white`}>Home</a>
+          <a href="/search" className={`${currentPath == "/search" ? "font-bold text-white" : ""} hover:text-white`}>Search</a>
+          <a href="/library" className={`${currentPath == "/library" ? "font-bold text-white" : ""} hover:text-white`}>Library</a>
         </div>
 
         {/* Hamburger Menu - Mobile */}
@@ -131,7 +132,7 @@ useEffect(()=>{
           </button>
         </div>
       </div>
-    </header>
+    </header>}</>
   );
 };
 

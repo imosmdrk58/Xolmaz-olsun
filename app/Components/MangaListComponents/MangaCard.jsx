@@ -7,14 +7,22 @@ import MangaCardSkeleton from '../Skeletons/MangaList/MangaCardSkeleton';
 import { useMangaFetch } from '../../hooks/useMangaFetch';
 import MangaCardPagination from '../../Components/MangaListComponents/MangaCardPagination';
 import StableFlag from '../StableFlag';
+import { useRouter } from 'next/navigation';
+import { useManga } from '../../providers/MangaContext';
 
-const MangaCard = React.memo(({ handleMangaClicked }) => {
+const MangaCard = React.memo(() => {
     const { data, isLoading, isError, error } = useMangaFetch('latest', 1);
     const [currentPage, setCurrentPage] = useState(1)
     const ITEMS_PER_PAGE = 12;
     const processedLatestMangas = data?.data || [];
     const totalPages = Math.ceil(processedLatestMangas.length / ITEMS_PER_PAGE);
 
+  const router = useRouter();
+  const { setSelectedManga } = useManga();
+  const handleMangaClicked = useCallback((manga) => {
+    setSelectedManga(manga);
+    router.push(`/manga/${manga.id}/chapters`);
+  }, [router, setSelectedManga]);
     const stableHandleMangaClicked = useCallback(handleMangaClicked, []);
 
     const loadMoreMangas = useCallback(() => {

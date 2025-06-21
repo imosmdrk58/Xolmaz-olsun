@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, useMemo, useState } from "react";
+import React, { Suspense, useCallback, useMemo, useState } from "react";
 import {
   Star,
   Heart,
@@ -12,11 +12,10 @@ import {
 import Image from "next/image"
 import AsideComponentSkeleton from "../Skeletons/MangaList/AsideComponentSkeleton";
 import { useMangaFetch } from "../../hooks/useMangaFetch";
+import { useRouter } from "next/navigation";
+import { useManga } from "../../providers/MangaContext";
 
-function AsideComponent({
-  handleMangaClicked = () => { },
-}) {
-
+function AsideComponent() {
   const { data: ratingData, isLoading: ratingLoading, isError: ratingError, error: ratingErrorMsg } = useMangaFetch('rating', 1);
   const { data: favouriteData, isLoading: favouriteLoading, isError: favouriteError, error: favouriteErrorMsg } = useMangaFetch('favourite', 1);
   const { data: latestArrivalsData, isLoading: latestArrivalsLoading, isError: latestArrivalsError, error: latestArrivalsErrorMsg } = useMangaFetch('latestArrivals', 1);
@@ -26,6 +25,13 @@ function AsideComponent({
   const processedLatestArrivalsMangas = useMemo(() => latestArrivalsData?.data || [], [latestArrivalsData]);
 
   const [selectedCategory, setSelectedCategory] = useState("Top");
+    const router = useRouter();
+  const { setSelectedManga } = useManga();
+  const handleMangaClicked = useCallback((manga) => {
+    setSelectedManga(manga);
+    router.push(`/manga/${manga.id}/chapters`);
+  }, [router, setSelectedManga]);
+
   const formatNumber = (num) => {
     if (num >= 1000) {
       return (num / 1000).toFixed(1).replace(".0", "") + "K";
