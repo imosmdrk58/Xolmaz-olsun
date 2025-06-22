@@ -17,12 +17,12 @@ const MangaCard = React.memo(() => {
     const processedLatestMangas = data?.data || [];
     const totalPages = Math.ceil(processedLatestMangas.length / ITEMS_PER_PAGE);
 
-  const router = useRouter();
-  const { setSelectedManga } = useManga();
-  const handleMangaClicked = useCallback((manga) => {
-    setSelectedManga(manga);
-    router.push(`/manga/${manga.id}/chapters`);
-  }, [router, setSelectedManga]);
+    const router = useRouter();
+    const { setSelectedManga } = useManga();
+    const handleMangaClicked = useCallback((manga) => {
+        setSelectedManga(manga);
+        router.push(`/manga/${manga.id}/chapters`);
+    }, [router, setSelectedManga]);
     const stableHandleMangaClicked = useCallback(handleMangaClicked, []);
 
     const loadMoreMangas = useCallback(() => {

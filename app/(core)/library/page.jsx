@@ -30,6 +30,13 @@ import {
   Eye,
   BookOpenCheck,
   BookOpenText,
+  UserPlus,
+  Pin,
+  XCircle,
+  ClockAlert,
+  CircleCheck,
+  ListFilter,
+  LibraryBig,
 } from 'lucide-react';
 import filterOptions from '../../constants/filterOptions';
 
@@ -42,7 +49,7 @@ const ReadingHistoryCard = ({ item, onClick }) => {
   );
 
   return (
-    <div className="group relative bg-gradient-to-br from-gray-950/95 to-gray-900/90 backdrop-blur-md border border-gray-900 rounded-xl overflow-hidden hover:border-gray-700 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 text-sm">
+    <div className="group relative  border border-gray-900 rounded-xl overflow-hidden hover:border-gray-700 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 text-sm">
       <div className="absolute inset-0 bg-gradient-to-r from-gray-900/30 via-gray-850/30 to-gray-900/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-md pointer-events-none" />
 
       <div className="relative flex gap-3 p-3">
@@ -178,27 +185,35 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
     themes: filterOptions.themes,
     content: filterOptions.content,
   };
+  const statusIconMap = {
+    ongoing: Clock,
+    completed: CircleCheck,
+    hiatus: ClockAlert,
+    cancelled: XCircle,
+  };
   const statusOptions = [
-    { value: 'all', label: 'All Status', icon: BookOpen },
-    { value: 'ongoing', label: 'Ongoing', icon: Clock },
-    { value: 'completed', label: 'Completed', icon: BookmarkCheck },
-    { value: 'hiatus', label: 'On Hiatus', icon: Clock5 },
+    ...filterOptions.statuses.map((status) => ({
+      value: status.id,
+      label: status.label,
+      icon: statusIconMap[status.id] || BookOpen, // Fallback icon if no match
+      color: status.color, // Preserve color for UI use
+    })),
   ];
 
   const sortOptions = [
-    { value: 'recent', label: 'Recently Read', icon: Clock },
-    { value: 'rating', label: 'Highest Rated', icon: Star },
+    { value: 'recent', label: 'Recency', icon: Clock },
+    { value: 'rating', label: 'Top Rated', icon: Star },
     { value: 'popular', label: 'Most Popular', icon: TrendingUp },
     { value: 'title', label: 'Title A-Z', icon: SortAsc },
     { value: 'progress', label: 'Progress', icon: ArrowUpDown },
   ];
 
   return (
-    <div className="bg-gradient-to-b from-gray-950 to-gray-900 backdrop-blur-md border border-gray-900 rounded-xl p-4 sticky top-6 shadow-lg max-h-[72vh] overflow-y-auto custom-scrollbar text-sm">
-      <div className="flex mb-7 gap-3 items-center justify-between">
-        <div className="flex items-center gap-3">
+    <div className=" rounded-xl p-4 max-h-[75vh] border-[1px] border-white/10  sticky top-6   text-sm">
+      <div className="flex mb-5 gap-3 items-center justify-between">
+        <div className="flex items-center gap-3 justify-between">
           <div className="bg-gray-800/50 p-3 rounded-lg">
-            <BookOpen className="w-6 h-6 text-indigo-400" />
+            <Filter className="w-6 h-6 text-indigo-400" />
           </div>
           <div>
             <h2 className="text-base font-semibold text-gray-100">Filter</h2>
@@ -214,161 +229,187 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
           Clear
         </button>
       </div>
-      <div style={{ scrollbarWidth: "none" }} className=' max-h-[200px] flex flex-col gap-3 overflow-y-auto custom-scrollbar'>
-        {/* Genres Filter */}
-        <div className=" min-h-fit">
-          <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2">
-            <Tag className="w-4 h-4" />
-            Genres
-          </h3>
-          <div className="flex min-h-fit flex-wrap gap-1 max-h-28 overflow-visible ">
+      <div className=' max-h-[75vh] px-2  custom-scrollbar overflow-y-auto'>
+        <div className=' max-h-[180px] flex flex-col gap-3 overflow-y-auto custom-scrollbar'>
+          {/* Genres Filter */}
+          <div className=" min-h-fit">
+            <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2">
+              <Tag className="w-4 h-4" />
+              Genres
+            </h3>
+            <div className="flex min-h-fit flex-wrap gap-1 max-h-28 overflow-visible ">
 
-            {options.genres.map((genre) => (
+              {options.genres.map((genre) => (
+                <li
+                  key={genre.label}
+                  onClick={() => {
+                    const newGenres = filters.genre.includes(genre.label)
+                      ? filters.genre.filter((g) => g !== genre.label)
+                      : [...filters.genre, genre.label];
+                    onFiltersChange({ ...filters, genre: newGenres });
+                  }}
+                  className={`transition-all  cursor-pointer border-solid border-[0.5px] rounded-md px-1 flex items-center gap-1 text-gray-300
+              ${filters.genre.includes(genre.label)
+                      ? ' border-purple-500/40 bg-gray-700/30'
+                      : ' border-gray-500/20 hover:bg-gray-700'
+                    }`}
+                  role="button"
+                  aria-pressed={filters.genre.includes(genre.label)}
+                >
+                  <div className="px-1 my-auto text-center">
+                    <span className="my-auto select-none text-xs relative bottom-[1px]">
+                      {genre.label}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </div>
+          </div>
+
+          {/* Formats Filter */}
+          <div className="min-h-fit">
+            <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2">
+              <Tag className="w-4 h-4" />
+              Formats
+            </h3>
+            <div className="flex min-h-fit flex-wrap gap-1 max-h-28 overflow-visible ">
+
+              {options.formats.map((format) => (
+                <li
+                  key={format.label}
+                  onClick={() => {
+                    const newGenres = filters.genre.includes(format.label)
+                      ? filters.genre.filter((g) => g !== format.label)
+                      : [...filters.genre, format.label];
+                    onFiltersChange({ ...filters, genre: newGenres });
+                  }}
+                  className={`transition-all  cursor-pointer border-solid border-[0.5px] rounded-md px-1 flex items-center gap-1 text-gray-300
+              ${filters.genre.includes(format.label)
+                      ? ' border-purple-500/40 bg-gray-700/30'
+                      : ' border-gray-500/20 hover:bg-gray-700'
+                    }`}
+                  role="button"
+                  aria-pressed={filters.genre.includes(format.label)}
+                >
+                  <div className="px-1 my-auto text-center">
+                    <span className="my-auto select-none text-xs relative bottom-[1px]">
+                      {format.label}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </div>
+          </div>
+
+          {/* Themes Filter */}
+          <div className="  min-h-fit">
+            <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2">
+              <Tag className="w-4 h-4" />
+              Themes
+            </h3>
+            <div className="flex min-h-fit flex-wrap gap-1 max-h-28 overflow-visible ">
+              {options.themes.map((theme) => (
+                <li
+                  key={theme.label}
+                  onClick={() => {
+                    const newGenres = filters.genre.includes(theme.label)
+                      ? filters.genre.filter((g) => g !== theme.label)
+                      : [...filters.genre, theme.label];
+                    onFiltersChange({ ...filters, genre: newGenres });
+                  }}
+                  className={`transition-all  cursor-pointer border-solid border-[0.5px] rounded-md px-1 flex items-center gap-1 text-gray-300
+              ${filters.genre.includes(theme.label)
+                      ? ' border-purple-500/40 bg-gray-700/30'
+                      : ' border-gray-500/20 hover:bg-gray-700'
+                    }`}
+                  role="button"
+                  aria-pressed={filters.genre.includes(theme.label)}
+                >
+                  <div className="px-1 my-auto text-center">
+                    <span className="my-auto select-none text-xs relative bottom-[1px]">
+                      {theme.label}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </div>
+          </div>
+
+          {/* Content Filter */}
+          <div className=" min-h-fit">
+            <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2">
+              <Tag className="w-4 h-4" />
+              Content
+            </h3>
+            <div className="flex min-h-fit flex-wrap gap-1 max-h-28 overflow-visible ">
+
+              {options.content.map((content) => (
+                <li
+                  key={content.label}
+                  onClick={() => {
+                    const newGenres = filters.genre.includes(content.label)
+                      ? filters.genre.filter((g) => g !== content.label)
+                      : [...filters.genre, content.label];
+                    onFiltersChange({ ...filters, genre: newGenres });
+                  }}
+                  className={`transition-all  cursor-pointer border-solid border-[0.5px] rounded-md px-1 flex items-center gap-1 text-gray-300
+              ${filters.genre.includes(content.label)
+                      ? ' border-purple-500/40 bg-gray-700/30'
+                      : ' border-gray-500/20 hover:bg-gray-700'
+                    }`}
+                  role="button"
+                  aria-pressed={filters.genre.includes(content.label)}
+                >
+                  <div className="px-1 my-auto text-center">
+                    <span className="my-auto select-none text-xs relative bottom-[1px]">
+                      {content.label}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </div>
+          </div>
+        </div>
+        {/* Status Filter */}
+        <div className="mb-4 mt-5">
+          <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2"><TrendingUp className=' w-5 h-5' />Status</h3>
+          <div className="gap-1 grid grid-cols-2 flex-row">
+            {statusOptions.map((option) => (
               <button
-                key={genre.label}
-                onClick={() => {
-                  const newGenres = filters.genre.includes(genre.label)
-                    ? filters.genre.filter((g) => g !== genre.label)
-                    : [...filters.genre, genre.label];
-                  onFiltersChange({ ...filters, genre: newGenres });
-                }}
-                className={`px-2 py-1 text-[10px] font-medium rounded-lg transition-all duration-300 ${filters.genre.includes(genre.label)
-                  ? 'bg-gray-900 text-gray-100 shadow-inner scale-105'
-                  : 'bg-gray-950 text-gray-400 hover:bg-gray-900 hover:text-gray-300'
+                key={option.value}
+                onClick={() => onFiltersChange({ ...filters, status: option.value })}
+                className={`w-full flex col-span-1 items-center gap-2 p-2 px-3 rounded-lg text-xs transition-all duration-300 ${filters.status === option.value
+                  ? 'bg-gray-900 text-gray-100 border border-gray-800 shadow-inner'
+                  : 'text-gray-400 hover:bg-gray-900 border border-gray-800 hover:text-gray-300'
                   }`}
-                aria-pressed={filters.genre.includes(genre.label)}
+                aria-pressed={filters.status === option.value}
               >
-                {genre.label}
+                <option.icon className="w-4 h-4" />
+                {option.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Formats Filter */}
-        <div className="min-h-fit">
-          <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2">
-            <Tag className="w-4 h-4" />
-            Formats
-          </h3>
-          <div className="flex min-h-fit flex-wrap gap-1 max-h-28 overflow-visible ">
-
-            {options.formats.map((format) => (
+        {/* Sort Options */}
+        <div className="mb-4">
+          <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2"><ListFilter className=' w-5 h-5' />Sort By</h3>
+          <div className="gap-1 grid grid-cols-2 flex-row">
+            {sortOptions.map((option) => (
               <button
-                key={format.label}
-                onClick={() => {
-                  const newGenres = filters.genre.includes(format.label)
-                    ? filters.genre.filter((g) => g !== format.label)
-                    : [...filters.genre, format.label];
-                  onFiltersChange({ ...filters, genre: newGenres });
-                }}
-                className={`px-2 py-1 text-[10px] font-medium rounded-lg transition-all duration-300 ${filters.genre.includes(format.label)
-                  ? 'bg-gray-900 text-gray-100 shadow-inner scale-105'
-                  : 'bg-gray-950 text-gray-400 hover:bg-gray-900 hover:text-gray-300'
+                key={option.value}
+                onClick={() => onFiltersChange({ ...filters, sort: option.value })}
+                className={`w-full flex col-span-1 items-center gap-2 p-2 px-3 rounded-lg text-xs transition-all duration-300 ${filters.sort === option.value
+                  ? 'bg-gray-900 text-gray-100 border border-gray-800 shadow-inner'
+                  : 'text-gray-400 hover:bg-gray-900 border border-gray-800 hover:text-gray-300'
                   }`}
-                aria-pressed={filters.genre.includes(format.label)}
+                aria-pressed={filters.sort === option.value}
               >
-                {format.label}
+                <option.icon className="w-4 h-4" />
+                {option.label}
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Themes Filter */}
-        <div className="  min-h-fit">
-          <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2">
-            <Tag className="w-4 h-4" />
-            Themes
-          </h3>
-          <div className="flex min-h-fit flex-wrap gap-1 max-h-28 overflow-visible ">
-            {options.themes.map((theme) => (
-              <button
-                key={theme.label}
-                onClick={() => {
-                  const newGenres = filters.genre.includes(theme.label)
-                    ? filters.genre.filter((g) => g !== theme.label)
-                    : [...filters.genre, theme.label];
-                  onFiltersChange({ ...filters, genre: newGenres });
-                }}
-                className={`px-2 py-1 text-[10px] font-medium rounded-lg transition-all duration-300 ${filters.genre.includes(theme.label)
-                  ? 'bg-gray-900 text-gray-100 shadow-inner scale-105'
-                  : 'bg-gray-950 text-gray-400 hover:bg-gray-900 hover:text-gray-300'
-                  }`}
-                aria-pressed={filters.genre.includes(theme.label)}
-              >
-                {theme.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Content Filter */}
-        <div className=" min-h-fit">
-          <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2">
-            <Tag className="w-4 h-4" />
-            Content
-          </h3>
-          <div className="flex min-h-fit flex-wrap gap-1 max-h-28 overflow-visible ">
-
-            {options.content.map((content) => (
-              <button
-                key={content.label}
-                onClick={() => {
-                  const newGenres = filters.genre.includes(content.label)
-                    ? filters.genre.filter((g) => g !== content.label)
-                    : [...filters.genre, content.label];
-                  onFiltersChange({ ...filters, genre: newGenres });
-                }}
-                className={`px-2 py-1 text-[10px] font-medium rounded-lg transition-all duration-300 ${filters.genre.includes(content.label)
-                  ? 'bg-gray-900 text-gray-100 shadow-inner scale-105'
-                  : 'bg-gray-950 text-gray-400 hover:bg-gray-900 hover:text-gray-300'
-                  }`}
-                aria-pressed={filters.genre.includes(content.label)}
-              >
-                {content.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-      {/* Status Filter */}
-      <div className="mb-4 mt-5">
-        <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2"><TrendingUp className=' w-5 h-5' />Status</h3>
-        <div className="space-y-1">
-          {statusOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => onFiltersChange({ ...filters, status: option.value })}
-              className={`w-full flex items-center gap-2 p-2 rounded-lg text-xs transition-all duration-300 ${filters.status === option.value
-                ? 'bg-gray-900 text-gray-100 border border-gray-800 shadow-inner'
-                : 'text-gray-400 hover:bg-gray-900 hover:text-gray-300'
-                }`}
-              aria-pressed={filters.status === option.value}
-            >
-              <option.icon className="w-4 h-4" />
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Sort Options */}
-      <div className="mb-4">
-        <h3 className="text-xs font-semibold text-gray-400 mb-2">Sort By</h3>
-        <div className="space-y-1">
-          {sortOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => onFiltersChange({ ...filters, sort: option.value })}
-              className={`w-full flex items-center gap-2 p-2 rounded-lg text-xs transition-all duration-300 ${filters.sort === option.value
-                ? 'bg-gray-900 text-gray-100 border border-gray-800 shadow-inner'
-                : 'text-gray-400 hover:bg-gray-900 hover:text-gray-300'
-                }`}
-              aria-pressed={filters.sort === option.value}
-            >
-              <option.icon className="w-4 h-4" />
-              {option.label}
-            </button>
-          ))}
         </div>
       </div>
     </div>
@@ -386,14 +427,13 @@ const CompactMangaCard = ({ item, onClick, type }) => {
       className={`group  backdrop-blur-sm border border-gray-900 rounded-lg ${isChapter ? "p-3 bg-gray-950/90" : "p-0"}  cursor-pointer hover:border-gray-700 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-sm`} title={manga.title}
     >
       <div className={`flex gap-3 ${isChapter ? "" : "flex-col"}`}>
-        <div className={`relative ${isChapter ? "w-12 h-18" : "w-full h-18"} rounded-lg overflow-hidden flex-shrink-0 ring-1 ring-gray-900/80`}>
+        <div className={`relative ${isChapter ? "w-16 h-16" : "w-full h-18"} rounded-full overflow-hidden flex-shrink-0 ring-1 ring-gray-900/80`}>
           <img
             src={manga.coverImageUrl || '/placeholder.jpg'}
             alt={manga.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
         </div>
         <div className="flex-1 min-w-0 space-y-1">
           {/* Emphasize chapter info for favorites */}
@@ -415,29 +455,27 @@ const CompactMangaCard = ({ item, onClick, type }) => {
             </h4>
           )}
 
-          {isChapter && <div className="flex items-center gap-2 text-xs text-gray-400">
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <span className="font-medium">
-                {manga.rating?.rating?.bayesian?.toFixed(1) || 'N/A'}
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Users className="w-4 h-4 text-blue-400" />
-              <span className="font-medium">
-                {manga.rating?.follows
-                  ? `${(manga.rating.follows / 1000).toFixed(1)}K`
-                  : '0'}
-              </span>
-            </div>
-          </div>}
+          {/* {isChapter && <div className="flex items-center gap-2 text-xs text-gray-400">
+            <div className='flex flex-row w-full gap-4 mb-0'>
+                        <div className="flex items-center gap-1 md:gap-1 mt-1 text-xs text-gray-400">
+                          <span
+                            className="flex items-center justify-center w-5 h-5 rounded-full  text-indigo-400"
+                          >
+                            <Star className="w-4 h-4" />
+                          </span>
+                          <span className="font-medium text-gray-300">{manga?.rating?.rating?.bayesian.toFixed(2)}</span>
+                        </div>
+                        <div className="flex items-center gap-1 md:gap-1 mt-1 text-xs text-gray-400">
+                          <span
+                            className="flex items-center justify-center w-5 h-5 rounded-full  text-indigo-400"
+                          >
+                            <UserPlus className="w-4 h-4" />
+                          </span>
+                          <span className="font-medium text-gray-300">{manga?.rating?.follows}</span>
+                        </div>
+                      </div>
+          </div>} */}
 
-          {type === 'bookmark' && item.bookmarkedAt && (
-            <div className="text-white bg-gray-950/90 rounded-lg p-2 flex-row justify-center text-xs flex items-center gap-1 select-none">
-              <Calendar className="w-4 h-4" />
-              <span>{new Date(item.bookmarkedAt).toLocaleDateString()}</span>
-            </div>
-          )}
         </div>
       </div>
     </div>
@@ -447,26 +485,30 @@ const CompactMangaCard = ({ item, onClick, type }) => {
 // Right Sidebar with grid layouts for bookmarks and favorites (darker)
 const RightSidebar = ({
   favorites,
-  searchHistory,
   onMangaClick,
-  onSearchClick,
 }) => {
   return (
-    <div className="space-y-5 h-[79vh] overflow-scroll custom-scrollbar">
+    <div className="space-y-5 ">
 
       {/* Favorites Section */}
-      <div className="bg-gradient-to-b from-gray-950 to-gray-900 backdrop-blur-md border border-gray-900 rounded-xl p-4 flex-1 flex flex-col shadow-lg">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="p-1 bg-gray-900 rounded-md">
-            <Heart className="w-4 h-4 text-gray-400" />
+      <div className=" flex-1 mt-2 flex flex-col shadow-lg">
+        <div className="flex mb-5 gap-3 items-center justify-between">
+          <div className="flex items-center gap-3 justify-between">
+            <div className="bg-gray-800/50 p-3 rounded-lg">
+              <BookOpenCheck className="w-6 h-6 text-indigo-400" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-gray-100">Favorites</h2>
+              <p className="text-[9px] text-gray-400 uppercase tracking-wide">Your favorites chapters</p>
+            </div>
           </div>
-          <h2 className="text-base font-semibold text-gray-100">Favorites</h2>
-          <span className="ml-auto bg-gray-900/70 text-gray-400 text-xs font-semibold px-2 py-0.5 rounded-full border border-gray-800 select-none">
-            {favorites.length}
-          </span>
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 bg-gray-900/80 p-1 px-3 rounded-full border border-gray-800">
+            <div>{favorites.length}</div>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar space-y-2">
+        <div className="flex-1 max-h-[25vh] overflow-scroll custom-scrollbar space-y-2">
           {favorites.length > 0 ? (
             favorites.map((item, idx) => (
               <CompactMangaCard
@@ -487,53 +529,13 @@ const RightSidebar = ({
           )}
         </div>
       </div>
-
-      {/* Search History Section */}
-      <div className="bg-gradient-to-b from-gray-950 to-gray-900 backdrop-blur-md border border-gray-900 rounded-xl p-4 flex-1 flex flex-col shadow-lg">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="p-1 bg-gray-900 rounded-md">
-            <Search className="w-4 h-4 text-gray-400" />
-          </div>
-          <h2 className="text-base font-semibold text-gray-100">Recent Searches</h2>
-          <span className="ml-auto bg-gray-900/70 text-gray-400 text-xs font-semibold px-2 py-0.5 rounded-full border border-gray-800 select-none">
-            {searchHistory.length}
-          </span>
-        </div>
-
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
-          {searchHistory.length > 0 ? (
-            <div className="space-y-1">
-              {searchHistory.slice(0, 10).map((query, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => onSearchClick(query)}
-                  className="w-full flex items-center gap-2 p-2 bg-gray-950 hover:bg-gray-900 border border-gray-900 rounded-lg text-left transition-colors duration-200 text-xs text-gray-400 hover:text-gray-300"
-                >
-                  <Search className="w-4 h-4" />
-                  <span className="truncate flex-1">{query}</span>
-                  <Clock className="w-4 h-4 text-gray-600" />
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center py-6 text-gray-400 text-xs">
-              <div className="p-3 bg-gray-900 rounded-full mb-3">
-                <Search className="w-6 h-6" />
-              </div>
-              <p>No search history</p>
-              <p className="mt-1 text-gray-600 text-xs">Your searches will appear here</p>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 };
 
 const Library = () => {
   const router = useRouter();
-  const { getSelectedManga, getAllFavorites, getAllBookMarks, getAllFromReadHistory } =
-    useManga();
+  const { getSelectedManga, getAllFavorites, getAllBookMarks, getAllFromReadHistory } = useManga();
 
   const [searchHistory, setSearchHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -640,7 +642,7 @@ const Library = () => {
 
 
   return (
-    <div className="min-h-[89vh] bg-gradient-to-br from-gray-950 to-gray-900">
+    <div className="min-h-[89vh]">
       {/* Custom Scrollbar Styles */}
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
@@ -651,7 +653,7 @@ const Library = () => {
           border-radius: 3px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, #303030, #808080);
+          background: linear-gradient(to bottom, #30303023, #80808023);
           border-radius: 3px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -660,113 +662,238 @@ const Library = () => {
       `}</style>
 
       {/* Header */}
-      <div className="flex mb-7 px-10 pt-7 items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="bg-white/10 p-3 rounded-lg">< BookOpenCheck className={`w-6 h-6 text-cyan-300 drop-shadow-md`} /></div>
-          <div className='leading-5 sm:leading-normal mt-1 sm:mt-0'>
-            <h2 className="text-[18px] md:text-lg font-semibold text-white">Library</h2>
-            <p className="text-[11px] md:text-xs text-gray-400 uppercase tracking-wide">See your Reading History , Favourite Chapters , Bookmarked Mangas and  more</p>
+      <div className="w-full border-b  border-purple-500/20">
+        <div className="flex items-center justify-between px-7 py-4 relative overflow-hidden">
+
+          {/* Left section - Icon and title */}
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="relative group">
+              <div className="absolute inset-0 rounded-xl  transition-all duration-300"></div>
+              <div className="relative bg-gradient-to-br from-slate-800 to-gray-900 p-3 rounded-xl border border-purple-400/30 shadow-xl">
+                <LibraryBig className="w-8 h-8 text-purple-400 drop-shadow-lg" />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-white via-cyan-100 to-white bg-clip-text text-transparent tracking-tight">
+                Library
+              </h2>
+              <p className="text-xs text-gray-400 font-medium tracking-wide max-w-md">
+                Reading History • Favourites • Bookmarks & More
+              </p>
+            </div>
           </div>
-        </div>
-        <div className=' flex flex-row gap-4'>
-        <button className="flex items-center justify-center min-w-36 gap-1.5 px-3 py-2 rounded-full text-gray-300 text-sm hover:text-white bg-indigo-500/10 transition-all duration-200 border border-gray-800/50 custom-hover">
-          <BookOpenText className="w-5 h-5" />
-         History  ({readHistory.length})
-        </button>
-            <button className="flex items-center justify-center min-w-36 gap-1.5 px-3 py-3.5 rounded-full text-gray-300 text-sm hover:text-white bg-rose-500/10 transition-all duration-200 border border-gray-700/50">
-          <Heart className="w-5 h-5" />
-          Favourite  ({favorites.length})
-        </button>
-            <button className="flex items-center justify-center min-w-36 gap-1.5 px-3 py-3.5 rounded-full text-gray-300 text-sm hover:text-white bg-green-500/10 transition-all duration-200 border border-gray-700/50">
-          <Bookmark className="w-5 h-5" />
-          Bookmarks ({bookmarks.length}) 
-        </button>
+
+          {/* Right section - Action buttons */}
+          <div className="flex items-center gap-3 relative z-10">
+            <button className="group relative overflow-hidden flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-indigo-600/20 to-indigo-500/10 border border-indigo-400/30 text-indigo-300 text-sm font-medium hover:from-indigo-500/30 hover:to-indigo-400/20 hover:text-indigo-200 hover:border-indigo-300/50 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/25">
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/0 via-indigo-400/10 to-indigo-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <BookOpenText className="w-4 h-4 relative z-10" />
+              <span className="relative z-10">History ({readHistory.length})</span>
+            </button>
+
+            <button className="group relative overflow-hidden flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-rose-600/20 to-rose-500/10 border border-rose-400/30 text-rose-300 text-sm font-medium hover:from-rose-500/30 hover:to-rose-400/20 hover:text-rose-200 hover:border-rose-300/50 transition-all duration-300 hover:shadow-lg hover:shadow-rose-500/25">
+              <div className="absolute inset-0 bg-gradient-to-r from-rose-400/0 via-rose-400/10 to-rose-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <Heart className="w-4 h-4 relative z-10" />
+              <span className="relative z-10">Favourite ({favorites.length})</span>
+            </button>
+
+            <button className="group relative overflow-hidden flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-emerald-600/20 to-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-sm font-medium hover:from-emerald-500/30 hover:to-emerald-400/20 hover:text-emerald-200 hover:border-emerald-300/50 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/25">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/0 via-emerald-400/10 to-emerald-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <Bookmark className="w-4 h-4 relative z-10" />
+              <span className="relative z-10">Bookmarks ({bookmarks.length})</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-full px-6 pt-6">
-        <div className="grid grid-cols-12 gap-6" style={{ height: '72vh' }}>
+      <div className="max-w-full px-6 pt-1">
+        <div className="flex flex-row w-full gap-1" style={{ height: '75vh' }}>
           {/* Left Sidebar - Filters */}
-          <div className="col-span-12 overflow-y-auto lg:col-span-3">
+          <div className="col-span-12 overflow-y-hidden  bg-black/30 backdrop-blur-xl  rounded-lg pb-4 max-w-80">
             <FilterPanel filters={filters} onFiltersChange={setFilters} />
           </div>
 
           {/* Main Content Area - Reading History (2 per row) */}
-          <div className="col-span-12 lg:col-span-6 flex flex-col bg-gradient-to-b from-gray-950 to-gray-900 backdrop-blur-md border border-gray-900 rounded-xl p-4 shadow-lg overflow-hidden">
-            <div className="flex items-center justify-between mb-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="p-1 bg-gray-900 rounded-md">
-                  <History className="w-4 h-4 text-gray-400" />
+          <div className="col-span-12 lg:col-span-7 flex flex-col border border-gray-900 bg-black/30 rounded-xl p-4 shadow-lg overflow-hidden">
+            <div className='flex flex-col mb-4 rounded-xl overflow-y-auto custom-sidebar'>
+              <div className="flex mb-5 gap-3 items-center justify-between">
+                <div className="flex items-center gap-3 justify-between">
+                  <div className="bg-gray-800/50 p-3 rounded-lg">
+                    <BookOpenCheck className="w-6 h-6 text-indigo-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-100">Reading History</h2>
+                    <p className="text-[9px] text-gray-400 uppercase tracking-wide">Continue where you left off</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-base font-semibold text-gray-100">
-                    Reading History
-                  </h2>
-                  <p className="text-gray-400 text-xs">Continue where you left off</p>
+                {/* View Toggle */}
+                <div className="flex items-center gap-1 bg-gray-900/80 p-1 px-3 rounded-full border border-gray-800">
+                  <div>{readHistory.length}</div>
                 </div>
               </div>
 
-              {/* View Toggle */}
-              <div className="flex items-center gap-1 bg-gray-900/80 p-1 rounded-lg border border-gray-800">
-                <button
-                  className="p-1 bg-gray-900 text-gray-400 rounded-md border border-gray-800 cursor-default"
-                  aria-label="List View"
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-1 text-gray-600 hover:text-gray-300 hover:bg-gray-800 rounded-md transition-all"
-                  aria-label="Grid View"
-                >
-                  <Grid3x3 className="w-4 h-4" />
-                </button>
+
+              {/* Reading History List (grid 2 columns) */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar">
+                {filteredHistory.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {filteredHistory.map((item, idx) => (
+                      <ReadingHistoryCard
+                        key={`${item.manga.id}-${idx}`}
+                        item={item}
+                        onClick={handleMangaClick}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center py-8 text-xs text-gray-400">
+                    <div className="p-4 bg-gray-900 rounded-full mb-4">
+                      <History className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-100 mb-2">
+                      No Reading History
+                    </h3>
+                    <p className="mb-4 max-w-xs">
+                      {readHistory.length === 0
+                        ? 'Start reading some manga to see your progress here!'
+                        : 'No manga match your current filters. Try adjusting your search criteria.'}
+                    </p>
+                    <button
+                      onClick={() => router.push('/search')}
+                      className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-gray-300 font-semibold rounded-lg shadow-md transition-all"
+                    >
+                      <Search className="w-4 h-4 inline mr-1" />
+                      Discover Manga
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
-
-            {/* Reading History List (grid 2 columns) */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
-              {filteredHistory.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {filteredHistory.map((item, idx) => (
-                    <ReadingHistoryCard
-                      key={`${item.manga.id}-${idx}`}
-                      item={item}
-                      onClick={handleMangaClick}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full text-center py-8 text-xs text-gray-400">
-                  <div className="p-4 bg-gray-900 rounded-full mb-4">
-                    <History className="w-8 h-8" />
+            <div className=' grid grid-cols-2 border gap-2 border-white/5 px-4 rounded-xl'>
+              {/* Search History Section */}
+              <div className=" h-fit  rounded-xl   flex-1 flex flex-col shadow-lg">
+                <div className="flex mb-5 gap-3 mt-4 items-center justify-between">
+                  <div className="flex items-center gap-3 justify-between">
+                    <div className="bg-gray-800/50 p-3 rounded-lg">
+                      <Search className="w-6 h-6 text-indigo-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-semibold text-gray-100">Search History</h2>
+                      <p className="text-[9px] text-gray-400 uppercase tracking-wide">Your Search History</p>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-100 mb-2">
-                    No Reading History
-                  </h3>
-                  <p className="mb-4 max-w-xs">
-                    {readHistory.length === 0
-                      ? 'Start reading some manga to see your progress here!'
-                      : 'No manga match your current filters. Try adjusting your search criteria.'}
-                  </p>
-                  <button
-                    onClick={() => router.push('/search')}
-                    className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-gray-300 font-semibold rounded-lg shadow-md transition-all"
-                  >
-                    <Search className="w-4 h-4 inline mr-1" />
-                    Discover Manga
-                  </button>
+                  {/* View Toggle */}
+                  <div className="flex items-center gap-1 bg-gray-900/80 p-1 px-3 rounded-full border border-gray-800">
+                    <div>{searchHistory.length}</div>
+                  </div>
                 </div>
-              )}
+
+                <div className="flex-1">
+                  {searchHistory.length > 0 ? (
+                    <div className="flex min-h-fit flex-wrap gap-1 max-h-44 overflow-y-scroll  custom-scrollbar ">
+                      {searchHistory.slice(0, 10).map((query, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => onSearchClick(query)}
+                          className="w-fit flex items-center gap-2 p-2 px-3 bg-gray-950 hover:bg-gray-900 border border-gray-900 rounded-lg text-left transition-colors duration-200 text-xs text-gray-400 hover:text-gray-300"
+                        >
+                          <Search className="w-3 h-3" />
+                          <span className="truncate flex-1">{query}</span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-center py-6 text-gray-400 text-xs">
+                      <div className="p-3 bg-gray-900 rounded-full mb-3">
+                        <Search className="w-6 h-6" />
+                      </div>
+                      <p>No search history</p>
+                      <p className="mt-1 text-gray-600 text-xs">Your searches will appear here</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              {/* curently reading/selected */}
+              {selectedManga &&
+                <div
+                  className="w-full mb-10 md:mb-0 border-l-[1px] border-white/5  p-4 py-0 shadow-xl"
+                >
+                  <div className="flex items-center mt-4 gap-3 mb-5">
+                    <div className="bg-gray-800/50 p-3 rounded-lg">
+                      <Pin className="w-6 h-6 text-indigo-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-semibold text-gray-100">Currently Selected</h2>
+                      <p className="text-[9px] text-gray-400 uppercase tracking-wide">Your Last visited Manga</p>
+                    </div>
+                  </div>
+                  <div
+                    tabIndex={0}
+                    className="group  flex items-center md:gap-1 cursor-pointer rounded-lg   transition-colors duration-250 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 "
+                  >
+
+                    {/* Cover */}
+                    <div className="flex-shrink-0 mb-6  w-10 h-12 md:w-12 md:h-12 rounded-full overflow-hidden shadow-md">
+                      <Image
+                        width={48}
+                        height={64}
+                        src={selectedManga.coverImageUrl || '/placeholder.jpg'}
+                        alt={`Cover for ${selectedManga.title || 'unknown manga'}`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[102%]"
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => (e.target.src = '/placeholder.jpg')}
+                      />
+                    </div>
+
+                    {/* Title & Stats */}
+                    <div className="flex flex-col ml-1 md:ml-3 flex-1 min-w-0">
+                      <h3
+                        className="text-gray-100 text-xs md:text-base font-semibold truncate"
+                        title={selectedManga.title}
+                      >
+                        {selectedManga.title || 'Untitled Manga'}
+                      </h3>
+                      <div className='flex flex-row w-full gap-4 mb-6'>
+                        <div className="flex items-center gap-1 md:gap-1 mt-1 text-xs text-gray-400">
+                          <span
+                            className="flex items-center justify-center w-5 h-5 rounded-full  text-indigo-400"
+                          >
+                            <Star className="w-4 h-4" />
+                          </span>
+                          <span className="font-medium text-gray-300">{selectedManga?.rating?.rating?.bayesian.toFixed(2)}</span>
+                        </div>
+                        <div className="flex items-center gap-1 md:gap-1 mt-1 text-xs text-gray-400">
+                          <span
+                            className="flex items-center justify-center w-5 h-5 rounded-full  text-indigo-400"
+                          >
+                            <UserPlus className="w-4 h-4" />
+                          </span>
+                          <span className="font-medium text-gray-300">{selectedManga?.rating?.follows}</span>
+                        </div>
+                      </div>
+                      {/* <div className=' flex gap-1 w-full line-clamp-1'>
+                      {selectedManga.flatTags.slice(0, 4).map((tag) => (
+                        <div key={tag} className="flex px-2 py-1 min-w-fit items-center w-fit gap-1 md:gap-1 text-[10px] rounded-lg bg-gray-600/20 text-gray-400">
+                          <span className="font-medium text-gray-300">{tag}</span>
+                        </div>
+                      ))}
+                    </div> */}
+                    </div>
+                  </div>
+                </div>}
             </div>
           </div>
 
           {/* Right Sidebar - Bookmarks (3 per row), Favorites, Search History */}
-          <div className="col-span-12 lg:col-span-3 flex flex-col gap-4 overflow-hidden">
+          <div className="col-span-12 lg:col-span-3 bg-black/30 backdrop-blur-xl flex flex-col gap-4 overflow-hidden rounded-xl p-4 border-[1px] border-white/10">
 
+            {/* BookMarks section  */}
             <section
               aria-label="Manga list"
-              className="w-full mb-10 md:mb-0 bg-black/50 backdrop-blur-xl rounded-xl p-4 shadow-xl"
+              className="w-full mb-10 md:mb-0  rounded-xl  shadow-xl"
             >
               <div className="flex mb-7 items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -777,8 +904,8 @@ const Library = () => {
                     <h2 className="text-base font-semibold text-gray-100">BookMarked Mangas</h2>
                     <p className="text-[9px] text-gray-400 uppercase tracking-wide">Book marked manga collections</p>
                   </div>
-
-                </div>                  <div className=' bg-white/10 rounded-full p-1 px-3'>{bookmarks.length}</div>
+                </div>
+                <div className=' bg-white/10 rounded-full p-1 px-3'>{bookmarks.length}</div>
               </div>
 
               {/* Manga List */}

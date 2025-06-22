@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import Link from "next/link";
 import Image from "next/image";
@@ -72,9 +70,6 @@ const Home = () => {
 
   // Fetch TopManga list on mount
   useEffect(() => {
-    const controller = new AbortController(); // Create AbortController
-    const signal = controller.signal;
-
     const fetchTopMangaList = async () => {
       try {
         const cached = getFromStorage("topMangaList");
@@ -84,9 +79,7 @@ const Home = () => {
         }
 
         const listResponse = await fetch(
-          "https://api.mangadex.org/user/0dd9b63a-f561-4632-b739-84397cb60ca7/list?limit=10",
-          { signal } // Pass the signal to the fetch call
-        );
+          "https://api.mangadex.org/user/0dd9b63a-f561-4632-b739-84397cb60ca7/list?limit=10");
         if (!listResponse.ok) throw new Error(`Failed to fetch lists: ${listResponse.status}`);
 
         const listData = await listResponse.json();
@@ -106,7 +99,7 @@ const Home = () => {
         if (mangaIds.length === 0) throw new Error("No manga IDs found");
 
         // Use your new API endpoint
-        const mangaResponse = await fetch(`/api/manga/${mangaIds.join(',')}`, { signal }); // Pass the signal
+        const mangaResponse = await fetch(`/api/manga/${mangaIds.join(',')}`); // Pass the signal
         if (!mangaResponse.ok) {
           throw new Error(`Failed to fetch manga details: ${mangaResponse.status}`);
         }
@@ -135,13 +128,7 @@ const Home = () => {
         saveToStorage("topMangaList", TopFavouriteMangas);
       }
     };
-
     fetchTopMangaList();
-
-    // Cleanup: Abort fetch on unmount
-    return () => {
-      controller.abort();
-    };
   }, []);
 
   const handleSearch = useCallback(
