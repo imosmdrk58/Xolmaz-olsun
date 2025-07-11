@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
 export async function GET(req: NextRequest, context: { params: { mangaId: string } }) {
@@ -120,4 +119,4 @@ export async function GET(req: NextRequest, context: { params: { mangaId: string
       { status }
     );
   }
-        }
+}
