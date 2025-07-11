@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import axios from 'axios';
 
-export async function GET(req: Request, { params }: { params: { mangaId: string } }) {
-  const { mangaId } = await params;
+export async function GET(req: NextRequest, context: { params: { mangaId: string } }) {
+  const { mangaId } = context.params;
   const baseUrl = 'https://api.mangadex.org';
 
-  // Handle comma-separated IDs
   const mangaIds = mangaId.split(',').filter(id => id.trim());
 
   if (mangaIds.length === 0) {
@@ -16,12 +16,11 @@ export async function GET(req: Request, { params }: { params: { mangaId: string 
   }
 
   try {
-    // Fetch manga data in bulk
     const [mangaResponse, statsResponse] = await Promise.all([
       axios.get(`${baseUrl}/manga`, {
         params: {
           includes: ['cover_art', 'author', 'artist', 'creator'],
-          ids: mangaIds.slice(0, 100) // Mangadex has a limit of 100 IDs per request
+          ids: mangaIds.slice(0, 100)
         },
       }),
       axios.get(`${baseUrl}/statistics/manga`, {
@@ -48,8 +47,7 @@ export async function GET(req: Request, { params }: { params: { mangaId: string 
       );
     }
 
-    // Process each manga item
-    const processedManga = mangaList.map((manga: { type?: any; id?: any; attributes?: any; relationships?: any; }) => {
+    const processedManga = mangaList.map((manga: any) => {
       const { id, attributes, relationships } = manga;
       const {
         title,
@@ -67,18 +65,15 @@ export async function GET(req: Request, { params }: { params: { mangaId: string 
         originalLanguage,
       } = attributes;
 
-      // Process relationships
-      const groupedRelationships = relationships.reduce((acc: Record<string, any[]>, rel: { type: string | number; }) => {
+      const groupedRelationships = relationships.reduce((acc: Record<string, any[]>, rel: any) => {
         (acc[rel.type] = acc[rel.type] || []).push(rel);
         return acc;
       }, {});
 
-      // Process cover art
       const coverArt = groupedRelationships.cover_art?.[0]?.attributes?.fileName;
       const coverImageUrl = coverArt ? `https://mangadex.org/covers/${id}/${coverArt}.256.jpg` : '';
 
-      // Process tags
-      const { groupedTags, flatTags } = tags.reduce((acc: { groupedTags: { [x: string]: any[]; }; flatTags: any[]; }, tag: { attributes: { group: string; name: { en: string; }; }; }) => {
+      const { groupedTags, flatTags } = tags.reduce((acc: any, tag: any) => {
         const group = tag.attributes?.group || 'Unknown Group';
         const tagName = tag.attributes?.name?.en || 'Unknown Tag';
         acc.groupedTags[group] = acc.groupedTags[group] || [];
@@ -86,7 +81,7 @@ export async function GET(req: Request, { params }: { params: { mangaId: string 
         acc.flatTags.push(tagName);
         return acc;
       }, { groupedTags: {} as Record<string, string[]>, flatTags: [] as string[] });
-      
+
       return {
         id,
         title: title?.en || Object.values(altTitles[0] || {})[0] || 'Untitled',
@@ -125,4 +120,4 @@ export async function GET(req: Request, { params }: { params: { mangaId: string 
       { status }
     );
   }
-}
+        }
