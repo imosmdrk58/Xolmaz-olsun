@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
-export async function GET(req: NextRequest, context: { params: { mangaId: string } }) {
-  const { mangaId } = context.params;
+export async function GET(req: NextRequest, { params }: any) {
+  const mangaId = params.mangaId;
   const baseUrl = 'https://api.mangadex.org';
 
-  const mangaIds = mangaId.split(',').filter(id => id.trim());
+  const mangaIds = mangaId.split(',').filter((id: string) => id.trim());
 
   if (mangaIds.length === 0) {
     return NextResponse.json(
@@ -19,13 +19,13 @@ export async function GET(req: NextRequest, context: { params: { mangaId: string
       axios.get(`${baseUrl}/manga`, {
         params: {
           includes: ['cover_art', 'author', 'artist', 'creator'],
-          ids: mangaIds.slice(0, 100)
+          ids: mangaIds.slice(0, 100),
         },
       }),
       axios.get(`${baseUrl}/statistics/manga`, {
         params: {
-          'manga[]': mangaIds.slice(0, 100)
-        }
+          'manga[]': mangaIds.slice(0, 100),
+        },
       }),
     ]);
 
@@ -64,22 +64,30 @@ export async function GET(req: NextRequest, context: { params: { mangaId: string
         originalLanguage,
       } = attributes;
 
-      const groupedRelationships = relationships.reduce((acc: Record<string, any[]>, rel: any) => {
-        (acc[rel.type] = acc[rel.type] || []).push(rel);
-        return acc;
-      }, {});
+      const groupedRelationships = relationships.reduce(
+        (acc: Record<string, any[]>, rel: any) => {
+          (acc[rel.type] = acc[rel.type] || []).push(rel);
+          return acc;
+        },
+        {}
+      );
 
       const coverArt = groupedRelationships.cover_art?.[0]?.attributes?.fileName;
-      const coverImageUrl = coverArt ? `https://mangadex.org/covers/${id}/${coverArt}.256.jpg` : '';
+      const coverImageUrl = coverArt
+        ? `https://mangadex.org/covers/${id}/${coverArt}.256.jpg`
+        : '';
 
-      const { groupedTags, flatTags } = tags.reduce((acc: any, tag: any) => {
-        const group = tag.attributes?.group || 'Unknown Group';
-        const tagName = tag.attributes?.name?.en || 'Unknown Tag';
-        acc.groupedTags[group] = acc.groupedTags[group] || [];
-        acc.groupedTags[group].push(tagName);
-        acc.flatTags.push(tagName);
-        return acc;
-      }, { groupedTags: {} as Record<string, string[]>, flatTags: [] as string[] });
+      const { groupedTags, flatTags } = tags.reduce(
+        (acc: any, tag: any) => {
+          const group = tag.attributes?.group || 'Unknown Group';
+          const tagName = tag.attributes?.name?.en || 'Unknown Tag';
+          acc.groupedTags[group] = acc.groupedTags[group] || [];
+          acc.groupedTags[group].push(tagName);
+          acc.flatTags.push(tagName);
+          return acc;
+        },
+        { groupedTags: {} as Record<string, string[]>, flatTags: [] as string[] }
+      );
 
       return {
         id,
@@ -103,7 +111,7 @@ export async function GET(req: NextRequest, context: { params: { mangaId: string
         originalLanguage,
         type: manga.type,
         links,
-        rating: stats[id] || {}
+        rating: stats[id] || {},
       };
     });
 
